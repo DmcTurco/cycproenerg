@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('solicitudes_tecnico', function (Blueprint $table) {
+        Schema::create('solicitante_tecnico', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tecnico_id');
-            $table->unsignedBigInteger('solicitud_id')->nullable();
-            $table->unsignedBigInteger('numero_solicitud');
-            $table->unsignedBigInteger('numero_documento');
-            $table->text('tipo_cliente');
+            $table->unsignedBigInteger('solicitante_id');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('solicitudes_tecnico');
+        Schema::dropIfExists('solicitante_tecnico');
     }
 };

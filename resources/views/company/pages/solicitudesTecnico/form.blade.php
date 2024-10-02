@@ -36,19 +36,14 @@
                             <div class="invalid-feedback" id="numero_solicitudError"></div>
                         </div>
                         <div class="col-md-6">
-                            <label for="numero_documento">Número de documento:</label>
+                            <label for="numero_documento">Nombre del cliente:</label>
                             <input type="text" class="new-form-control" id="numero_documento" name="numero_documento" value="" style="text-align: right">
                             <div class="invalid-feedback" id="numero_documentoError"></div>
                         </div>
                         <div class="col-md-3">
-                            <label for="tipo_cliente">Tipo de cliente:</label>
-                            <select class="new-form-control" name="tipo_cliente" id="tipo_cliente">
-                                <option value="" ></option>
-                                @foreach ($tipoClientes as $tipo)
-                                    <option value="{{ $tipo }}">{{ $tipo }}</option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback" id="tipo_clienteError"></div>
+                            <label for="numero_solicitud">Número de identificación:</label>
+                            <input  type="number" class="new-form-control" id="numero_solicitud" name="numero_solicitud" value="" min="0" step="1" style="text-align: right"></input>
+                            <div class="invalid-feedback" id="numero_solicitudError"></div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-center mt-2">

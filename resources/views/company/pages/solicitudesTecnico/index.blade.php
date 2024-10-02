@@ -6,7 +6,7 @@
     <div class="container-fluid py-4">
         <div class="row mb-4">
             <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
-                
+
                 <div class="card">
                     <div class="card-header pb-0">
                         <a class="btn btn-info OpenModal py-2 px-3" data-toggle="modal" data-target="myModal">Registrar</a>
@@ -32,10 +32,6 @@
                                             Tipo de cliente</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Vincular
-                                        </th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Acciones
                                         </th>
                                     </tr>
@@ -54,11 +50,6 @@
                                                     <span class="text-xs font-weight-bold">{{ $solicitud->tipo_cliente }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">
-                                                        <i class="fas fa-link"></i>
-                                                    </span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
                                                     <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
                                                         data-target="#myModal" data-head-id="{{ $solicitud->id }}">
                                                         <i class="fa fa-edit fa-lg text-info"></i>
@@ -70,7 +61,7 @@
                                             </tr>
                                         @endforeach
                                     @else
-                                    
+
                                         <tr>
                                             <td class="align-middle text-center text-sm" colspan="5">No existen solicitudes registradas
                                         </tr>
@@ -92,11 +83,11 @@
             </a>
         </div>
 
-        <form id="form-delete" action="{{ route('company.technicals.requests.destroy', ['technical' => $tecnico->id , 'request' => ':request']) }}" method="POST" class="d-inline"
+        {{-- <form id="form-delete" action="{{ route('company.technicals.requests.destroy', ['technical' => $tecnico->id , 'request' => ':request']) }}" method="POST" class="d-inline"
             style="cursor:pointer">
             @csrf
             @method('DELETE')
-        </form>
+        </form> --}}
 
         @include('company.pages.solicitudesTecnico.form')
 

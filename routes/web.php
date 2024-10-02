@@ -38,7 +38,7 @@ Route::prefix(MyApp::COMPANIES_SUBDIR)->middleware('auth:company')->name('compan
     Route::get('/home', [Company\CompanyController::class, 'index'])->name('home');
     Route::resource('client', Company\ClientController::class);
     Route::resource('technicals', Company\TecnicoController::class);
-    Route::resource('technicals.requests', Company\SolicitudTecnicoController::class);
+    Route::resource('technicals.requests', Company\SolicitanteTecnicoController::class);
     Route::post('/change', [Company\ClientController::class, 'change'])->name('change');
     // Route::get('/home', [Company\HomeController::class, 'index'])->name('home');
 });

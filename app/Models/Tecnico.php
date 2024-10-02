@@ -21,7 +21,7 @@ class Tecnico extends Model
     ];
 
     public function solicitudes() {
-        return $this->Hasmany(SolicitudTecnico::class);
+        return $this->Hasmany(SolicitanteTecnico::class);
     }
 
     public function numeroSolicitudes() {
