@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('company_id');
             $table->text('nombre');
-            $table->text('dni')->unique();
+            $table->text('tipo_documento');
+            $table->unsignedInteger('numero_documento_identificacion')->unique();
             $table->text('cargo');
             $table->timestamps();
             $table->softDeletes();

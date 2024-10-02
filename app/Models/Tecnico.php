@@ -15,7 +15,8 @@ class Tecnico extends Model
     protected $fillable = [
         'company_id',
         'nombre',
-        'dni',
+        'tipo_documento',
+        'numero_documento_identificacion',
         'cargo',
     ];
 

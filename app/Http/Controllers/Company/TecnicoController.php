@@ -12,20 +12,22 @@ class TecnicoController extends Controller
 {
 
     public function index() {
-        
+
         $tecnicos = Tecnico::where('company_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
         $cargos = ['Supervisor', 'empleado'];
-        return view('company.pages.tecnicos.index', compact('tecnicos', 'cargos') );
+        $tipoDocumentos = ['DNI', 'CE'];
+        return view('company.pages.tecnicos.index', compact('tecnicos', 'cargos', 'tipoDocumentos') );
     }
-    
+
     public function store(Request $request)
     {
 
         $tecnicoId = $request->tecnicoId;
 
         $validator = Validator::make($request->all(), [
-            'nombre' => 'required|max:255', 
-            'dni' => 'required',
+            'nombre' => 'required|max:255',
+            'tipo_documento' => 'required',
+            'numero_documento_identificacion' => 'required|integer|min:0|max:999999999|unique:tecnicos',
             'cargo' => 'required|string',
         ]);
 
@@ -35,12 +37,13 @@ class TecnicoController extends Controller
 
 
         if (!empty($tecnicoId)) {
-            
+
             $tecnico = Tecnico::find($tecnicoId);
 
             $tecnico->update([
                 'nombre' => $request->nombre,
-                'dni' => $request->dni,
+                'tipo_documento' => $request->tipo_documento,
+                'numero_documento_identificacion' => $request->numero_documento_identificacion,
                 'cargo' => $request->cargo,
             ]);
             session()->flash('message', __('Actualización éxitosa') );
@@ -51,7 +54,8 @@ class TecnicoController extends Controller
             $tecnico = Tecnico::create([
                 'company_id' => Auth::user()->id,
                 'nombre' => $request->nombre,
-                'dni' => $request->dni,
+                'tipo_documento' => $request->tipo_documento,
+                'numero_documento_identificacion' => $request->numero_documento_identificacion,
                 'cargo' => $request->cargo,
             ]);
 

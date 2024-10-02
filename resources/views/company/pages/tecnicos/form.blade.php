@@ -30,17 +30,12 @@
                     @csrf
                     <input id="tecnicoId" type="hidden" value="" name="tecnicoId">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-7">
                             <label for="nombre">Nombre:</label>
                             <input type="text" class="new-form-control" id="nombre" name="nombre" value="">
                             <div class="invalid-feedback" id="nombreError"></div>
                         </div>
-                        <div class="col-md-3">
-                            <label for="dni">DNI:</label>
-                            <input  type="text" class="new-form-control" id="dni" name="dni"></input>
-                            <div class="invalid-feedback" id="dniError"></div>
-                        </div>
-                        <div class="col-md-3">
+                        <div class="col-md-5">
                             <label for="cargo">Rango:</label>
                             <select class="new-form-control" name="cargo" id="cargo">
                                 <option value="" ></option>
@@ -49,6 +44,24 @@
                                 @endforeach
                             </select>
                             <div class="invalid-feedback" id="cargoError"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <label for="tipo_documento">Tipo de documento:</label>
+                            <select class="new-form-control" name="tipo_documento" id="tipo_documento">
+                                <option value="" ></option>
+                                @foreach ($tipoDocumentos as $tipo)
+                                    <option value="{{ $tipo }}">{{ $tipo }}</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback" id="tipo_documentoError"></div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="numero_documento_identificacion">N° Documento de indentidad:</label>
+                            <input  type="number" class="new-form-control" id="numero_documento_identificacion"
+                            name="numero_documento_identificacion" style="text-align: right" min="0" step="1"></input>
+                            <div class="invalid-feedback" id="numero_documento_identificacionError"></div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-center mt-2">

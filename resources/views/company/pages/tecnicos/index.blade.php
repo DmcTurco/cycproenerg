@@ -45,7 +45,10 @@
                                             Nombre</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            DNI</th>
+                                            Tipo de documento</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            N° Documento de indentidad</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Cargo</th>
@@ -67,7 +70,10 @@
                                                     <span class="text-xs font-weight-bold">{{ $tecnico->nombre }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->dni }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $tecnico->tipo_documento }}</span>
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
+                                                    <span class="text-xs font-weight-bold">{{ $tecnico->numero_documento_identificacion }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">{{ $tecnico->cargo }}</span>
@@ -76,8 +82,8 @@
                                                     <span class="text-xs font-weight-bold">
                                                         {{ $tecnico->numeroSolicitudes() }}
                                                         <a href="{{ route('company.technicals.requests.index' , $tecnico->id) }}">
-                                                            <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i> 
-                                                        </a>                                         
+                                                            <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i>
+                                                        </a>
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
