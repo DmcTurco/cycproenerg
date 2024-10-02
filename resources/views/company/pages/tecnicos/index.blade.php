@@ -74,10 +74,10 @@
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
+                                                        {{ $tecnico->numeroSolicitudes() }}
                                                         <a href="{{ route('company.technicals.requests.index' , $tecnico->id) }}">
-                                                            <i class="fas fa-plus-circle text-info" style="font-size: 20px"></i> 
-                                                        </a>
-                                                        {{-- {{ numeroSolicitudes() }} --}}
+                                                            <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i> 
+                                                        </a>                                         
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">

@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('solicitudes_tecnico', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tecnico_id');
+            $table->unsignedBigInteger('solicitud_id')->nullable();
             $table->unsignedBigInteger('numero_solicitud');
             $table->unsignedBigInteger('numero_documento');
-            $table->unsignedBigInteger('tipo_cliente');
+            $table->text('tipo_cliente');
             $table->timestamps();
             $table->softDeletes();
         });

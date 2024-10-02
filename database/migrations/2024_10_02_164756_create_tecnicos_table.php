@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('company_id');
             $table->text('nombre');
-            $table->text('dni');
+            $table->text('dni')->unique();
             $table->text('cargo');
             $table->timestamps();
             $table->softDeletes();

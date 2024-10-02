@@ -41,7 +41,7 @@
                             <div class="invalid-feedback" id="dniError"></div>
                         </div>
                         <div class="col-md-3">
-                            <label for="numero_de_documento">Rango:</label>
+                            <label for="cargo">Rango:</label>
                             <select class="new-form-control" name="cargo" id="cargo">
                                 <option value="" ></option>
                                 @foreach ($cargos as $cargo)

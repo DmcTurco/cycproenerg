@@ -32,7 +32,7 @@
                                             Tipo de cliente</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-
+                                            Vincular
                                         </th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -41,7 +41,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (count($tecnicos ?? []) > 0)
+                                    @if (count($solicitudes ?? []) > 0)
                                         @foreach ($solicitudes as $solicitud)
                                             <tr>
                                                 <td class="align-middle text-center text-sm">
@@ -54,7 +54,9 @@
                                                     <span class="text-xs font-weight-bold">{{ $solicitud->tipo_cliente }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold"></span>
+                                                    <span class="text-xs font-weight-bold">
+                                                        <i class="fas fa-link"></i>
+                                                    </span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
@@ -89,15 +91,14 @@
                 ATRAS
             </a>
         </div>
-{{-- 
-        <form id="form-delete" action="{{ route('company.technicals.destroy', '') }}" method="POST" class="d-inline"
+
+        <form id="form-delete" action="{{ route('company.technicals.requests.destroy', ['technical' => $tecnico->id , 'request' => ':request']) }}" method="POST" class="d-inline"
             style="cursor:pointer">
             @csrf
             @method('DELETE')
-        </form> --}}
+        </form>
 
-
-        {{-- <input type="file" id="file-input" style="display: none;" accept=".xls,.xlsx" /> --}}
+        @include('company.pages.solicitudesTecnico.form')
 
         @if (session('message') || session('error'))
             <script>
@@ -114,7 +115,7 @@
 
         <script>
             $(document).ready(function() {
-                initModal('.OpenModal', '/company/technicals/', {
+                initModal('.OpenModal', '/company/technicals/{{ $tecnico->id}}/requests/', {
                     id: 'head-id',
                     titleEdit: "Editar",
                     titleCreate: "Registrar",
@@ -122,27 +123,26 @@
                     submitTextCreate: "Guardar",
                     modalID: '#myModal',
                     dataTransform: function(response) {
-                        return response.tecnico;
+                        return response.solicitud;
                     }
                 });
 
                 initFormSubmission('#myForm', '#myModal');
 
-                //Delete Tecnico
+                //Borrar Solicitud
                 $('.delete-btn').on('click', function() {
-                    var tecnicoId = $(this).data('head-id')
-                    var action = $('#form-delete').attr('action') + '/' + tecnicoId;
-                    console.log(action);
+                    var solicitudId = $(this).data('head-id')
+                    var newAction = $('#form-delete').attr('action').replace(':request',solicitudId);
                     confirmDelete(function() {
-                        $('#form-delete').attr('action', action).submit();
+                        $('#form-delete').attr('action', newAction).submit();
                     });
                 });
 
-                //Edit Tecncio
+                //Editar Solicitud
                 $(document).ready(function() {
                     $('.edit-form-data').on('click', function() {
-                        var tecnicoId = $(this).data('head-id');
-                        $('#myModal input#tecnicoId').val(tecnicoId);
+                        var solicitudId = $(this).data('head-id');
+                        $('#myModal input#solicitudID').val(solicitudId);
                     })
                 });
             });

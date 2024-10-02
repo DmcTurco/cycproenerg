@@ -14,6 +14,7 @@ class SolicitudTecnico extends Model
 
     protected $fillable = [
         'tecnico_id',
+        'solicitud_id',
         'numero_solicitud',
         'numero_documento',
         'tipo_cliente',
