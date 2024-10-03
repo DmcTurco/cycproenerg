@@ -101,16 +101,64 @@ class SolicitanteTecnicoController extends Controller
 
     }
 
-    public function obtenerRegistros(Request $request) {
-        
-        $numeroSolicitud = $request->numero_solicitud;
-        $nombre = $request->nombre;
-        $direccion = $request->direccion;
-        $numeroDocumento = $request->numero_documento_identificacion;
+    public function obtenerRegistros(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'numero_solicitud' => 'nullable|integer',
+            'numero_documento_identificacion' => 'nullable|integer',
+            'nombre' => 'nullable|max:255',
+            'direccion' => 'nullable',
+        ]);
 
-        $solicitante =  Solicitante::where('numero_documento_identificacion', $numeroDocumento)->get();
+        $validator->after(function($validator) use ($request) {
+            if ( empty($request->numero_solicitud) && empty($request->numero_documento_identificacion)
+                && empty($request->nombre) && empty($request->direccion) ) {
+                    $validator->errors()->add('atleast_one', 'Debes proporcionar al menos un campo de búsqueda.');
+            }
+        });
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
+        $numSolicitud = $request->numero_solicitud;
+        $numDocIdentidad = $request->numero_documento_identificacion;
+        $nombre = strtolower($request->nombre);
+        $direccion = strtolower($request->direccion);
+
+        $query = Solicitante::query();
+
+        if (!empty($numSolicitud)) {
+            $query->whereHas('solicitudes', function ($q) use ($numSolicitud) {
+                $q->where('numero_solicitud', $numSolicitud);
+            });
+        }
+
+        if ($numDocIdentidad) {
+            $query->where('numero_documento_identificacion', $numDocIdentidad);
+        }
+
+        // if ($nombre) {
+        //     $query->where('nombre', 'like' , "%$nombre%");
+        // }
+        if ($nombre) {
+            $query->whereRaw('LOWER(nombre) LIKE ?', ["%$nombre%"]);
+        }
+
+        // if ($direccion) {
+        //     $query->whereHas('ubicaciones', function($q) use ($direccion) {
+        //         $q->where('direccion', 'like' ,"%$direccion%");
+        //     });
+        // }
+
+        if ($direccion) {
+            $query->whereHas('ubicaciones', function($q) use ($direccion) {
+                $q->whereRaw('LOWER(direccion) LIKE ?', ["%$direccion%"]);
+            });
+        }
+
+        $busqueda = $query->paginate(10);
+        return view('company.pages.solicitudesTecnico.respuestas', compact('busqueda')); // Crea e
 
     }
 }
