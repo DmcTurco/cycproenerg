@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Company;
 
-use App\Models\Tecnico;
+use App\Models\Solicitante;
+use App\Models\Solicitud;
 use App\Models\SolicitanteTecnico;
+use App\Models\Tecnico;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -96,6 +98,19 @@ class SolicitanteTecnicoController extends Controller
 
         // $solicitud->delete();
         // return redirect()->route('company.technicals.requests.index', $tecnicoID);
+
+    }
+
+    public function obtenerRegistros(Request $request) {
+        
+        $numeroSolicitud = $request->numero_solicitud;
+        $nombre = $request->nombre;
+        $direccion = $request->direccion;
+        $numeroDocumento = $request->numero_documento_identificacion;
+
+        $solicitante =  Solicitante::where('numero_documento_identificacion', $numeroDocumento)->get();
+
+
 
     }
 }
