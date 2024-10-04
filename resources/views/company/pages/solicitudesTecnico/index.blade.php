@@ -8,7 +8,7 @@
             ATRAS
         </a>
     </div>
-    <div class="container-fluid py-4" style="height:80vh">
+    <div class="container-fluid py-4" style="max-height:200vh">
         <div class="row mb-4" style="height: 100%">
 
             <div class="col-lg-6 col-md-12 mb-md-0 mb-4">
@@ -90,9 +90,10 @@
             </div>
 
             <div class="col-lg-6 col-md-12 mb-md-0 mb-4">
-                <form id="form-solicitudes" action="" method="POST" style="height: 100%; overflow-y:auto">
-                    @csrf
-                    <div class="card" style="height: 100%; padding: 0 20px">
+
+                <div class="card" style="height: 100%; padding: 0 20px">
+                    <form id="form-solicitudes" action="" method="POST" style="height: 100%;">
+                        @csrf
                         <div class="card-header pb-0">
                             <div class="mt-3 d-flex justify-content-between">
                                 <div class="">
@@ -107,36 +108,35 @@
                             </div>
                         </div>
                         <div class="card-body px-0 pb-2">
-                                <div class="row">
-                                    <input id="solicitudID" type="hidden" value="" name="solicitudID">
-                                    <div class="col-md-3">
-                                        <label for="numero_documento_identificacion" style="font-size: 12px">N° Documento de
-                                            identidad:</label>
-                                        <input type="text" class="new-form-control" id="numero_documento_identificacion"
-                                            name="numero_documento_identificacion" value="" style="text-align: right">
-                                        <div class="invalid-feedback" id="numero_documento_identificacionError"></div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="nombre">Nombre del cliente:</label>
-                                        <input type="text" class="new-form-control" id="nombre" name="nombre"
-                                            value="">
-                                        <div class="invalid-feedback" id="nombreError"></div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="numero_solicitud">Número de solicitud:</label>
-                                        <input type="number" class="new-form-control" id="numero_solicitud"
-                                            name="numero_solicitud" value="" min="0" step="1"
-                                            style="text-align: right">
-                                        <div class="invalid-feedback" id="numero_solicitudError"></div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="direccion">Dirección:</label>
-                                        <input type="text" class="new-form-control" id="direccion" name="direccion"
-                                            value="">
-                                        <div class="invalid-feedback" id="direccionError"></div>
-                                    </div>
+                            <div class="row">
+                                <input id="solicitudID" type="hidden" value="" name="solicitudID">
+                                <div class="col-md-3">
+                                    <label for="numero_documento_identificacion" style="font-size: 12px">N° Documento de
+                                        identidad:</label>
+                                    <input type="text" class="new-form-control" id="numero_documento_identificacion"
+                                        name="numero_documento_identificacion" value="" style="text-align: right">
+                                    <div class="invalid-feedback" id="numero_documento_identificacionError"></div>
                                 </div>
-
+                                <div class="col-md-3">
+                                    <label for="nombre">Nombre del cliente:</label>
+                                    <input type="text" class="new-form-control" id="nombre" name="nombre"
+                                        value="">
+                                    <div class="invalid-feedback" id="nombreError"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="numero_solicitud">Número de solicitud:</label>
+                                    <input type="number" class="new-form-control" id="numero_solicitud"
+                                        name="numero_solicitud" value="" min="0" step="1"
+                                        style="text-align: right">
+                                    <div class="invalid-feedback" id="numero_solicitudError"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="direccion">Dirección:</label>
+                                    <input type="text" class="new-form-control" id="direccion" name="direccion"
+                                        value="">
+                                    <div class="invalid-feedback" id="direccionError"></div>
+                                </div>
+                            </div>
 
                             <br>
                             <div id="resultados" class="mt-3">
@@ -168,6 +168,10 @@
                 });
             </script>
         @endif
+
+        @php
+            $tecnicoId = $tecnico->id;
+        @endphp
 
         <script>
             $(document).ready(function() {

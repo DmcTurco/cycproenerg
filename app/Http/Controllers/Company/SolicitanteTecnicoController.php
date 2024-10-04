@@ -26,6 +26,8 @@ class SolicitanteTecnicoController extends Controller
 
     public function store($tecnicoID, Request $request) {
 
+        dd($request->all());
+
         // $tecnico = Tecnico::findOrFail($tecnicoID);
 
         // if (Auth::user()->id != $tecnico->company_id) {
@@ -158,7 +160,7 @@ class SolicitanteTecnicoController extends Controller
         }
 
         $busqueda = $query->paginate(10);
-        return view('company.pages.solicitudesTecnico.respuestas', compact('busqueda')); // Crea e
+        return view('company.pages.solicitudesTecnico.respuestas', compact('busqueda')); 
 
     }
 }
