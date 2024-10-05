@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Company;
 
 use App\Models\Solicitante;
 use App\Models\Solicitud;
-use App\Models\SolicitanteTecnico;
+use App\Models\SolicitudTecnico;
 use App\Models\Tecnico;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class SolicitanteTecnicoController extends Controller
+class SolicitudTecnicoController extends Controller
 {
     public function index($tecnicoID) {
 
@@ -19,14 +19,37 @@ class SolicitanteTecnicoController extends Controller
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
-        $solicitudes = SolicitanteTecnico::where('tecnico_id', $tecnico->id)->orderBy('id', 'desc')->paginate(10);
-
+        $solicitudes = SolicitudTecnico::where('tecnico_id', $tecnico->id)->orderBy('id', 'desc')->paginate(10);
         return view('company.pages.solicitudesTecnico.index', compact('solicitudes', 'tecnico'));
     }
 
     public function store($tecnicoID, Request $request) {
 
-        dd($request->all());
+        $tecnico = Tecnico::findOrFail($tecnicoID);
+
+        if ($tecnico->company_id != Auth::user()->id) {
+            abort(403);
+        }
+
+        $solicitanteID = $request->solicitanteID;
+        $categoria = $request->categoria;
+        $numSolicitud = $request->numSolicitud;
+        $numDocIdentificacion = $request->numDocIdentificacion;
+        $nombre = $request->nombre;
+        $direccion = $request->direccion;
+
+        $solicitud = Solicitud::where('numero_solicitud', $numSolicitud)->first();
+
+        $solicitud->tecnico()->sync($tecnico->id);
+
+        return redirect()->route('company.technicals.requests.index', $tecnico->id);
+
+
+
+
+
+
+
 
         // $tecnico = Tecnico::findOrFail($tecnicoID);
 
@@ -123,6 +146,7 @@ class SolicitanteTecnicoController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $tecnicoID = $request->tecnicoID;
         $numSolicitud = $request->numero_solicitud;
         $numDocIdentidad = $request->numero_documento_identificacion;
         $nombre = strtolower($request->nombre);
@@ -159,8 +183,8 @@ class SolicitanteTecnicoController extends Controller
             });
         }
 
-        $busqueda = $query->paginate(10);
-        return view('company.pages.solicitudesTecnico.respuestas', compact('busqueda')); 
+        $registros = $query->paginate(10);
+        return view('company.pages.solicitudesTecnico.respuestas', compact('registros' , 'tecnicoID'));
 
     }
 }

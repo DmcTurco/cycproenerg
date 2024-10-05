@@ -80,7 +80,7 @@
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
-                                                        {{ $tecnico->numeroSolicitudes() }}
+                                                        {{-- {{ $tecnico->numeroSolicitudes() }} --}}
                                                         <a href="{{ route('company.technicals.requests.index' , $tecnico->id) }}">
                                                             <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i>
                                                         </a>

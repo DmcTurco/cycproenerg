@@ -19,10 +19,6 @@
                             <div class="">
                                 <h6>Solicitudes</h6>
                             </div>
-                            <div>
-                                <a class="btn btn-info OpenModal py-2 px-3" data-toggle="modal"
-                                    data-target="myModal">Registrar</a>
-                            </div>
                         </div>
                     </div>
                     <div class="card-body px-0 pb-2">
@@ -51,7 +47,7 @@
                                             <tr>
                                                 <td class="align-middle text-center text-sm">
                                                     <span
-                                                        class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
+                                                        class="text-xs font-weight-bold">{{ $solicitud->id }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span
@@ -94,6 +90,7 @@
                 <div class="card" style="height: 100%; padding: 0 20px">
                     <form id="form-solicitudes" action="" method="POST" style="height: 100%;">
                         @csrf
+                        <input type="hidden" id="tecnicoID" name="tecnicoID" value="{{ $tecnico->id }}">
                         <div class="card-header pb-0">
                             <div class="mt-3 d-flex justify-content-between">
                                 <div class="">
@@ -139,10 +136,10 @@
                             </div>
 
                             <br>
-                            <div id="resultados" class="mt-3">
-                            </div>
                         </div>
                     </form>
+                    <div id="resultados" class="mt-3">
+                    </div>
                 </div>
             </div>
         </div>

@@ -21,10 +21,10 @@ class Tecnico extends Model
     ];
 
     public function solicitudes() {
-        return $this->Hasmany(SolicitanteTecnico::class);
+        return $this->belongsToMany(SolicitudTecnico::class, 'solicitud_tecnico')->withTimestamps();
     }
 
-    public function numeroSolicitudes() {
-        return $this->solicitudes()->count();
-    }
+    // public function numeroSolicitudes() {
+    //     return $this->solicitudes()->count();
+    // }
 }
