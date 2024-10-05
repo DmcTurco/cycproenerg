@@ -1,13 +1,14 @@
 @if ($registros->count() > 0)
     <div class="table-responsive" id="tabla-respuestas">
-        <table class="table">
+        <table class="table align-items-center mb-0">
             <thead>
                 <tr>
                     <th></th>
-                    <th class="text-center">N° Solicitud</th>
-                    <th class="text-center">N° Documento</th>
-                    <th>Nombre</th>
-                    <th>Dirección</th>
+                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N° Solicitud</th>
+                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N° Documento</th>
+                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
+                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dirección</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -22,10 +23,10 @@
                             data-solicitante-id = "{{ $registro->id }}">
                             <i class="fas fa-arrow-left"></i>
                         </td>
-                        <td>{{ $registro->solicitudes->first()->numero_solicitud }}</td>
-                        <td>{{ $registro->numero_documento_identificacion }}</td>
-                        <td>{{ $registro->nombre }}</td>
-                        <td>{{ $registro->ubicaciones->first()->direccion }}</td>
+                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->solicitudes->first()->numero_solicitud }}</td>
+                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->numero_documento_identificacion }}</td>
+                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->nombre }}</td>
+                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->ubicaciones->first()->direccion }}</td>
                     </tr>
                 @endforeach
             </tbody>

@@ -21,7 +21,7 @@ class Tecnico extends Model
     ];
 
     public function solicitudes() {
-        return $this->belongsToMany(SolicitudTecnico::class, 'solicitud_tecnico')->withTimestamps();
+        return $this->belongsToMany(Solicitud::class, 'solicitud_tecnico', 'tecnico_id', 'solicitud_id')->withPivot('categoria')->withTimestamps();
     }
 
     // public function numeroSolicitudes() {

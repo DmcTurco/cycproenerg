@@ -14,12 +14,11 @@ use Illuminate\Support\Facades\Validator;
 class SolicitudTecnicoController extends Controller
 {
     public function index($tecnicoID) {
-
         $tecnico = Tecnico::findOrFail($tecnicoID);
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
-        $solicitudes = SolicitudTecnico::where('tecnico_id', $tecnico->id)->orderBy('id', 'desc')->paginate(10);
+        $solicitudes = $tecnico->solicitudes()->paginate(10); 
         return view('company.pages.solicitudesTecnico.index', compact('solicitudes', 'tecnico'));
     }
 
@@ -40,7 +39,7 @@ class SolicitudTecnicoController extends Controller
 
         $solicitud = Solicitud::where('numero_solicitud', $numSolicitud)->first();
 
-        $solicitud->tecnico()->sync($tecnico->id);
+        $tecnico->solicitudes()->attach($solicitud->id, ['categoria' => $categoria]);
 
         return redirect()->route('company.technicals.requests.index', $tecnico->id);
 
@@ -115,15 +114,14 @@ class SolicitudTecnicoController extends Controller
 
     public function destroy($tecnicoID, $solicitudID) {
 
-        // $tecnico = Tecnico::findOrFail($tecnicoID);
-        // $solicitud = SolicitanteTecnico::findOrFail($solicitudID);
-        // if ($tecnico->company_id != Auth::user()->id  && $solicitud->tecnico_id != $tecnico->id) {
-        //     abort(403);
-        // }
+        $tecnico = Tecnico::findOrFail($tecnicoID);
+        $solicitud = Solicitud::findOrFail($solicitudID);
+        if ($tecnico->company_id != Auth::user()->id) {
+            abort(403);
+        }
 
-        // $solicitud->delete();
-        // return redirect()->route('company.technicals.requests.index', $tecnicoID);
-
+        $tecnico->solicitudes()->detach($solicitud->id);
+       
     }
 
     public function obtenerRegistros(Request $request)
