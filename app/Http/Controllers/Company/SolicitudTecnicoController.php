@@ -154,12 +154,12 @@ class SolicitudTecnicoController extends Controller
 
         if (!empty($numSolicitud)) {
             $query->whereHas('solicitudes', function ($q) use ($numSolicitud) {
-                $q->where('numero_solicitud', $numSolicitud);
+                $q->where('numero_solicitud', 'like' ,"%$numSolicitud%");
             });
         }
 
         if ($numDocIdentidad) {
-            $query->where('numero_documento_identificacion', $numDocIdentidad);
+            $query->where('numero_documento_identificacion', 'like' ,"%$numDocIdentidad%");
         }
 
         // if ($nombre) {
