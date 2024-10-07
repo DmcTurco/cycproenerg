@@ -57,6 +57,7 @@
     <script src="{{ asset('assets') }}/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="{{ asset('assets') }}/js/plugins/smooth-scrollbar.min.js"></script>
     <script src="{{ asset('/js/validations.js') }}"></script>
+    <script src="{{ asset('/js/tbodyIndex.js') }}"></script>
     @stack('js')
     @stack('dashboard')
     <script>

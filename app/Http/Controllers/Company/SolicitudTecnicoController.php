@@ -18,8 +18,19 @@ class SolicitudTecnicoController extends Controller
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
+        $solicitudesIndex = $tecnico->solicitudes()->paginate(10); 
+        return view('company.pages.solicitudesTecnico.index', compact('solicitudesIndex', 'tecnico'));
+    }
+
+    public function obtenerSolicitudesIndex($tecnicoID) {
+        $tecnico = Tecnico::findOrFail($tecnicoID);
+        if ( $tecnico->company_id != Auth::user()->id) {
+            abort(403);
+        }
         $solicitudes = $tecnico->solicitudes()->paginate(10); 
-        return view('company.pages.solicitudesTecnico.index', compact('solicitudes', 'tecnico'));
+        return response()->json([
+            'solicitudes' => $solicitudes,
+        ]);
     }
 
     public function store($tecnicoID, Request $request) {
@@ -120,8 +131,7 @@ class SolicitudTecnicoController extends Controller
             abort(403);
         }
 
-        $tecnico->solicitudes()->detach($solicitud->id);
-       
+        $tecnico->solicitudes()->detach($solicitud->id);      
     }
 
     public function obtenerRegistros(Request $request)

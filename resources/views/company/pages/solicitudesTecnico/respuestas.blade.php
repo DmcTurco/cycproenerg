@@ -4,10 +4,14 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N° Solicitud</th>
-                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N° Documento</th>
-                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
-                    <th  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dirección</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N°
+                        Solicitud</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N°
+                        Documento</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre
+                    </th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dirección
+                    </th>
 
                 </tr>
             </thead>
@@ -23,10 +27,13 @@
                             data-solicitante-id = "{{ $registro->id }}">
                             <i class="fas fa-arrow-left"></i>
                         </td>
-                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->solicitudes->first()->numero_solicitud }}</td>
-                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->numero_documento_identificacion }}</td>
+                        <td class="text-center text-uppercase text-sm font-weight-bold">
+                            {{ $registro->solicitudes->first()->numero_solicitud }}</td>
+                        <td class="text-center text-uppercase text-sm font-weight-bold">
+                            {{ $registro->numero_documento_identificacion }}</td>
                         <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->nombre }}</td>
-                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->ubicaciones->first()->direccion }}</td>
+                        <td class="text-center text-uppercase text-sm font-weight-bold">
+                            {{ $registro->ubicaciones->first()->direccion }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -40,8 +47,12 @@
         {{ $registros->links() }}
     </div>
 
+
+
     <script>
         $(document).ready(function() {
+
+            var tecnicoID = "{{ $tecnicoID }}";
 
             $('#tabla-respuestas').on('click', '.añadir-solicitud', function() {
 
@@ -79,13 +90,56 @@
                                 direccion: direccion
                             },
                             success: function(response) {
-                                console.log('Registro añadido con éxito');
+                                let urlIndex = "/company/getDataIndex/" + tecnicoID;
+                                $.ajax({
+                                    url: urlIndex,
+                                    type: 'GET',
+                                    success: function (response) {
+                                        createTableTbody(response);                                  
+                                    }
+                                });
 
                             },
                         });
                     }
                 });
             });
+
+            function createTableTbody(response) {
+                let tbdoy = $('#tbody');
+                tbdoy.empty();
+                if (response.solicitudes.data.length > 0) {
+                    response.solicitudes.data.forEach(function(item) {
+                        tbdoy.append(`
+                            <tr data-id="${item.id}">
+                                <td class="align-middle text-center text-sm">
+                                    <span
+                                        class="text-xs font-weight-bold">${item.numero_solicitud}</span>
+                                </td>
+                                <td class="align-middle text-center text-sm">
+                                    <span
+                                        class="text-xs font-weight-bold"></span>
+                                </td>
+                                <td class="align-middle text-center text-sm">
+                                    <span
+                                        class="text-xs font-weight-bold"></span>
+                                </td>
+                                <td class="align-middle text-center text-sm">
+                                    <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
+                                        data-target="#myModal" data-head-id="${item.id}">
+                                        <i class="fa fa-edit fa-lg text-info"></i>
+                                    </a>
+                                    <a class="delete-btn" data-head-id="${item.id}">
+                                        <i class="far fa-trash-alt fa-lg text-danger"></i>
+                                    </a>
+                                </td>
+                            </tr>`
+                        );
+                    });
+                } else {
+                    $(tbdoy).append('<p>No images found for this location.</p>');
+                }
+            }
         });
     </script>
 @else

@@ -40,9 +40,18 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @if (count($solicitudes ?? []) > 0)
-                                    @foreach ($solicitudes as $solicitud)
+                            {{-- <tbody id="tbody">
+
+                                @if (!empty($solicitudesIndex))
+                                ok
+
+                                @endif
+                                <!--dynamic data-->
+
+                            </tbody> --}}
+                            <tbody id="tbody">
+                                @if (count($solicitudesIndex ?? []) > 0)
+                                    @foreach ($solicitudesIndex as $solicitud)
                                         <tr>
                                             <td class="align-middle text-center text-sm">
                                                 <span
@@ -69,21 +78,23 @@
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td class="align-middle text-center text-sm" colspan="5">No existen
+                                        <td class="align-middle text-center text-sm font-weight-bold" colspan="5">No
+                                            existen
                                             solicitudes registradas
                                     </tr>
                                 @endif
                             </tbody>
+
                         </table>
                         <br>
                         <div class="d-flex justify-content-center">
-                            {{ $solicitudes->links('pagination::bootstrap-4') }}
+                            {{ $solicitudesIndex->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
+        <!---------------->
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
 
             <div class="card" style="height: 100%; padding: 0 20px">
@@ -107,34 +118,32 @@
                         <div class="row">
                             <input id="solicitudID" type="hidden" value="" name="solicitudID">
                             <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="numero_documento_identificacion" style="font-size: 12px" 
-                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                N° Documento de identidad:</label>
+                                <label for="numero_documento_identificacion" style="font-size: 12px"
+                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    N° Documento de identidad:</label>
                                 <input type="text" class="new-form-control" id="numero_documento_identificacion"
                                     name="numero_documento_identificacion" value="" style="text-align: right">
                                 <div class="invalid-feedback" id="numero_documento_identificacionError"></div>
                             </div>
                             <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="nombre" 
-                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                Nombre del cliente:</label>
-                                <input type="text" class="new-form-control" id="nombre" name="nombre"
-                                    value="">
+                                <label for="nombre"
+                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Nombre del cliente:</label>
+                                <input type="text" class="new-form-control" id="nombre" name="nombre" value="">
                                 <div class="invalid-feedback" id="nombreError"></div>
                             </div>
                             <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="numero_solicitud" 
-                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                Número de solicitud:</label>
-                                <input type="number" class="new-form-control" id="numero_solicitud"
-                                    name="numero_solicitud" value="" min="0" step="1"
-                                    style="text-align: right">
+                                <label for="numero_solicitud"
+                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Número de solicitud:</label>
+                                <input type="number" class="new-form-control" id="numero_solicitud" name="numero_solicitud"
+                                    value="" min="0" step="1" style="text-align: right">
                                 <div class="invalid-feedback" id="numero_solicitudError"></div>
                             </div>
                             <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="direccion" 
-                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                Dirección:</label>
+                                <label for="direccion"
+                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Dirección:</label>
                                 <input type="text" class="new-form-control" id="direccion" name="direccion"
                                     value="">
                                 <div class="invalid-feedback" id="direccionError"></div>
@@ -144,7 +153,9 @@
 
                         <br>
                     </div>
+                    <div id="invalid-feedback" class="d-flex justify-content-center" >
                 </form>
+                </div>
                 <div id="resultados" class="mt-3">
                 </div>
             </div>
@@ -173,9 +184,6 @@
         </script>
     @endif
 
-    @php
-        $tecnicoId = $tecnico->id;
-    @endphp
 
     <script>
         $(document).ready(function() {
@@ -208,28 +216,30 @@
                 var newAction = $('#form-delete').attr('action').replace(':request', solicitudId);
                 var _token = $('#form-delete input[name="_token"]').val();
                 console.log(newAction, _token);
-                
+
                 confirmDelete(function() {
                     // Realizar la eliminación mediante AJAX
                     $.ajax({
                         url: newAction,
                         type: 'DELETE', // Método para eliminar
                         data: {
-                            _token : _token
+                            _token: _token
                         },
                         success: function(response) {
-                            
+
                             $.ajax({
                                 url: "/company/technicals/{{ $tecnico->id }}/requests",
                                 type: 'GET',
                                 success: function(response) {
-                                    console.log('Indice recuperado correctamente');     
+                                    console.log(
+                                        'Indice recuperado correctamente'
+                                        );
                                 }
                             });
 
-                        //     // Opcional: Actualiza la tabla o elimina el elemento visualmente
-                        //     $('#fila-' + solicitudId)
-                        // .remove(); // Asegúrate de tener un identificador para la fila
+                            //     // Opcional: Actualiza la tabla o elimina el elemento visualmente
+                            //     $('#fila-' + solicitudId)
+                            // .remove(); // Asegúrate de tener un identificador para la fila
                         },
                         error: function(xhr) {
                             Swal.fire({
@@ -251,27 +261,36 @@
 
             //Obtiene resultados de la busqueda
             $('#form-solicitudes').on('submit', function(event) {
-                console.log("estoy");
 
                 event.preventDefault();
+                let invalidFeedback = $('#invalid-feedback');
 
                 $.ajax({
                     url: '{{ route('company.obtenerRegistros') }}', // Ruta del controlador
                     type: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
+                        invalidFeedback.empty();
                         $('#resultados').html(
                             response); // Mostrar resultados en el modal
                     },
-                    error: function(xhr) {
-                        // Manejo de errores
-                        let errors = xhr.responseJSON.errors;
-                        if (errors) {
-                            // Mostrar errores de validación, si los hay
+                    error: function(response) {
+
+                        if (response.status == 422) {
+
+                            var errors = response.responseJSON.errors;
+                            console.log(errors.atleast_one);
+                            
+                            invalidFeedback.empty();
+                            invalidFeedback.html(
+                            `<p class="text-danger font-weight-bold" style="font-size:13px">${errors.atleast_one}</p>`
+                            )
                         }
                     }
                 });
             });
+
+
 
         });
     </script>
