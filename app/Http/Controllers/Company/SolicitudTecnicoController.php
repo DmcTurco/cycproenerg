@@ -57,58 +57,6 @@ class SolicitudTecnicoController extends Controller
 
 
 
-
-
-
-
-        // $tecnico = Tecnico::findOrFail($tecnicoID);
-
-        // if (Auth::user()->id != $tecnico->company_id) {
-        //     abort(403);
-        // }
-
-        // $solicitudID = $request->solicitudID;
-
-        // $validator = Validator::make($request->all(), [
-        //     'numero_solicitud' => 'required|integer',
-        //     'numero_documento' => 'required|max:50',
-        //     'tipo_cliente' => 'required|string',
-        // ]);
-
-        // if ($validator->fails()) {
-        //     return response()->json(['errors' => $validator->errors()], 422);
-        // }
-
-
-        // if (!empty($solicitudID)) {
-
-        //     $solicitud = SolicitanteTecnico::find($solicitudID);
-
-        //     if ($solicitud->tecnico_id != $tecnico->id) {
-        //         abort(403);
-        //     }
-
-        //     $solicitud->update([
-        //         'numero_solicitud' => $request->numero_solicitud,
-        //         'numero_documento' => $request->numero_documento,
-        //         'tipo_cliente' => $request->tipo_cliente,
-        //     ]);
-        //     session()->flash('message', __('Actualización éxitosa') );
-        //     return response()->json(['redirect' => route('company.technicals.requests.index', $tecnicoID)]);
-
-        // } else {
-
-        //     $solicitud = SolicitanteTecnico::create([
-        //         'tecnico_id' => $tecnico->id,
-        //         'numero_solicitud' => $request->numero_solicitud,
-        //         'numero_documento' => $request->numero_documento,
-        //         'tipo_cliente' => $request->tipo_cliente,
-        //     ]);
-
-        //     session()->flash('message', __('Registro éxitoso') );
-        //     return response()->json(['redirect' => route('company.technicals.requests.index', $tecnicoID)]);
-        // }
-
     }
 
     public function edit($tecnicoID, $solicitudID) {

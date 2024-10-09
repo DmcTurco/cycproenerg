@@ -143,5 +143,7 @@
         });
     </script>
 @else
-    <p>No se encontraron registros.</p>
+    <div class="d-flex justify-content-center" id="no_hay_registros">
+        <p class="font-weight-bolder text-danger">No se encontraron registros.</p>
+    </div>
 @endif

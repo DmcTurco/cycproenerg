@@ -39,16 +39,7 @@
                                         Acciones
                                     </th>
                                 </tr>
-                            </thead>
-                            {{-- <tbody id="tbody">
-
-                                @if (!empty($solicitudesIndex))
-                                ok
-
-                                @endif
-                                <!--dynamic data-->
-
-                            </tbody> --}}
+                            </thead>                    
                             <tbody id="tbody">
                                 @if (count($solicitudesIndex ?? []) > 0)
                                     @foreach ($solicitudesIndex as $solicitud)
@@ -98,7 +89,7 @@
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
 
             <div class="card" style="height: 100%; padding: 0 20px" id="informacion">
-                <form id="form-solicitudes" action="" method="POST" style="height: 100%;">
+                <form id="form-solicitudes" action="" method="POST" style="max-height: 100%" >
                     @csrf
                     <input type="hidden" id="tecnicoID" name="tecnicoID" value="{{ $tecnico->id }}">
                     <div class="card-header pb-0">
@@ -118,6 +109,14 @@
                         <div class="row">
                             <input id="solicitudID" type="hidden" value="" name="solicitudID">
                             <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
+                                <label for="numero_solicitud"
+                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Número de solicitud:</label>
+                                <input type="number" class="new-form-control" id="numero_solicitud" name="numero_solicitud"
+                                    value="" min="0" step="1" style="text-align: right">
+                                <div class="invalid-feedback" id="numero_solicitudError"></div>
+                            </div>
+                            <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
                                 <label for="numero_documento_identificacion" style="font-size: 12px"
                                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                     N° Documento de identidad:</label>
@@ -131,14 +130,6 @@
                                     Nombre del cliente:</label>
                                 <input type="text" class="new-form-control" id="nombre" name="nombre" value="">
                                 <div class="invalid-feedback" id="nombreError"></div>
-                            </div>
-                            <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="numero_solicitud"
-                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    Número de solicitud:</label>
-                                <input type="number" class="new-form-control" id="numero_solicitud" name="numero_solicitud"
-                                    value="" min="0" step="1" style="text-align: right">
-                                <div class="invalid-feedback" id="numero_solicitudError"></div>
                             </div>
                             <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
                                 <label for="direccion"
@@ -156,7 +147,7 @@
                     <div id="invalid-feedback" class="d-flex justify-content-center">
                 </form>
             </div>
-            <div id="resultados" class="mt-3">
+            <div id="resultados" class=""  style="height: 100%">
             </div>
         </div>
     </div>
@@ -321,10 +312,10 @@
 
                                 var errors = response.responseJSON.errors;
                                 console.log(errors.atleast_one);
-
+                                $('#no_hay_registros').remove();
                                 invalidFeedback.empty();
                                 invalidFeedback.html(
-                                    `<p class="text-danger font-weight-bold" style="font-size:13px">${errors.atleast_one}</p>`
+                                    `<p class="text-danger font-weight-bold" style="font-size:14px">${errors.atleast_one}</p>`
                                 )
                             }
                         }
