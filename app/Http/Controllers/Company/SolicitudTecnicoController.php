@@ -18,7 +18,7 @@ class SolicitudTecnicoController extends Controller
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
-        $solicitudesIndex = $tecnico->solicitudes()->paginate(10); 
+        $solicitudesIndex = $tecnico->solicitudes()->paginate(10);
         return view('company.pages.solicitudesTecnico.index', compact('solicitudesIndex', 'tecnico'));
     }
 
@@ -27,7 +27,7 @@ class SolicitudTecnicoController extends Controller
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
-        $solicitudes = $tecnico->solicitudes()->paginate(10); 
+        $solicitudes = $tecnico->solicitudes()->paginate(10);
         return response()->json([
             'solicitudes' => $solicitudes,
         ]);
@@ -49,6 +49,18 @@ class SolicitudTecnicoController extends Controller
         $direccion = $request->direccion;
 
         $solicitud = Solicitud::where('numero_solicitud', $numSolicitud)->first();
+        $solicitudExistente = SolicitudTecnico::where('solicitud_id', $solicitud->id)->first();
+
+        if (!is_null($solicitudExistente)) {
+
+            $IDtecnico =  $solicitudExistente->tecnico_id;
+            $tecnicoConSolicitud = Tecnico::find($IDtecnico);
+            return response()->json([
+                'errors' => 'El número de solicitud ya esta registrado' . "<br>" .
+                            'Nombre del técnico: ' . $tecnicoConSolicitud->nombre . "<br>".
+                            'Documento de identidad del técnico: ' . $tecnicoConSolicitud->numero_documento_identificacion
+            ], 422);
+        }
 
         $tecnico->solicitudes()->attach($solicitud->id, ['categoria' => $categoria]);
 
@@ -71,7 +83,7 @@ class SolicitudTecnicoController extends Controller
             abort(403);
         }
 
-        $tecnico->solicitudes()->detach($solicitud->id);      
+        $tecnico->solicitudes()->detach($solicitud->id);
     }
 
     public function obtenerRegistros(Request $request)

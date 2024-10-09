@@ -39,7 +39,7 @@
                                         Acciones
                                     </th>
                                 </tr>
-                            </thead>                    
+                            </thead>
                             <tbody id="tbody">
                                 @if (count($solicitudesIndex ?? []) > 0)
                                     @foreach ($solicitudesIndex as $solicitud)
@@ -99,7 +99,7 @@
                             </div>
                             <div class="">
                                 <label for="" style="opacity: 0">r</label>
-                                <button type="submit" id="getInfo" class="btn btn-info px-3 py-2">
+                                <button type="submit" id="submit_formulario_informacion" class="btn btn-info px-3 py-2">
                                     Buscar
                                 </button>
                             </div>
@@ -222,10 +222,12 @@
                                 url: "/company/technicals/{{ $tecnico->id }}/requests",
                                 type: 'GET',
                                 success: function(response) {
-                                    console.log(
-                                        'Indice recuperado correctamente'
-                                    );
+
+                                },
+                                error: function(response) {
+                                    console.log('Error al borrar registro');
                                 }
+
                             });
 
                             //     // Opcional: Actualiza la tabla o elimina el elemento visualmente
@@ -284,13 +286,10 @@
 
             });
 
-            $('#informacion').on('click', '#getInfo', function() {
+            $('#informacion').on('click', '#submit_formulario_informacion', function() {
                 let type = 'POST';
                 let url = '{{ route('company.obtenerRegistros') }}';
-                obtenerRegistros(url, type);
-            })
 
-            function obtenerRegistros(url, type, newdata = null) {
                 $('#form-solicitudes').off('submit').on('submit', function(event) {
                     console.log('estoy en el form');
 
@@ -300,7 +299,7 @@
                     $.ajax({
                         url: url,
                         type: type,
-                        data: newdata ? newdata : $(this).serialize(),
+                        data: $(this).serialize(),
                         success: function(response) {
                             invalidFeedback.empty();
                             $('#resultados').html(
@@ -320,8 +319,10 @@
                             }
                         }
                     });
-                });
-            }
+                    });
+
+            })
+
 
         });
     </script>

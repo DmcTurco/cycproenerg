@@ -31,8 +31,8 @@
                             {{ $registro->solicitudes->first()->numero_solicitud }}</td>
                         <td class="text-center text-uppercase text-sm font-weight-bold">
                             {{ $registro->numero_documento_identificacion }}</td>
-                        <td class="text-center text-uppercase text-sm font-weight-bold">{{ $registro->nombre }}</td>
-                        <td class="text-center text-uppercase text-sm font-weight-bold">
+                        <td class="text-left text-uppercase text-sm font-weight-bold">{{ $registro->nombre }}</td>
+                        <td class="text-left text-uppercase text-sm font-weight-bold">
                             {{ $registro->ubicaciones->first()->direccion }}</td>
                     </tr>
                 @endforeach
@@ -95,11 +95,23 @@
                                     url: urlIndex,
                                     type: 'GET',
                                     success: function (response) {
-                                        createTableTbody(response);                                  
+                                        createTableTbody(response);
                                     }
                                 });
-
                             },
+                            //Este error se visualizara cuando se  quiera guardar una solicitud ya registrada con algún técnico
+                            error: function(response) {
+                                errors = response.responseJSON.errors;
+
+                                if (response.status == 422) {
+                                    Swal.fire({
+                                        title: 'Información',
+                                        html:errors,
+                                        icon: 'warning',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                }
+                            }
                         });
                     }
                 });
