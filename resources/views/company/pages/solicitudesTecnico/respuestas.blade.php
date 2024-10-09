@@ -4,10 +4,10 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N°
-                        Solicitud</th>
-                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">N°
-                        Documento</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                        N° Solicitud</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                        N° Documento</th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre
                     </th>
                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dirección
@@ -44,7 +44,7 @@
         </form>
     </div>
     <div class="pagination">
-        {{ $registros->links() }}
+        {{ $registros->appends($request->all())->links()}}
     </div>
 
 

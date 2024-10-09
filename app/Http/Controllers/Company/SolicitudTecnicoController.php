@@ -113,14 +113,6 @@ class SolicitudTecnicoController extends Controller
 
     public function edit($tecnicoID, $solicitudID) {
 
-        // $tecnico = Tecnico::findOrFail($tecnicoID);
-        // $solicitud = SolicitanteTecnico::findOrFail($solicitudID);
-        // if ($tecnico->company_id != Auth::user()->id  && $solicitud->tecnico_id != $tecnico->id) {
-        //     abort(403);
-        // }
-
-        // return response()->json( ['solicitud' => $solicitud]);
-
     }
 
     public function destroy($tecnicoID, $solicitudID) {
@@ -192,7 +184,9 @@ class SolicitudTecnicoController extends Controller
         }
 
         $registros = $query->paginate(10);
-        return view('company.pages.solicitudesTecnico.respuestas', compact('registros' , 'tecnicoID'));
+        $registros->appends($request->all());
+
+        return view('company.pages.solicitudesTecnico.respuestas', compact('registros' , 'tecnicoID', 'request'));
 
     }
 }

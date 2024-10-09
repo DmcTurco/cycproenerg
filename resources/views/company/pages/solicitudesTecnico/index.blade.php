@@ -97,7 +97,7 @@
         <!---------------->
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
 
-            <div class="card" style="height: 100%; padding: 0 20px">
+            <div class="card" style="height: 100%; padding: 0 20px" id="informacion">
                 <form id="form-solicitudes" action="" method="POST" style="height: 100%;">
                     @csrf
                     <input type="hidden" id="tecnicoID" name="tecnicoID" value="{{ $tecnico->id }}">
@@ -108,7 +108,7 @@
                             </div>
                             <div class="">
                                 <label for="" style="opacity: 0">r</label>
-                                <button type="submit" class="btn btn-info px-3 py-2">
+                                <button type="submit" id="getInfo" class="btn btn-info px-3 py-2">
                                     Buscar
                                 </button>
                             </div>
@@ -153,13 +153,13 @@
 
                         <br>
                     </div>
-                    <div id="invalid-feedback" class="d-flex justify-content-center" >
+                    <div id="invalid-feedback" class="d-flex justify-content-center">
                 </form>
-                </div>
-                <div id="resultados" class="mt-3">
-                </div>
+            </div>
+            <div id="resultados" class="mt-3">
             </div>
         </div>
+    </div>
     </div>
 
     <form id="form-delete"
@@ -233,7 +233,7 @@
                                 success: function(response) {
                                     console.log(
                                         'Indice recuperado correctamente'
-                                        );
+                                    );
                                 }
                             });
 
@@ -260,37 +260,77 @@
             });
 
             //Obtiene resultados de la busqueda
-            $('#form-solicitudes').on('submit', function(event) {
+            $('#informacion').on('click', '.page-link', function(e) {
 
-                event.preventDefault();
+                e.preventDefault();
+                let url = $(this).attr('href');
+
+                //Extaemos parametros de la url
+                let params = new URLSearchParams(url.split('?')[1]);
+                let requesData = {};
+                params.forEach((value, key) => {
+                    requesData[key] = value;
+                });
+
+                let type = 'GET';
                 let invalidFeedback = $('#invalid-feedback');
-
                 $.ajax({
-                    url: '{{ route('company.obtenerRegistros') }}', // Ruta del controlador
-                    type: 'POST',
-                    data: $(this).serialize(),
+                    url: url,
+                    type: type,
+                    data: requesData,
                     success: function(response) {
                         invalidFeedback.empty();
                         $('#resultados').html(
                             response); // Mostrar resultados en el modal
                     },
                     error: function(response) {
-
                         if (response.status == 422) {
-
                             var errors = response.responseJSON.errors;
-                            console.log(errors.atleast_one);
-                            
-                            invalidFeedback.empty();
-                            invalidFeedback.html(
-                            `<p class="text-danger font-weight-bold" style="font-size:13px">${errors.atleast_one}</p>`
-                            )
+                            // Maneja errores si es necesario
                         }
                     }
                 });
+
             });
 
+            $('#informacion').on('click', '#getInfo', function() {
+                let type = 'POST';
+                let url = '{{ route('company.obtenerRegistros') }}';
+                obtenerRegistros(url, type);
+            })
 
+            function obtenerRegistros(url, type, newdata = null) {
+                $('#form-solicitudes').off('submit').on('submit', function(event) {
+                    console.log('estoy en el form');
+
+                    event.preventDefault();
+                    let invalidFeedback = $('#invalid-feedback');
+
+                    $.ajax({
+                        url: url,
+                        type: type,
+                        data: newdata ? newdata : $(this).serialize(),
+                        success: function(response) {
+                            invalidFeedback.empty();
+                            $('#resultados').html(
+                                response); // Mostrar resultados en el modal
+                        },
+                        error: function(response) {
+
+                            if (response.status == 422) {
+
+                                var errors = response.responseJSON.errors;
+                                console.log(errors.atleast_one);
+
+                                invalidFeedback.empty();
+                                invalidFeedback.html(
+                                    `<p class="text-danger font-weight-bold" style="font-size:13px">${errors.atleast_one}</p>`
+                                )
+                            }
+                        }
+                    });
+                });
+            }
 
         });
     </script>
