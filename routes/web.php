@@ -37,6 +37,9 @@ Route::prefix(MyApp::COMPANIES_SUBDIR)->middleware('auth:company')->name('compan
     })->withoutMiddleware('auth:company');
     Route::get('/home', [Company\CompanyController::class, 'index'])->name('home');
     Route::resource('client', Company\ClientController::class);
+    Route::resource('technicals', Company\TecnicoController::class);
+    Route::resource('technicals.requests', Company\SolicitudTecnicoController::class);
+    Route::post('technicals-getrecords-request', [Company\SolicitudTecnicoController::class, 'obtenerRegistros'])->name('obtenerRegistros');
     Route::post('/change', [Company\ClientController::class, 'change'])->name('change');
     // Route::get('/home', [Company\HomeController::class, 'index'])->name('home');
 });

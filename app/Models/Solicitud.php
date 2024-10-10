@@ -37,4 +37,8 @@ class Solicitud extends Model
     {
         return $this->belongsTo(Solicitante::class);
     }
+
+    public function tecnico() {
+        return $this->belongsToMany(Tecnico::class, 'solicitud_tecnico', 'solicitud_id', 'tecnico_id')->withPivot('categoria')->withTimestamps();
+    }
 }
