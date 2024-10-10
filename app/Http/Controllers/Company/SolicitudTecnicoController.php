@@ -18,8 +18,19 @@ class SolicitudTecnicoController extends Controller
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
-        $solicitudes = $tecnico->solicitudes()->paginate(10); 
-        return view('company.pages.solicitudesTecnico.index', compact('solicitudes', 'tecnico'));
+        $solicitudesIndex = $tecnico->solicitudes()->paginate(10);
+        return view('company.pages.solicitudesTecnico.index', compact('solicitudesIndex', 'tecnico'));
+    }
+
+    public function obtenerSolicitudesIndex($tecnicoID) {
+        $tecnico = Tecnico::findOrFail($tecnicoID);
+        if ( $tecnico->company_id != Auth::user()->id) {
+            abort(403);
+        }
+        $solicitudes = $tecnico->solicitudes()->paginate(10);
+        return response()->json([
+            'solicitudes' => $solicitudes,
+        ]);
     }
 
     public function store($tecnicoID, Request $request) {
@@ -38,6 +49,18 @@ class SolicitudTecnicoController extends Controller
         $direccion = $request->direccion;
 
         $solicitud = Solicitud::where('numero_solicitud', $numSolicitud)->first();
+        $solicitudExistente = SolicitudTecnico::where('solicitud_id', $solicitud->id)->first();
+
+        if (!is_null($solicitudExistente)) {
+
+            $IDtecnico =  $solicitudExistente->tecnico_id;
+            $tecnicoConSolicitud = Tecnico::find($IDtecnico);
+            return response()->json([
+                'errors' => 'El número de solicitud ya esta registrado' . "<br>" .
+                            'Nombre del técnico: ' . $tecnicoConSolicitud->nombre . "<br>".
+                            'Documento de identidad del técnico: ' . $tecnicoConSolicitud->numero_documento_identificacion
+            ], 422);
+        }
 
         $tecnico->solicitudes()->attach($solicitud->id, ['categoria' => $categoria]);
 
@@ -46,69 +69,9 @@ class SolicitudTecnicoController extends Controller
 
 
 
-
-
-
-
-        // $tecnico = Tecnico::findOrFail($tecnicoID);
-
-        // if (Auth::user()->id != $tecnico->company_id) {
-        //     abort(403);
-        // }
-
-        // $solicitudID = $request->solicitudID;
-
-        // $validator = Validator::make($request->all(), [
-        //     'numero_solicitud' => 'required|integer',
-        //     'numero_documento' => 'required|max:50',
-        //     'tipo_cliente' => 'required|string',
-        // ]);
-
-        // if ($validator->fails()) {
-        //     return response()->json(['errors' => $validator->errors()], 422);
-        // }
-
-
-        // if (!empty($solicitudID)) {
-
-        //     $solicitud = SolicitanteTecnico::find($solicitudID);
-
-        //     if ($solicitud->tecnico_id != $tecnico->id) {
-        //         abort(403);
-        //     }
-
-        //     $solicitud->update([
-        //         'numero_solicitud' => $request->numero_solicitud,
-        //         'numero_documento' => $request->numero_documento,
-        //         'tipo_cliente' => $request->tipo_cliente,
-        //     ]);
-        //     session()->flash('message', __('Actualización éxitosa') );
-        //     return response()->json(['redirect' => route('company.technicals.requests.index', $tecnicoID)]);
-
-        // } else {
-
-        //     $solicitud = SolicitanteTecnico::create([
-        //         'tecnico_id' => $tecnico->id,
-        //         'numero_solicitud' => $request->numero_solicitud,
-        //         'numero_documento' => $request->numero_documento,
-        //         'tipo_cliente' => $request->tipo_cliente,
-        //     ]);
-
-        //     session()->flash('message', __('Registro éxitoso') );
-        //     return response()->json(['redirect' => route('company.technicals.requests.index', $tecnicoID)]);
-        // }
-
     }
 
     public function edit($tecnicoID, $solicitudID) {
-
-        // $tecnico = Tecnico::findOrFail($tecnicoID);
-        // $solicitud = SolicitanteTecnico::findOrFail($solicitudID);
-        // if ($tecnico->company_id != Auth::user()->id  && $solicitud->tecnico_id != $tecnico->id) {
-        //     abort(403);
-        // }
-
-        // return response()->json( ['solicitud' => $solicitud]);
 
     }
 
@@ -121,7 +84,6 @@ class SolicitudTecnicoController extends Controller
         }
 
         $tecnico->solicitudes()->detach($solicitud->id);
-       
     }
 
     public function obtenerRegistros(Request $request)
@@ -182,7 +144,9 @@ class SolicitudTecnicoController extends Controller
         }
 
         $registros = $query->paginate(10);
-        return view('company.pages.solicitudesTecnico.respuestas', compact('registros' , 'tecnicoID'));
+        $registros->appends($request->all());
+
+        return view('company.pages.solicitudesTecnico.respuestas', compact('registros' , 'tecnicoID', 'request'));
 
     }
 }
