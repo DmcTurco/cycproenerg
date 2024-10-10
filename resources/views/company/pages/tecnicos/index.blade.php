@@ -66,10 +66,12 @@
                                                     <span class="text-xs font-weight-bold">{{ $tecnico->nombre }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->tipo_documento }}</span>
+                                                    <span
+                                                        class="text-xs font-weight-bold">{{ $tecnico->tipo_documento }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->numero_documento_identificacion }}</span>
+                                                    <span
+                                                        class="text-xs font-weight-bold">{{ $tecnico->numero_documento_identificacion }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">{{ $tecnico->cargo }}</span>
@@ -77,8 +79,10 @@
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
                                                         {{-- {{ $tecnico->numeroSolicitudes() }} --}}
-                                                        <a href="{{ route('company.technicals.requests.index' , $tecnico->id) }}">
-                                                            <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i>
+                                                        <a
+                                                            href="{{ route('company.technicals.requests.index', $tecnico->id) }}">
+                                                            <i class="fas fa-plus-circle text-info"
+                                                                style="font-size: 15px"></i>
                                                         </a>
                                                     </span>
                                                 </td>
