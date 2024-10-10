@@ -10,7 +10,7 @@
                         <a class="btn btn-info OpenModal py-2 px-3" data-toggle="modal" data-target="myModal">Registrar</a>
                         <div class="row mt-3">
                             <div class="col-lg-6 col-7">
-                                <h6>Tecnicos</h6>
+                                <h6>Vendedores</h6>
                             </div>
                         </div>
                     </div>
@@ -25,7 +25,7 @@
                                             Nombre</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Tipo de documento</th>
+                                            Numero de solicitud</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             N° Documento de indentidad</th>
@@ -34,44 +34,40 @@
                                             Cargo</th>
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Solicitudes
-                                        </th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Acciones
+                                            Tipo de cliente
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (count($tecnicos ?? []) > 0)
-                                        @foreach ($tecnicos as $tecnico)
+                                    @if (count($vendedores ?? []) > 0)
+                                        @foreach ($vendedores as $vendedor)
                                             <tr>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->nombre }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $vendedor->nombre }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->tipo_documento }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $vendedor->tipo_documento }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->numero_documento_identificacion }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $vendedor->numero_documento_identificacion }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->cargo }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $vendedor->cargo }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
-                                                        {{-- {{ $tecnico->numeroSolicitudes() }} --}}
-                                                        <a href="{{ route('company.technicals.requests.index' , $tecnico->id) }}">
+                                                        {{-- {{ $vendedor->numeroSolicitudes() }} --}}
+                                                        <a href="{{ route('company.technicals.requests.index' , $vendedor->id) }}">
                                                             <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i>
                                                         </a>
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
-                                                        data-target="#myModal" data-head-id="{{ $tecnico->id }}">
+                                                        data-target="#myModal" data-head-id="{{ $vendedor->id }}">
                                                         <i class="fa fa-edit fa-lg text-info"></i>
                                                     </a>
-                                                    <a class="delete-btn" data-head-id="{{ $tecnico->id }}">
+                                                    <a class="delete-btn" data-head-id="{{ $vendedor->id }}">
                                                         <i class="far fa-trash-alt fa-lg text-danger"></i>
                                                     </a>
                                                 </td>
@@ -79,14 +75,14 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td class="align-middle text-center text-sm" colspan="5">No existen técnicos
+                                            <td class="align-middle text-center text-sm" colspan="5">No existen Vendedores
                                         </tr>
                                     @endif
                                 </tbody>
                             </table>
                             <br>
                             <div class="d-flex justify-content-center">
-                                {{ $tecnicos->links('pagination::bootstrap-4') }}
+                                {{ $vendedores->links('pagination::bootstrap-4') }}
                             </div>
                         </div>
                     </div>
@@ -94,15 +90,12 @@
             </div>
         </div>
 
-        <form id="form-delete" action="{{ route('company.technicals.destroy', '') }}" method="POST" class="d-inline"
+        {{-- <form id="form-delete" action="{{ route('company.technicals.destroy', '') }}" method="POST" class="d-inline"
             style="cursor:pointer">
             @csrf
             @method('DELETE')
-        </form>
+        </form> --}}
 
-        @include('company.pages.tecnicos.form')
-
-        {{-- <input type="file" id="file-input" style="display: none;" accept=".xls,.xlsx" /> --}}
 
         @if (session('message') || session('error'))
             <script>
@@ -117,40 +110,5 @@
             </script>
         @endif
 
-        <script>
-            $(document).ready(function() {
-                initModal('.OpenModal', '/company/technicals/', {
-                    id: 'head-id',
-                    titleEdit: "Editar",
-                    titleCreate: "Registrar",
-                    submitTextEdit: "Actualizar",
-                    submitTextCreate: "Guardar",
-                    modalID: '#myModal',
-                    dataTransform: function(response) {
-                        return response.tecnico;
-                    }
-                });
-
-                initFormSubmission('#myForm', '#myModal');
-
-                //Delete Tecnico
-                $('.delete-btn').on('click', function() {
-                    var tecnicoId = $(this).data('head-id')
-                    var action = $('#form-delete').attr('action') + '/' + tecnicoId;
-                    console.log(action);
-                    confirmDelete(function() {
-                        $('#form-delete').attr('action', action).submit();
-                    });
-                });
-
-                //Edit Tecncio
-                $(document).ready(function() {
-                    $('.edit-form-data').on('click', function() {
-                        var tecnicoId = $(this).data('head-id');
-                        $('#myModal input#tecnicoId').val(tecnicoId);
-                    })
-                });
-            });
-        </script>
 
     @endsection
