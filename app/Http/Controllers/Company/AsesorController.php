@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vendedor;
+use App\Models\Asesor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class VendedorController extends Controller
+class AsesorController extends Controller
 {
 
     public function index()
     {
-        $vendedores = Vendedor::where('company_id', Auth::user()->id)->paginate(10);
-        return view('company.pages.vendedores.index', compact('vendedores'));
+        $asesores = Asesor::where('company_id', Auth::user()->id)->paginate(10);
+        return view('company.pages.asesores.index', compact('asesores'));
     }
 
     /**

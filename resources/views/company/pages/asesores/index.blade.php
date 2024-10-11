@@ -10,7 +10,7 @@
                         <a class="btn btn-info OpenModal py-2 px-3" data-toggle="modal" data-target="myModal">Registrar</a>
                         <div class="row mt-3">
                             <div class="col-lg-6 col-7">
-                                <h6>Vendedores</h6>
+                                <h6>Asesores</h6>
                             </div>
                         </div>
                     </div>
@@ -39,35 +39,35 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (count($vendedores ?? []) > 0)
-                                        @foreach ($vendedores as $vendedor)
+                                    @if (count($asesores ?? []) > 0)
+                                        @foreach ($asesores as $asesor)
                                             <tr>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $vendedor->nombre }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $asesor->nombre }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $vendedor->tipo_documento }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $asesor->tipo_documento }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $vendedor->numero_documento_identificacion }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $asesor->numero_documento_identificacion }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $vendedor->cargo }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $asesor->cargo }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
-                                                        {{-- {{ $vendedor->numeroSolicitudes() }} --}}
-                                                        <a href="{{ route('company.technicals.requests.index' , $vendedor->id) }}">
+                                                        {{-- {{ $asesor->numeroSolicitudes() }} --}}
+                                                        <a href="{{ route('company.technicals.requests.index' , $asesor->id) }}">
                                                             <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i>
                                                         </a>
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
-                                                        data-target="#myModal" data-head-id="{{ $vendedor->id }}">
+                                                        data-target="#myModal" data-head-id="{{ $asesor->id }}">
                                                         <i class="fa fa-edit fa-lg text-info"></i>
                                                     </a>
-                                                    <a class="delete-btn" data-head-id="{{ $vendedor->id }}">
+                                                    <a class="delete-btn" data-head-id="{{ $asesor->id }}">
                                                         <i class="far fa-trash-alt fa-lg text-danger"></i>
                                                     </a>
                                                 </td>
@@ -75,14 +75,14 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td class="align-middle text-center text-sm" colspan="5">No existen Vendedores
+                                            <td class="align-middle text-center text-sm text-danger font-weight-bolder" colspan="5">No existen Asesores
                                         </tr>
                                     @endif
                                 </tbody>
                             </table>
                             <br>
                             <div class="d-flex justify-content-center">
-                                {{ $vendedores->links('pagination::bootstrap-4') }}
+                                {{ $asesores->links('pagination::bootstrap-4') }}
                             </div>
                         </div>
                     </div>
