@@ -89,7 +89,7 @@
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
 
             <div class="card" style="height: 100%; padding: 0 20px" id="informacion">
-                <form id="form-solicitudes" action="" method="POST" style="max-height: 100%" >
+                <form id="form-solicitudes" action="" method="POST" style="max-height: 100%">
                     @csrf
                     <input type="hidden" id="tecnicoID" name="tecnicoID" value="{{ $tecnico->id }}">
                     <div class="card-header pb-0">
@@ -128,7 +128,8 @@
                                 <label for="nombre"
                                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                     Nombre del cliente:</label>
-                                <input type="text" class="new-form-control" id="nombre" name="nombre" value="">
+                                <input type="text" class="new-form-control" id="nombre" name="nombre"
+                                    value="">
                                 <div class="invalid-feedback" id="nombreError"></div>
                             </div>
                             <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
@@ -147,7 +148,7 @@
                     <div id="invalid-feedback" class="d-flex justify-content-center">
                 </form>
             </div>
-            <div id="resultados" class=""  style="height: 100%">
+            <div id="resultados" class="" style="height: 100%">
             </div>
         </div>
     </div>
@@ -178,35 +179,12 @@
 
     <script>
         $(document).ready(function() {
-            initModal('.OpenModal', '/company/technicals/{{ $tecnico->id }}/requests/', {
-                id: 'head-id',
-                titleEdit: "Editar",
-                titleCreate: "Registrar",
-                submitTextEdit: "Actualizar",
-                submitTextCreate: "Guardar",
-                modalID: '#myModal',
-                dataTransform: function(response) {
-                    return response.solicitud;
-                }
-            });
-
-            initFormSubmission('#myForm', '#myModal');
-
-            //Borrar Solicitud
-            $('#tabla-solicitudes').on('click', '.delete-btn', function() {
-                var solicitudId = $(this).data('head-id')
-                var newAction = $('#form-delete').attr('action').replace(':request', solicitudId);
-                confirmDelete(function() {
-                    $('#form-delete').attr('action', newAction).submit();
-                });
-            });
 
             // Borrar Solicitud
             $('#tabla-solicitudes').on('click', '.delete-btn', function() {
                 var solicitudId = $(this).data('head-id');
                 var newAction = $('#form-delete').attr('action').replace(':request', solicitudId);
                 var _token = $('#form-delete input[name="_token"]').val();
-                console.log(newAction, _token);
 
                 confirmDelete(function() {
                     // Realizar la eliminación mediante AJAX
@@ -219,10 +197,48 @@
                         success: function(response) {
 
                             $.ajax({
-                                url: "/company/technicals/{{ $tecnico->id }}/requests",
+                                url: "/company/getDataIndex/{{ $tecnico->id }}",
                                 type: 'GET',
                                 success: function(response) {
 
+                                    let tbdoy = $('#tbody');
+                                    tbdoy.empty();
+                                    if (response.solicitudes.data.length >0) {
+                                        response.solicitudes.data.forEach(
+                                            function(item) {
+                                                tbdoy.append(`
+                                                    <tr data-id="${item.id}">
+                                                        <td class="align-middle text-center text-sm">
+                                                            <span
+                                                                class="text-xs font-weight-bold">${item.numero_solicitud}</span>
+                                                        </td>
+                                                        <td class="align-middle text-center text-sm">
+                                                            <span class="text-xs font-weight-bold">
+                                                                ${item.solicitante.numero_documento_identificacion}
+                                                            </span>
+                                                        </td>
+                                                        <td class="align-middle text-center text-sm">
+                                                            <span class="text-xs font-weight-bold">
+                                                                ${item.proyecto.categoria}
+                                                            </span>
+                                                        </td>
+                                                        <td class="align-middle text-center text-sm">
+                                                            <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
+                                                                data-target="#myModal" data-head-id="${item.id}">
+                                                                <i class="fa fa-edit fa-lg text-info"></i>
+                                                            </a>
+                                                            <a class="delete-btn" data-head-id="${item.id}">
+                                                                <i class="far fa-trash-alt fa-lg text-danger"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>`
+                                                );
+                                            });
+                                    } else {
+                                        $(tbdoy).append(
+                                            '<p>No existen solicitudes para este técnico.</p>'
+                                            );
+                                    }
                                 },
                                 error: function(response) {
                                     console.log('Error al borrar registro');
@@ -291,7 +307,6 @@
                 let url = '{{ route('company.obtenerRegistros') }}';
 
                 $('#form-solicitudes').off('submit').on('submit', function(event) {
-                    console.log('estoy en el form');
 
                     event.preventDefault();
                     let invalidFeedback = $('#invalid-feedback');
@@ -310,7 +325,6 @@
                             if (response.status == 422) {
 
                                 var errors = response.responseJSON.errors;
-                                console.log(errors.atleast_one);
                                 $('#no_hay_registros').remove();
                                 invalidFeedback.empty();
                                 invalidFeedback.html(
@@ -319,7 +333,7 @@
                             }
                         }
                     });
-                    });
+                });
 
             })
 

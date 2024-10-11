@@ -18,7 +18,7 @@ class SolicitudTecnicoController extends Controller
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
-        $solicitudesIndex = $tecnico->solicitudes()->paginate(10);
+        $solicitudesIndex = $tecnico->solicitudes()->withPivot('solicitud_tecnico.id')->orderBy('solicitud_tecnico.id', 'desc')->paginate(10);
         return view('company.pages.solicitudesTecnico.index', compact('solicitudesIndex', 'tecnico'));
     }
 
@@ -27,7 +27,9 @@ class SolicitudTecnicoController extends Controller
         if ( $tecnico->company_id != Auth::user()->id) {
             abort(403);
         }
-        $solicitudes = $tecnico->solicitudes()->paginate(10);
+        $solicitudes = $tecnico->solicitudes()->withPivot('solicitud_tecnico.id')->orderBy('solicitud_tecnico.id', 'desc')->paginate(10);
+        $solicitudes->load('solicitante:id,numero_documento_identificacion');
+        $solicitudes->load('proyecto:id,categoria');
         return response()->json([
             'solicitudes' => $solicitudes,
         ]);
@@ -112,37 +114,29 @@ class SolicitudTecnicoController extends Controller
         $nombre = strtolower($request->nombre);
         $direccion = strtolower($request->direccion);
 
-        $query = Solicitante::query();
+        $query = Solicitud::query();
 
         if (!empty($numSolicitud)) {
-            $query->whereHas('solicitudes', function ($q) use ($numSolicitud) {
-                $q->where('numero_solicitud', 'like' ,"%$numSolicitud%");
+            $query->where('numero_solicitud', 'like' ,"%$numSolicitud%"); 
+        }
+
+        if (!empty($numDocIdentidad)) {
+            $query->whereHas('solicitante', function ($q) use ($numDocIdentidad) {
+                $q->where('numero_documento_identificacion', 'like' ,"%$numDocIdentidad%");
             });
         }
 
-        if ($numDocIdentidad) {
-            $query->where('numero_documento_identificacion', 'like' ,"%$numDocIdentidad%");
-        }
-
-        // if ($nombre) {
-        //     $query->where('nombre', 'like' , "%$nombre%");
-        // }
-        if ($nombre) {
-            $query->whereRaw('LOWER(nombre) LIKE ?', ["%$nombre%"]);
-        }
-
-        // if ($direccion) {
-        //     $query->whereHas('ubicaciones', function($q) use ($direccion) {
-        //         $q->where('direccion', 'like' ,"%$direccion%");
-        //     });
-        // }
-
-        if ($direccion) {
-            $query->whereHas('ubicaciones', function($q) use ($direccion) {
-                $q->whereRaw('LOWER(direccion) LIKE ?', ["%$direccion%"]);
+        if (!empty($nombre)) {
+            $query->whereHas('solicitante', function ($q) use ($nombre) {
+                $q->whereRaw('LOWER(nombre) LIKE ?' ,["%".strtolower($nombre)."%"]);
             });
         }
 
+        if (!empty($direccion)) {
+            $query->whereHas('ubicacion', function($q) use ($direccion) {
+                $q->whereRaw('LOWER(direccion) LIKE ?', ["%".strtolower($direccion)."%"]);
+            });
+        }
         $registros = $query->paginate(10);
         $registros->appends($request->all());
 

@@ -150,6 +150,8 @@ class ClientController extends Controller
                     $ubicacion->codigo_manzana = trim($row['R']) ?: null;
                     $ubicacion->nombre_malla = trim($row['S']) ?: null;
                     $ubicacion->save();
+
+                    $solicitud->update(['ubicacion_id' => $ubicacion->id]);
     
                     $proyecto = Proyecto::where('solicitante_id', $client->id)->first();
     
@@ -164,6 +166,8 @@ class ClientController extends Controller
                     $proyecto->sub_categoria = trim($row['CM']) ?: null;
                     $proyecto->codigo_objeto_conexion = trim($row['CN']) ?: null;
                     $proyecto->save();
+
+                    $solicitud->update(['proyecto_id' => $proyecto->id]);
     
                     $empresa = Empresa::where('solicitante_id', $client->id)->first();
     

@@ -16,24 +16,29 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($registros as $registro)
+                @foreach ($registros as $registro)  <!--Cada registro pertenece a  una solicitud-->
                     <tr>
-                        <td style="color:rgb(36, 150, 36);cursor:pointer" class="añadir-solicitud"
-                            data-num-solicitud = "{{ $registro->solicitudes->first()->numero_solicitud }}"
-                            data-num-doc-identificacion = "{{ $registro->numero_documento_identificacion }}"
-                            data-nombre = "{{ $registro->nombre }}"
-                            data-direccion = "{{ $registro->ubicaciones->first()->direccion }}"
-                            data-categoria = "{{ $registro->proyectos->first()->categoria }}"
-                            data-solicitante-id = "{{ $registro->id }}">
+                        <td style="color:rgb(36, 150, 36);cursor:pointer" class="añadir-solicitud text-center"
+                            data-num-solicitud = "{{ $registro->numero_solicitud }}"
+                            data-num-doc-identificacion = "{{ $registro->solicitante->numero_documento_identificacion }}"
+                            data-nombre = "{{ $registro->solicitante->nombre }}"
+                            data-direccion = "{{ $registro->ubicacion->direccion }}"
+                           
+                            data-categoria = "{{ $registro->proyecto->categoria }}"
+                            data-solicitante-id = "{{ $registro->solicitante->id }}">
                             <i class="fas fa-arrow-left"></i>
                         </td>
                         <td class="text-center text-uppercase text-sm font-weight-bold">
-                            {{ $registro->solicitudes->first()->numero_solicitud }}</td>
+                            {{ $registro->numero_solicitud }}
+                        </td>
                         <td class="text-center text-uppercase text-sm font-weight-bold">
-                            {{ $registro->numero_documento_identificacion }}</td>
-                        <td class="text-left text-uppercase text-sm font-weight-bold">{{ $registro->nombre }}</td>
+                            {{ $registro->solicitante->numero_documento_identificacion }}
+                        </td>
                         <td class="text-left text-uppercase text-sm font-weight-bold">
-                            {{ $registro->ubicaciones->first()->direccion }}</td>
+                            {{ $registro->solicitante->nombre }}
+                        </td>
+                        <td class="text-left text-uppercase text-sm font-weight-bold">
+                            {{ $registro->ubicacion->direccion }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -118,6 +123,8 @@
             });
 
             function createTableTbody(response) {
+                console.log(response);
+                
                 let tbdoy = $('#tbody');
                 tbdoy.empty();
                 if (response.solicitudes.data.length > 0) {
@@ -125,16 +132,19 @@
                         tbdoy.append(`
                             <tr data-id="${item.id}">
                                 <td class="align-middle text-center text-sm">
-                                    <span
-                                        class="text-xs font-weight-bold">${item.numero_solicitud}</span>
+                                    <span class="text-xs font-weight-bold">
+                                        ${item.numero_solicitud}
+                                    </span>
                                 </td>
                                 <td class="align-middle text-center text-sm">
-                                    <span
-                                        class="text-xs font-weight-bold"></span>
+                                    <span class="text-xs font-weight-bold">
+                                        ${item.solicitante.numero_documento_identificacion}
+                                    </span>
                                 </td>
                                 <td class="align-middle text-center text-sm">
-                                    <span
-                                        class="text-xs font-weight-bold"></span>
+                                    <span class="text-xs font-weight-bold">
+                                        ${item.proyecto.categoria}
+                                    </span>
                                 </td>
                                 <td class="align-middle text-center text-sm">
                                     <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
@@ -149,7 +159,7 @@
                         );
                     });
                 } else {
-                    $(tbdoy).append('<p>No images found for this location.</p>');
+                    $(tbdoy).append('<p>No existen solicitudes para este técnico.</p>');
                 }
             }
         });

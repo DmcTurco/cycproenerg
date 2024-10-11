@@ -14,16 +14,21 @@ class Proyecto extends Model
     protected $table = 'proyectos';
 
     protected $fillable = [
+        'solicitante_id',
         'tipo_proyecto',
         'codigo_proyecto',
         'categoria',
         'sub_categoria',
         'codigo_objeto_conexion',
-        'solicitante_id',
     ];
 
     public function solicitante()
     {
         return $this->belongsTo(Solicitante::class);
+    }
+    
+    public function solicitudes()
+    {
+        return $this->hasMany(Solicitud::class);
     }
 }

@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('solicituds', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('solicitante_id');
+            $table->unsignedBigInteger('ubicacion_id')->nullable();
+            $table->unsignedBigInteger('proyecto_id')->nullable();
             $table->string('numero_solicitud')->nullable();
             $table->string('codigo_identificacion_predio')->nullable();
             $table->string('numero_suministro')->nullable();

@@ -14,6 +14,7 @@ class Ubicacion extends Model
     protected $table = 'ubicacions';
 
     protected $fillable = [
+        'solicitante_id',
         'direccion',
         'departamento',
         'provincia',
@@ -21,7 +22,6 @@ class Ubicacion extends Model
         'ubicacion',
         'codigo_manzana',
         'nombre_malla',
-        'solicitante_id',
     ];
 
     // Relación con solicitante
@@ -29,4 +29,10 @@ class Ubicacion extends Model
     {
         return $this->belongsTo(Solicitante::class);
     }
+
+    public function solicitudes()
+    {
+        return $this->hasMany(Solicitud::class);
+    }
+
 }
