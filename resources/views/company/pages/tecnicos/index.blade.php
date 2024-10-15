@@ -7,7 +7,7 @@
             <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
                 <div class="card">
                     <div class="card-header pb-0">
-                        <a class="btn btn-info OpenModal py-2 px-3" data-toggle="modal" data-target="myModal">Registrar</a>
+                        <a class="btn btn-info OpenModal py-2 px-3" data-bs-toggle="modal" data-bs-target="#myModal">Registrar</a>
                         <div class="row mt-3">
                             <div class="col-lg-6 col-7">
                                 <h6>Tecnicos</h6>
