@@ -7,100 +7,102 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Solicitante;
+use App\Models\Empresa;
+use App\Models\Concesionaria;
+use App\Models\Solicitud;
+use App\Models\Ubicacion;
+use App\Models\Proyecto;
+use Illuminate\Support\Facades\Log;
+use App\Events\RowProcessed;
 
 class ProcessExcelJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $filePath;
+    protected $row;
+    protected $batchId;
+    protected $rowIndex;
+    protected $totalRows;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($filePath)
+    public function __construct($row, $batchId, $rowIndex, $totalRows)
     {
-        $this->filePath = $filePath;
+        $this->row = $row;
+        $this->batchId = $batchId;
+        $this->rowIndex = $rowIndex;
+        $this->totalRows = $totalRows;
     }
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle()
     {
-
-        // Inicializar los contadores
-        $createdCount = 0;
-        $updatedCount = 0;
-
         try {
-
-            // Cargar el archivo Excel
-            $spreadsheet = IOFactory::load($this->filePath);
-            $sheet = $spreadsheet->getActiveSheet();
-            $rows = $sheet->toArray(null, true, true, true);
-
-            // Iterar sobre las filas (omitir la primera fila si es el header)
-            foreach ($rows as $index => $row) {
-                if ($index == 1) {
-                    continue; // Ignorar el header
-                }
-
-                // Validar que las columnas clave existen y tienen datos válidos
-                if (empty($row['H']) || empty($row['I']) || empty($row['G']) || !is_numeric($row['H'])) {
-                    // Registrar un error si faltan datos críticos o si el DNI no es numérico
-                    Log::warning("Fila $index omitida: faltan datos clave o el formato es incorrecto.");
-                    continue; // Saltar a la siguiente fila
-                }
-
-                // Mapeo de columnas del Excel para el cliente
-                $dni = trim($row['H']); // Número de documento de identificación del solicitante
-                $client = Client::where('document_number', $dni)->first();
-
-                // Si el cliente no existe, lo creamos y aumentamos el contador de creados
-                if (!$client) {
-                    $client = new Client();
-                    $client->document_number = $dni;
-                    $createdCount++;  // Incrementar el contador de nuevos registros
-                } else {
-                    $updatedCount++;  // Incrementar el contador de actualizados
-                }
-
-                // Validaciones adicionales para los campos específicos
-                if (!filter_var($row['L'], FILTER_VALIDATE_EMAIL)) {
-                    // Si el correo electrónico no es válido, saltamos la fila y registramos el error
-                    Log::warning("Fila $index omitida: correo electrónico no válido.");
-                    continue; // Saltar esta fila
-                }
-
-                // Actualizamos los datos del cliente
-                $client->document_type = $row['G']; // Tipo de documento
-                $client->name = $row['I'];  // Nombre del solicitante
-                $client->phone = $row['J']; // Teléfono
-                $client->cell_phone = $row['K']; // Celular
-                $client->email = $row['L'];   // Correo electrónico
-                $client->address = $row['M']; // Dirección
-                $client->department = $row['N']; // Departamento
-                $client->province = $row['O'];  // Provincia
-                $client->district = $row['P'];  // Distrito
-                $client->save();
+            // Validar datos de la fila
+            if (empty($this->row['H']) || empty($this->row['I']) || empty($this->row['G']) || !is_numeric($this->row['H']) || !filter_var($this->row['L'], FILTER_VALIDATE_EMAIL)) {
+                throw new \Exception("Datos inválidos en la fila {$this->rowIndex}");
             }
 
-            // Después de procesar todas las filas, registrar el resultado
-            Log::info("Se agregaron $createdCount nuevos clientes y se actualizaron $updatedCount clientes existentes.");
+            // Procesar la fila
+            $solicitante = $this->processSolicitante();
+            $this->processSolicitud($solicitante);
+            // $this->processUbicacion($solicitante);
+            // $this->processProyecto($solicitante);
+            // $this->processEmpresa($solicitante);
+            // $this->processConcesionaria($solicitante);
 
-            // Devolver un resumen del procesamiento si quieres mostrarlo al usuario
-            // return response()->json([
-            //     'success' => true,
-            //     'message' => 'Se agregaron ' . $createdCount . ' nuevos clientes y se actualizaron ' . $updatedCount . ' clientes existentes.'
-            // ]);
+            // Emitir evento de progreso
+            event(new RowProcessed($this->batchId, $this->rowIndex, $this->totalRows));
         } catch (\Exception $e) {
-            // Si ocurre algún error, registrarlo en los logs de Laravel
-            Log::error('Error procesando el archivo Excel: ' . $e->getMessage());
-
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Error procesando el archivo Excel. Ver logs para más detalles.'
-            // ], 500);
+            Log::error("Error procesando fila {$this->rowIndex}: " . $e->getMessage());
+            // Aquí podrías emitir un evento de error si lo deseas
         }
     }
+
+
+    private function processSolicitante()
+    {
+        return Solicitante::updateOrCreate(
+            ['numero_documento' => trim($this->row['H'])],
+            [
+                'tipo_documento' => trim($this->row['G']),
+                'nombre' => trim($this->row['I']),
+                'celular' => trim($this->row['K']),
+                'correo_electronico' => trim($this->row['L']),
+                'usuario_fise' => trim($this->row['U']),
+            ]
+        );
+    }
+
+    private function processSolicitud($solicitante)
+    {
+        Solicitud::updateOrCreate(
+            ['solicitante_id' => $solicitante->id],
+            [
+                'numero_solicitud' => trim($this->row['A']) ?: null,
+                'numero_suministro' => trim($this->row['C']) ?: null,
+                'numero_contrato_suministro' => trim($this->row['D']) ?: null,
+                'fecha_aprobacion_contrato' => $this->parseDate(trim($this->row['F'])),
+                'fecha_registro_portal' => $this->parseDate(trim($this->row['X'])),
+                'estado_solicitud' => trim($this->row['CO']),
+            ]
+        );
+    }
+
+    private function parseDate($dateString)
+    {
+        return !empty($dateString) ? \Carbon\Carbon::parse($dateString)->format('Y-m-d') : null;
+    }
+
+
+
+
+
+
+
+
 }

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('solicitantes', function (Blueprint $table) {
             $table->id();
-            $table->string('tipo_documento_identificacion')->nullable();
-            $table->string('numero_documento_identificacion')->nullable();
+            $table->string('tipo_documento')->nullable();
+            $table->string('numero_documento')->nullable();
             $table->string('nombre')->nullable();
-            $table->string('telefono')->nullable();
             $table->string('celular')->nullable();
             $table->string('correo_electronico')->nullable();
+            $table->string('usuario_fise')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

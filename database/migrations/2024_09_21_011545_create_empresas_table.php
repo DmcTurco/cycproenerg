@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('empresas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('solicitante_id');
-            $table->string('tipo_documento_identificacion')->nullable();
-            $table->string('numero_documento_identificacion')->nullable();
+            $table->string('tipo_documento')->nullable();
+            $table->string('numero_documento')->nullable();
             $table->string('nombre')->nullable();
             $table->string('registro_gas_natural')->nullable();
             $table->timestamps();

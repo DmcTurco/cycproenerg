@@ -13,15 +13,14 @@ return new class extends Migration
     {
         Schema::create('instalacions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('solicitante_id');
-            $table->string('tipo')->nullable();
+            $table->string('tipo_instalacion')->nullable();
             $table->string('tipo_acometida')->nullable();
-            $table->string('material')->nullable();
-            $table->integer('numero_puntos_proyectados')->nullable();
-            $table->integer('numero_puntos_instalados')->nullable();
-            $table->integer('numero_puntos_habilitados')->nullable();
-            $table->integer('ambientes_aprobados')->nullable();
-            $table->integer('numero_ambientes')->nullable();
+            $table->integer('numero_puntos_instalacion')->nullable();
+            $table->date('fecha_finalizacion_instalacion_interna')->nullable();
+            $table->date('fecha_finalizacion_instalacion_acometida')->nullable();
+            $table->string('resultado_instalacion_tc')->nullable();
+            $table->date('fecha_programacion_habilitacion')->nullable();
+            $table->unsignedBigInteger('solicitud_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

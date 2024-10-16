@@ -29,11 +29,13 @@ class ClientController extends Controller
 {
     public function index()
     {
-        $clientesConSolicitudes = Solicitante::with(['solicitudes' => function ($query) {
-            $query->select('id', 'solicitante_id', 'numero_solicitud', 'numero_suministro', 'numero_contrato_suministro');
-        }])
-            ->select('id', 'tipo_documento_identificacion', 'nombre')
-            ->paginate(10); // Paginamos los resultados, 15 por página
+        // $clientesConSolicitudes = Solicitante::with(['solicitudes' => function ($query) {
+        //     $query->select('id', 'solicitante_id', 'numero_solicitud', 'numero_suministro', 'numero_contrato_suministro');
+        // }])
+        //     ->select('id', 'tipo_documento_identificacion', 'nombre')
+        //     ->paginate(10); // Paginamos los resultados, 15 por página
+
+        $clientesConSolicitudes = Solicitud::paginate(10);
 
         return view('company.pages.clients.index', compact('clientesConSolicitudes'));
     }

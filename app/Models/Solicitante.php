@@ -14,48 +14,12 @@ class Solicitante extends Model
     protected $table = 'solicitantes';
 
     protected $fillable = [
-        'tipo_documento_identificacion',
-        'numero_documento_identificacion',
+        'tipo_documento',
+        'numero_documento',
         'nombre',
-        'telefono',
         'celular',
         'correo_electronico',
+        'usuario_fise',
     ];
-
-    // Relación con Solicitudes
-    public function solicitudes()
-    {
-        return $this->hasMany(Solicitud::class);
-    }
-
-    // Relación con Ubicaciones
-    public function ubicaciones()
-    {
-        return $this->hasMany(Ubicacion::class);
-    }
-
-    // Relación con Proyectos
-    public function proyectos()
-    {
-        return $this->hasMany(Proyecto::class);
-    }
-
-    // Relación con Empresas
-    public function empresas()
-    {
-        return $this->hasMany(Empresa::class);
-    }
-
-    // Relación con Instalaciones
-    public function instalaciones()
-    {
-        return $this->hasMany(Instalacion::class);
-    }
-
-    // Relación con Pruebas
-    public function pruebas()
-    {
-        return $this->hasMany(Prueba::class);
-    }
 
 }

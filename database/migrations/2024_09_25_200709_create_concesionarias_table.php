@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('concesionarias', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('solicitante_id');
-            $table->string('tipo_documento_identificacion')->nullable();
-            $table->string('numero_documento_identificacion')->nullable();
+            $table->string('tipo_documento')->nullable();
+            $table->string('numero_documento')->nullable();
             $table->string('nombre')->nullable();
             $table->timestamps();
             $table->softDeletes();
