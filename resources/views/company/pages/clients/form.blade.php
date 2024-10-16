@@ -100,6 +100,8 @@
         const statusTitle = document.getElementById('status-title');
         const statusMessage = document.getElementById('status-message');
         const errorMessage = document.getElementById('error-message');
+        const modal = document.getElementById('uploadModal');
+        let uploadSuccessful = false;
 
         uploadTrigger.addEventListener('click', function(event) {
             event.preventDefault(); // Prevenir el comportamiento por defecto del enlace
@@ -163,16 +165,25 @@
                     const response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.success) {
                         handleSuccess(response.message);
+                        uploadSuccessful = true;
                     } else {
                         handleError(response.message || 'Error al procesar el archivo.');
+                        uploadSuccessful = false;
                     }
                 } catch (e) {
                     handleError('Error al procesar la respuesta del servidor.');
+                    uploadSuccessful = false;
                 }
             });
 
-            xhr.addEventListener('error', () => handleError('Error de conexión al servidor.'));
-            xhr.addEventListener('timeout', () => handleError('La solicitud ha excedido el tiempo de espera.'));
+            xhr.addEventListener('error', () => {
+                handleError('Error de conexión al servidor.');
+                uploadSuccessful = false;
+            });
+            xhr.addEventListener('timeout', () => {
+                handleError('La solicitud ha excedido el tiempo de espera.');
+                uploadSuccessful = false;
+            });
             xhr.open('POST', '/company/change');
             xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
             xhr.send(formData);
@@ -209,5 +220,13 @@
             errorMessage.textContent = message;
             errorMessage.classList.remove('d-none');
         }
+
+
+        modal.addEventListener('hidden.bs.modal', function() {
+
+            if (uploadSuccessful) {
+                location.reload();
+            }
+        });
     });
 </script>
