@@ -11,7 +11,7 @@ class Instalacion extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'instalaciones';
+    protected $table = 'instalacions';
 
     protected $fillable = [
         'tipo_instalacion',

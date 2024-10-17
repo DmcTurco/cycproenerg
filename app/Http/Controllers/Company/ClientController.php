@@ -8,13 +8,6 @@ use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Log;
 
-use App\Models\Client;
-use App\Models\Document;
-use App\Models\Installation;
-use App\Models\Enterprise;
-use App\Models\Inspector;
-use App\Models\Project;
-use App\Models\Result;
 use App\Jobs\ProcessExcelJob;
 use App\Models\Concesionaria;
 use App\Models\Empresa;
@@ -23,8 +16,10 @@ use App\Models\Prueba;
 use App\Models\Solicitante;
 use App\Models\Solicitud;
 use App\Models\Ubicacion;
+use App\Models\Instalacion;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use App\Helpers\TipoDocumentoHelper;
+
 
 class ClientController extends Controller
 {
@@ -230,6 +225,9 @@ class ClientController extends Controller
             $concesionaria = $this->processConcesionaria($row);
             $solicitante = $this->processSolicitante($row);
             $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria);
+            $ubicacion = $this->processUbicacion($row,$solicitud);
+            $proyecto = $this->processProyecto($row,$solicitud);
+            $instalacion = $this->processInstalacion($row,$solicitud);
 
             $solicitud->wasRecentlyCreated ? $created++ : $updated++;
         }
@@ -300,6 +298,56 @@ class ClientController extends Controller
                 'fecha_aprobacion_contrato' => $this->parseDate(trim($row['F'])),
                 'fecha_registro_portal' => $this->parseDate(trim($row['X'])),
                 'estado_solicitud' => trim($row['CO']),
+            ]
+        );
+    }
+
+    private function processUbicacion($row, $solicitud)
+    {
+        return Ubicacion::updateOrCreate(
+            ['solicitud_id' => $solicitud->id],
+            [
+                'ubicacion' => trim($row['Q']) ?: null,
+                'codigo_manzana' => trim($row['R']) ?: null,
+                'codigo_identificacion_interna' => trim($row['B']) ?: null,
+                'nombre_malla' => trim($row['S']) ?: null,
+                'direccion' => trim($row['M']) ?: null,
+                'departamento' => trim($row['N']),
+                'provincia' => trim($row['O']),
+                'distrito' => trim($row['P']),
+                'venta_zona_no_gasificada' => trim($row['W']),
+
+            ]
+        );
+    }
+
+    private function processProyecto($row, $solicitud)
+    {
+        return Proyecto::updateOrCreate(
+            ['solicitud_id' => $solicitud->id],
+            [
+                'tipo_proyecto' => trim($row['AE']) ?: null,
+                'codigo_proyecto' => trim($row['AF']) ?: null,
+                'categoria_proyecto' => trim($row['CL']) ?: null,
+                'sub_categoria_proyecto' => trim($row['CM']) ?: null,
+                'codigo_objeto_conexion' => trim($row['CN']) ?: null,
+
+            ]
+        );
+    }
+
+    private function processInstalacion($row, $solicitud)
+    {
+        return Instalacion::updateOrCreate(
+            ['solicitud_id' => $solicitud->id],
+            [
+                'tipo_instalacion' => trim($row['AG']) ?: null,
+                'tipo_acometida' => trim($row['AH']) ?: null,
+                'numero_puntos_instalacion' => trim($row['AJ']) ?: null,
+                'fecha_finalizacion_instalacion_interna' =>$this->parseDate(trim($row['AA'])) ?: null,
+                'fecha_finalizacion_instalacion_acometida' =>$this->parseDate(trim($row['AB'])) ?: null,
+                'resultado_instalacion_tc' => trim($row['CQ']) ?: null,
+                'fecha_programacion_habilitacion' =>$this->parseDate(trim($row['AC'])) ?: null,
             ]
         );
     }
