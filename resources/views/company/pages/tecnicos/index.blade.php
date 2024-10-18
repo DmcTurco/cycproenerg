@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="container-fluid py-4">
+    <div class="container-fluid ">
         <div class="row mb-4">
             <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
                 <div class="card">

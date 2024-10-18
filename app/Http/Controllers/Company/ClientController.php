@@ -19,22 +19,76 @@ use App\Models\Ubicacion;
 use App\Models\Instalacion;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use App\Helpers\TipoDocumentoHelper;
-
+use App\Models\Estado;
 
 class ClientController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        // $clientesConSolicitudes = Solicitante::with(['solicitudes' => function ($query) {
-        //     $query->select('id', 'solicitante_id', 'numero_solicitud', 'numero_suministro', 'numero_contrato_suministro');
-        // }])
-        //     ->select('id', 'tipo_documento_identificacion', 'nombre')
-        //     ->paginate(10); // Paginamos los resultados, 15 por página
 
-        $clientesConSolicitudes = Solicitud::paginate(10);
+        // Obtenemos la lista de estados desde la base de datos
+        $estados = Estado::orderBy('nombre', 'DESC')->get(); // Esto obtiene todos los estados ordenados por nombre en orden ascendente
 
-        return view('company.pages.clients.index', compact('clientesConSolicitudes'));
+        // Comenzamos una consulta base de Solicitud con la relación 'estado'
+        $query = Solicitud::with('estado');
+
+        // Aplicar filtros si están presentes en la solicitud
+        if ($request->filled('numero_solicitud')) {
+            $query->where('numero_solicitud', 'like', '%' . $request->numero_solicitud . '%');
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('estado_solicitud', $request->estado);
+        }
+
+        if ($request->filled('dni')) {
+            $query->whereHas('solicitante', function ($q) use ($request) {
+                $q->where('numero_documento', 'like', '%' . $request->dni . '%');
+            });
+        }
+
+        if ($request->filled('nombre')) {
+            $query->whereHas('solicitante', function ($q) use ($request) {
+                $q->where('nombre', 'like', '%' . $request->nombre . '%');
+            });
+        }
+
+        if ($request->filled('numero_suministro')) {
+            $query->where('numero_suministro', 'like', '%' . $request->numero_suministro . '%');
+        }
+
+        // Ejecutar la consulta paginada
+        $clientesConSolicitudes = $query->paginate(10)->appends($request->except('page'));
+
+        // Obtener el total de solicitudes
+        $totalSolicitudes = Solicitud::count();
+
+        // Obtener el total de solicitudes filtradas
+        $totalSolicitudesFiltradas = $query->count();
+
+        // Aplicar tipo_documento_nombre para cada solicitud como lo hacías antes
+        foreach ($clientesConSolicitudes as $solicitud) {
+            $solicitud->tipo_documento_nombre = $this->getTipoDocumentoName(optional($solicitud->solicitante)->tipo_documento);
+        }
+
+        // Retornar la vista con los resultados
+        return view('company.pages.clients.index', compact('clientesConSolicitudes', 'estados', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
     }
+
+
+
+    private function getTipoDocumentoName($id)
+    {
+        $tipos_documento = config('const.tipo_documeto');
+        foreach ($tipos_documento as $tipo) {
+            if ($tipo['id'] == $id) {
+                return $tipo['name'];
+            }
+        }
+        return 'N/A';
+    }
+
 
     private function parseDate($date)
     {
@@ -224,10 +278,11 @@ class ClientController extends Controller
             $empresa = $this->processEmpresa($row);
             $concesionaria = $this->processConcesionaria($row);
             $solicitante = $this->processSolicitante($row);
-            $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria);
-            $ubicacion = $this->processUbicacion($row,$solicitud);
-            $proyecto = $this->processProyecto($row,$solicitud);
-            $instalacion = $this->processInstalacion($row,$solicitud);
+            $estado = $this->processEstado($row);
+            $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estado);
+            $ubicacion = $this->processUbicacion($row, $solicitud);
+            $proyecto = $this->processProyecto($row, $solicitud);
+            $instalacion = $this->processInstalacion($row, $solicitud);
 
             $solicitud->wasRecentlyCreated ? $created++ : $updated++;
         }
@@ -285,7 +340,63 @@ class ClientController extends Controller
         );
     }
 
-    private function processSolicitud($row, $solicitante, $empresa, $concesionaria)
+    private function processEstado($row)
+    {
+        // Procesar el estado
+        $estadoCompleto = trim($row['CO']);
+        $partes = explode('-', $estadoCompleto, 2);
+        $codigo = $partes[0];
+        $nombre = $partes[1] ?? '';
+        $abreviatura = $this->obtenerAbreviatura($nombre);
+
+        // Crear el estado si no existe
+        return Estado::firstOrCreate(
+            ['codigo' => $codigo],
+            [
+                'nombre' => $nombre,
+                'abreviatura' => $abreviatura
+            ]
+        );
+    }
+    private function obtenerAbreviatura($nombre)
+    {
+        $palabrasExcluidas = ['de', 'del', 'la', 'las', 'los', 'el', 'y', 'e', 'o', 'u'];
+        $palabras = explode(' ', strtolower($nombre));
+        $iniciales = '';
+
+        foreach ($palabras as $palabra) {
+            if (!in_array($palabra, $palabrasExcluidas)) {
+                $iniciales .= strtoupper(substr($palabra, 0, 1));
+            }
+        }
+
+        // Si la abreviatura es muy corta (menos de 2 caracteres), usamos las dos primeras palabras
+        if (strlen($iniciales) < 2) {
+            return implode(' ', array_slice($palabras, 0, 2));
+        }
+
+        return $iniciales;
+    }
+
+    // private function obtenerAbreviatura($nombre)
+    // {
+    //     $palabrasClave = [
+    //         'registrada', 'observada', 'subsanada', 'aprobada', 'Habilitación registrado', 'Habilitación observada', 
+    //         'programada', 'iniciada', 'finalizada', 'sin descargo'
+    //     ];
+
+    //     foreach ($palabrasClave as $palabra) {
+    //         if (stripos($nombre, $palabra) !== false) {
+    //             return $palabra;
+    //         }
+    //     }
+
+    //     // Si no se encuentra una palabra clave, usamos las primeras palabras
+    //     $palabras = explode(' ', $nombre);
+    //     return implode(' ', array_slice($palabras, 0, 2));
+    // }
+
+    private function processSolicitud($row, $solicitante, $empresa, $concesionaria, $estado)
     {
         return Solicitud::updateOrCreate(
             ['numero_solicitud' => trim($row['A'])],
@@ -297,7 +408,7 @@ class ClientController extends Controller
                 'numero_contrato_suministro' => trim($row['D']) ?: null,
                 'fecha_aprobacion_contrato' => $this->parseDate(trim($row['F'])),
                 'fecha_registro_portal' => $this->parseDate(trim($row['X'])),
-                'estado_solicitud' => trim($row['CO']),
+                'estado_solicitud' => $estado->id,
             ]
         );
     }
@@ -344,13 +455,11 @@ class ClientController extends Controller
                 'tipo_instalacion' => trim($row['AG']) ?: null,
                 'tipo_acometida' => trim($row['AH']) ?: null,
                 'numero_puntos_instalacion' => trim($row['AJ']) ?: null,
-                'fecha_finalizacion_instalacion_interna' =>$this->parseDate(trim($row['AA'])) ?: null,
-                'fecha_finalizacion_instalacion_acometida' =>$this->parseDate(trim($row['AB'])) ?: null,
+                'fecha_finalizacion_instalacion_interna' => $this->parseDate(trim($row['AA'])) ?: null,
+                'fecha_finalizacion_instalacion_acometida' => $this->parseDate(trim($row['AB'])) ?: null,
                 'resultado_instalacion_tc' => trim($row['CQ']) ?: null,
-                'fecha_programacion_habilitacion' =>$this->parseDate(trim($row['AC'])) ?: null,
+                'fecha_programacion_habilitacion' => $this->parseDate(trim($row['AC'])) ?: null,
             ]
         );
     }
-
-
 }

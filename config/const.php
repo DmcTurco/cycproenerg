@@ -8,4 +8,13 @@ return [
         ['id' => 3, 'name' => 'CE'],
     ],
 
+
+    'tipo_estado' =>[
+
+        ['id' => 1, 'name' => 'pendiente'],
+        ['id' => 2, 'name' => 'reasignado'],
+        ['id' => 3, 'name' => 'cancelado'],
+        ['id' => 4, 'name' => 'expirado'],
+    ]
+
 ];

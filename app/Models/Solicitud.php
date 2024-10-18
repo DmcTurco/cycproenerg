@@ -55,6 +55,10 @@ class Solicitud extends Model
         return $this->belongsTo(Concesionaria::class, 'concesionaria_id');
     }
 
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'estado_solicitud');
+    }
     /**
      * Get the asesor associated with the Solicitud.
      */
