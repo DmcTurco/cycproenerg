@@ -16,8 +16,8 @@ class CompanySeeder extends Seeder
     {
         // Crear datos de ejemplo para la tabla companies
         Company::create([
-            'name' => 'Company 1',
-            'email' => 'company1@example.com',
+            'name' => 'My Company',
+            'email' => 'company@gmail.com',
             'password' => Hash::make('0000'),
         ]);
 

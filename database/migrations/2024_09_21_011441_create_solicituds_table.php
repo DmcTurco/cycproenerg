@@ -13,22 +13,16 @@ return new class extends Migration
     {
         Schema::create('solicituds', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('solicitante_id');
             $table->string('numero_solicitud')->nullable();
-            $table->string('codigo_identificacion_predio')->nullable();
             $table->string('numero_suministro')->nullable();
             $table->string('numero_contrato_suministro')->nullable();
-            $table->timestamp('fecha_registro_aprobacion_portal')->nullable();
-            $table->timestamp('fecha_aprobacion_contrato')->nullable();
-            $table->timestamp('fecha_registro_solicitud_portal')->nullable();
-            $table->timestamp('fecha_programada_instalacion_interna')->nullable();
-            $table->timestamp('fecha_inicio_instalacion_interna')->nullable();
-            $table->timestamp('fecha_finalizacion_instalacion_interna')->nullable();
-            $table->timestamp('fecha_finalizacion_instalacion_acometida')->nullable();
-            $table->timestamp('fecha_programacion_habilitacion')->nullable();
-            $table->timestamp('fecha_entrega_documentos_concesionario')->nullable();
+            $table->date('fecha_aprobacion_contrato')->nullable();
+            $table->date('fecha_registro_portal')->nullable();
             $table->string('estado_solicitud')->nullable();
-            $table->string('ultima_accion_realizada')->nullable();
+            $table->unsignedBigInteger('solicitante_id')->nullable();
+            $table->unsignedBigInteger('empresa_id')->nullable();
+            $table->unsignedBigInteger('concesionaria_id')->nullable();
+            $table->unsignedBigInteger('asesor_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

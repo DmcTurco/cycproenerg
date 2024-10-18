@@ -14,19 +14,20 @@ class Ubicacion extends Model
     protected $table = 'ubicacions';
 
     protected $fillable = [
+        'ubicacion',
+        'codigo_manzana',
+        'codigo_identificacion_interna',
+        'nombre_malla',
         'direccion',
         'departamento',
         'provincia',
         'distrito',
-        'ubicacion',
-        'codigo_manzana',
-        'nombre_malla',
-        'solicitante_id',
+        'venta_zona_no_gasificada',
+        'solicitud_id',
     ];
 
-    // Relación con solicitante
-    public function solicitante()
+    public function solicitud()
     {
-        return $this->belongsTo(Solicitante::class);
+        return $this->belongsTo(Solicitud::class, 'solicitud_id');
     }
 }

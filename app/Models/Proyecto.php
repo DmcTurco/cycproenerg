@@ -16,14 +16,14 @@ class Proyecto extends Model
     protected $fillable = [
         'tipo_proyecto',
         'codigo_proyecto',
-        'categoria',
-        'sub_categoria',
+        'categoria_proyecto',
+        'sub_categoria_proyecto',
         'codigo_objeto_conexion',
-        'solicitante_id',
+        'solicitud_id',
     ];
 
-    public function solicitante()
+    public function solicitud()
     {
-        return $this->belongsTo(Solicitante::class);
+        return $this->belongsTo(Solicitud::class, 'solicitud_id');
     }
 }

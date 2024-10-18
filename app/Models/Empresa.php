@@ -14,15 +14,10 @@ class Empresa extends Model
     protected $table = 'empresas';
 
     protected $fillable = [
-        'tipo_documento_identificacion',
-        'numero_documento_identificacion',
+        'tipo_documento',
+        'numero_documento',
         'nombre',
         'registro_gas_natural',
-        'solicitante_id',
     ];
 
-    public function solicitante()
-    {
-        return $this->belongsTo(Solicitante::class);
-    }
 }

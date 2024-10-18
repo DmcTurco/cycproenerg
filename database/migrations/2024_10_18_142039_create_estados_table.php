@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('concesionarias', function (Blueprint $table) {
+        Schema::create('estados', function (Blueprint $table) {
             $table->id();
-            $table->string('tipo_documento')->nullable();
-            $table->string('numero_documento')->nullable();
-            $table->string('nombre')->nullable();
+            $table->string('codigo', 10)->unique();
+            $table->string('nombre');
+            $table->string('abreviatura');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('concesionarias');
+        Schema::dropIfExists('estados');
     }
 };

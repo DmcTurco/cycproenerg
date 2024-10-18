@@ -14,14 +14,9 @@ class Concesionaria extends Model
     protected $table = 'concesionarias';
 
     protected $fillable = [
-        'tipo_documento_identificacion',
-        'numero_documento_identificacion',
+        'tipo_documento',
+        'numero_documento',
         'nombre',
-        'solicitante_id',
     ];
 
-    public function solicitante()
-    {
-        return $this->belongsTo(Solicitante::class);
-    }
 }

@@ -11,22 +11,28 @@ class Instalacion extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'instalaciones';
+    protected $table = 'instalacions';
 
     protected $fillable = [
-        'tipo',
+        'tipo_instalacion',
         'tipo_acometida',
-        'material',
-        'numero_puntos_proyectados',
-        'numero_puntos_instalados',
-        'numero_puntos_habilitados',
-        'ambientes_aprobados',
-        'numero_ambientes',
-        'solicitante_id',
+        'numero_puntos_instalacion',
+        'fecha_finalizacion_instalacion_interna',
+        'fecha_finalizacion_instalacion_acometida',
+        'resultado_instalacion_tc',
+        'fecha_programacion_habilitacion',
+        'solicitud_id',
     ];
 
-    public function solicitante()
+    protected $casts = [
+        'fecha_finalizacion_instalacion_interna' => 'date',
+        'fecha_finalizacion_instalacion_acometida' => 'date',
+        'fecha_programacion_habilitacion' => 'date',
+    ];
+
+    public function solicitud()
     {
-        return $this->belongsTo(Solicitante::class);
+        return $this->belongsTo(Solicitud::class, 'solicitud_id');
     }
+    
 }

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('proyectos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('solicitante_id');
             $table->string('tipo_proyecto')->nullable();
             $table->string('codigo_proyecto')->nullable();
-            $table->string('categoria')->nullable();
-            $table->string('sub_categoria')->nullable();
+            $table->string('categoria_proyecto')->nullable();
+            $table->string('sub_categoria_proyecto')->nullable();
             $table->string('codigo_objeto_conexion')->nullable();
+            $table->unsignedBigInteger('solicitud_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

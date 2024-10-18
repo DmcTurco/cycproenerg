@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('ubicacions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('solicitante_id');
+            $table->string('ubicacion')->nullable();
+            $table->string('codigo_manzana')->nullable();
+            $table->string('codigo_identificacion_interna')->nullable();
+            $table->string('nombre_malla')->nullable();
             $table->string('direccion')->nullable();
             $table->string('departamento')->nullable();
             $table->string('provincia')->nullable();
             $table->string('distrito')->nullable();
-            $table->string('ubicacion')->nullable();
-            $table->string('codigo_manzana')->nullable();
-            $table->string('nombre_malla')->nullable();
+            $table->string('venta_zona_no_gasificada')->nullable();
+            $table->unsignedBigInteger('solicitud_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
