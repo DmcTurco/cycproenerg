@@ -157,7 +157,7 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td class="align-middle text-center text-sm" colspan="5">No hay solicitudes
+                                            <td class="align-middle text-center text-sm" colspan="7">No hay solicitudes
                                                 asociadas</td>
                                         </tr>
                                     @endif

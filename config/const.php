@@ -12,9 +12,11 @@ return [
     'tipo_estado' =>[
 
         ['id' => 1, 'name' => 'pendiente'],
-        ['id' => 2, 'name' => 'reasignado'],
-        ['id' => 3, 'name' => 'cancelado'],
-        ['id' => 4, 'name' => 'expirado'],
+        ['id' => 2, 'name' => 'asignado'],
+        ['id' => 3, 'name' => 'finalizado'],
+        ['id' => 4, 'name' => 'reasignado'],
+        ['id' => 5, 'name' => 'cancelado'],
+        ['id' => 6, 'name' => 'expirado'],
     ]
 
 ];
