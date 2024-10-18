@@ -38,6 +38,7 @@ Route::prefix(MyApp::COMPANIES_SUBDIR)->middleware('auth:company')->name('compan
     Route::get('/home', [Company\CompanyController::class, 'index'])->name('home');
     Route::resource('client', Company\ClientController::class);
     Route::resource('technicals', Company\TecnicoController::class);
+    Route::resource('advisers', Company\AsesorController::class);
     Route::resource('technicals.requests', Company\SolicitudTecnicoController::class);
     Route::any('technicals-getrecords-request', [Company\SolicitudTecnicoController::class, 'obtenerRegistros'])->name('obtenerRegistros');
     Route::get('/getDataIndex/{id}', [Company\SolicitudTecnicoController::class, 'obtenerSolicitudesIndex'])->name('obtenerSolicitudesIndex');

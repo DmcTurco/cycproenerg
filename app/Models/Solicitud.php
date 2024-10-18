@@ -14,6 +14,9 @@ class Solicitud extends Model
     protected $table = 'solicituds';
 
     protected $fillable = [
+        'solicitante_id',
+        'ubicacion_id',
+        'proyecto_id',
         'numero_solicitud',
         'numero_suministro',
         'numero_contrato_suministro',
@@ -69,5 +72,13 @@ class Solicitud extends Model
 
     public function tecnico() {
         return $this->belongsToMany(Tecnico::class, 'solicitud_tecnico', 'solicitud_id', 'tecnico_id')->withPivot('categoria')->withTimestamps();
+    }
+
+    public function ubicacion() {
+        return $this->belongsTo(Ubicacion::class);
+    }
+
+    public function proyecto() {
+        return $this->belongsTo(Proyecto::class);
     }
 }
