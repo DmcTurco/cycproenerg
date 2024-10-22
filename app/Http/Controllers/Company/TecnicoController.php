@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Models\Tecnico;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class TecnicoController extends Controller
@@ -13,10 +12,8 @@ class TecnicoController extends Controller
 
     public function index() {
 
-        $tecnicos = Tecnico::where('company_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
-        $cargos = ['Supervisor', 'empleado'];
-        $tipoDocumentos = ['DNI', 'CE'];
-        return view('company.pages.tecnicos.index', compact('tecnicos', 'cargos', 'tipoDocumentos') );
+        $tecnicos = Tecnico::orderBy('id', 'desc')->paginate(10);
+        return view('company.pages.tecnicos.index', compact('tecnicos') );
     }
 
     public function store(Request $request)
@@ -26,9 +23,9 @@ class TecnicoController extends Controller
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|max:255',
-            'tipo_documento' => 'required',
+            'tipo_documento' => 'required|integer|min:0|max:3',
             'numero_documento_identificacion' => 'required|integer|min:0|max:999999999|unique:tecnicos',
-            'cargo' => 'required|string',
+            'cargo' => 'required|integer|min:0|max:2',
         ]);
 
         if ($validator->fails()) {
@@ -52,7 +49,7 @@ class TecnicoController extends Controller
         } else {
 
             $tecnico = Tecnico::create([
-                'company_id' => Auth::user()->id,
+                'empresa_id' => 1,
                 'nombre' => $request->nombre,
                 'tipo_documento' => $request->tipo_documento,
                 'numero_documento_identificacion' => $request->numero_documento_identificacion,

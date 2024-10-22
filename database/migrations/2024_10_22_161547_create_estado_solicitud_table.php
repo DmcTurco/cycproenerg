@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tecnicos', function (Blueprint $table) {
+        Schema::create('estado_solicitud', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('empresa_id');
-            $table->text('nombre');
-            $table->smallInteger('tipo_documento');
-            $table->unsignedInteger('numero_documento_identificacion')->unique();
-            $table->smallInteger('cargo');
+            $table->unsignedBigInteger('estado_id');
+            $table->unsignedBigInteger('solicitud_id');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tecnicos');
+        Schema::dropIfExists('estado_solicitud');
     }
 };
