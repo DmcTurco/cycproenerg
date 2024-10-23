@@ -60,8 +60,16 @@ class Solicitud extends Model
 
     public function estado()
     {
-        return $this->belongsTo(Estado::class);
+        return $this->belongsTo(Estado::class, 'estado_solicitud');
     }
+
+    // Modelo Solicitud
+    public function estadoSolicitud()
+    {
+        return $this->hasOne(EstadoSolicitud::class, 'solicitud_id');
+    }
+
+
     /**
      * Get the asesor associated with the Solicitud.
      */
@@ -70,15 +78,18 @@ class Solicitud extends Model
     //     return $this->belongsTo(Asesor::class, 'asesor_id');
     // }
 
-    public function tecnico() {
+    public function tecnico()
+    {
         return $this->belongsToMany(Tecnico::class, 'solicitud_tecnico', 'solicitud_id', 'tecnico_id')->withPivot('categoria')->withTimestamps();
     }
 
-    public function ubicacion() {
+    public function ubicacion()
+    {
         return $this->hasOne(Ubicacion::class);
     }
 
-    public function proyecto() {
+    public function proyecto()
+    {
         return $this->belongsTo(Proyecto::class);
     }
 }

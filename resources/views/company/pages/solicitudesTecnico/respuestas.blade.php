@@ -16,15 +16,14 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($registros as $registro)  <!--Cada registro pertenece a  una solicitud-->
+                @foreach ($registros as $registro)
+                    <!--Cada registro pertenece a  una solicitud-->
                     <tr>
                         <td style="color:rgb(36, 150, 36);cursor:pointer" class="añadir-solicitud text-center"
                             data-num-solicitud = "{{ $registro->numero_solicitud }}"
                             data-num-doc-identificacion = "{{ $registro->solicitante->numero_documento_identificacion }}"
                             data-nombre = "{{ $registro->solicitante->nombre }}"
                             data-direccion = "{{ $registro->ubicacion->direccion }}"
-                           
-
                             data-solicitante-id = "{{ $registro->solicitante->id }}">
                             <i class="fas fa-arrow-left"></i>
                         </td>
@@ -32,13 +31,15 @@
                             {{ $registro->numero_solicitud }}
                         </td>
                         <td class="text-center text-uppercase text-sm font-weight-bold">
-                            {{ $registro->solicitante->numero_documento_identificacion }}
+                            {{ $registro->solicitante->numero_documento }}
                         </td>
                         <td class="text-left text-uppercase text-sm font-weight-bold">
                             {{ $registro->solicitante->nombre }}
                         </td>
                         <td class="text-left text-uppercase text-sm font-weight-bold">
                             {{ $registro->ubicacion->direccion }}</td>
+                        <td class="text-left text-uppercase text-sm font-weight-bold">
+                            {{ $tipoEstado[$registro->estadoSolicitud->estado_id] ?? 'Desconocido' }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -49,7 +50,7 @@
         </form>
     </div>
     <div class="pagination">
-        {{ $registros->appends($request->all())->links()}}
+        {{ $registros->appends($request->all())->links() }}
     </div>
 
 
@@ -62,7 +63,7 @@
             $('#tabla-respuestas').on('click', '.añadir-solicitud', function() {
 
                 let solicitanteID = $(this).data('solicitante-id');
-          
+
                 let numSolicitud = $(this).data('num-solicitud');
                 let numDocIdentificacion = $(this).data('num-doc-identificacion');
                 let nombre = $(this).data('nombre');
@@ -99,7 +100,7 @@
                                 $.ajax({
                                     url: urlIndex,
                                     type: 'GET',
-                                    success: function (response) {
+                                    success: function(response) {
                                         createTableTbody(response);
                                     }
                                 });
@@ -111,7 +112,7 @@
                                 if (response.status == 422) {
                                     Swal.fire({
                                         title: 'Información',
-                                        html:errors,
+                                        html: errors,
                                         icon: 'warning',
                                         confirmButtonText: 'Aceptar'
                                     });
@@ -124,7 +125,7 @@
 
             function createTableTbody(response) {
                 console.log(response);
-                
+
                 let tbdoy = $('#tbody');
                 tbdoy.empty();
                 if (response.solicitudes.data.length > 0) {
@@ -151,8 +152,7 @@
                                         <i class="far fa-trash-alt fa-lg text-danger"></i>
                                     </a>
                                 </td>
-                            </tr>`
-                        );
+                            </tr>`);
                     });
                 } else {
                     $(tbdoy).append('<p>No existen solicitudes para este técnico.</p>');

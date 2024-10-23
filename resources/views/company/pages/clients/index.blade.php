@@ -150,7 +150,7 @@
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
-                                                        {{ $solicitud->estado->nombre }}
+                                                        {{ optional( $solicitud->estado)->nombre ?? 'N/A' }}
                                                     </span>
                                                 </td>
                                             </tr>
