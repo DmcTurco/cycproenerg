@@ -15,9 +15,7 @@ class SolicitudTecnicoController extends Controller
 {
     public function index($tecnicoID) {
         $tecnico = Tecnico::findOrFail($tecnicoID);
-        if ( $tecnico->company_id != Auth::user()->id) {
-            abort(403);
-        }
+
         $solicitudesIndex = $tecnico->solicitudes()->withPivot('solicitud_tecnico.id')->orderBy('solicitud_tecnico.id', 'desc')->paginate(10);
         return view('company.pages.solicitudesTecnico.index', compact('solicitudesIndex', 'tecnico'));
     }
@@ -67,10 +65,6 @@ class SolicitudTecnicoController extends Controller
         $tecnico->solicitudes()->attach($solicitud->id, ['categoria' => $categoria]);
 
         return redirect()->route('company.technicals.requests.index', $tecnico->id);
-
-
-
-
     }
 
     public function edit($tecnicoID, $solicitudID) {
@@ -122,7 +116,7 @@ class SolicitudTecnicoController extends Controller
 
         if (!empty($numDocIdentidad)) {
             $query->whereHas('solicitante', function ($q) use ($numDocIdentidad) {
-                $q->where('numero_documento_identificacion', 'like' ,"%$numDocIdentidad%");
+                $q->where('numero_documento', 'like' ,"%$numDocIdentidad%");
             });
         }
 

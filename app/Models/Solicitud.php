@@ -60,7 +60,7 @@ class Solicitud extends Model
 
     public function estado()
     {
-        return $this->belongsTo(Estado::class, 'estado_solicitud');
+        return $this->belongsTo(Estado::class);
     }
     /**
      * Get the asesor associated with the Solicitud.
@@ -75,7 +75,7 @@ class Solicitud extends Model
     }
 
     public function ubicacion() {
-        return $this->belongsTo(Ubicacion::class);
+        return $this->hasOne(Ubicacion::class);
     }
 
     public function proyecto() {

@@ -13,7 +13,7 @@ class Tecnico extends Model
     protected $table = 'tecnicos';
 
     protected $fillable = [
-        'company_id',
+        'empresa_id',
         'nombre',
         'tipo_documento',
         'numero_documento_identificacion',

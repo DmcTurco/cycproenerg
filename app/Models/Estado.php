@@ -14,4 +14,8 @@ class Estado extends Model
     protected $table = 'estados';
     protected $fillable = ['codigo', 'nombre', 'abreviatura'];
 
+    public function solicitudes() {
+        return $this->hasMany(Solicitud::class);
+    }
+
 }

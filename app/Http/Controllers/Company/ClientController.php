@@ -152,6 +152,7 @@ class ClientController extends Controller
             $solicitante = $this->processSolicitante($row);
             $estado = $this->processEstado($row);
             $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estado);
+            $estadoSolicitud = $this->processEstadoSolicitud($row, $estado, $solicitud);
             $ubicacion = $this->processUbicacion($row, $solicitud);
             $proyecto = $this->processProyecto($row, $solicitud);
             $instalacion = $this->processInstalacion($row, $solicitud);
@@ -230,6 +231,7 @@ class ClientController extends Controller
             ]
         );
     }
+
     private function obtenerAbreviatura($nombre)
     {
         $palabrasExcluidas = ['de', 'del', 'la', 'las', 'los', 'el', 'y', 'e', 'o', 'u'];
@@ -266,6 +268,13 @@ class ClientController extends Controller
                 'estado_solicitud' => $estado->id,
             ]
         );
+    }
+
+    public function processEstadoSolicitud($row, $estado, $solicitud) {
+
+       if ($solicitud->estado->codigo == 02) {
+        $solicitud->estados()->sync(config('const.tipo_estado'));
+       }
     }
 
     private function processUbicacion($row, $solicitud)

@@ -39,8 +39,8 @@
                             <label for="cargo">Rango:</label>
                             <select class="new-form-control" name="cargo" id="cargo">
                                 <option value="" ></option>
-                                @foreach ($cargos as $cargo)
-                                    <option value="{{ $cargo }}">{{ $cargo }}</option>
+                                @foreach (config('const.cargo') as $cargo)
+                                    <option value="{{ $cargo['id'] }}">{{ $cargo['name'] }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback" id="cargoError"></div>
@@ -51,8 +51,8 @@
                             <label for="tipo_documento">Tipo de documento:</label>
                             <select class="new-form-control" name="tipo_documento" id="tipo_documento">
                                 <option value="" ></option>
-                                @foreach ($tipoDocumentos as $tipo)
-                                    <option value="{{ $tipo }}">{{ $tipo }}</option>
+                                @foreach (config('const.tipo_documeto') as $tipo)
+                                    <option value="{{ $tipo['id'] }}">{{ $tipo['name'] }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback" id="tipo_documentoError"></div>

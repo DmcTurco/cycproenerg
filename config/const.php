@@ -8,6 +8,12 @@ return [
         ['id' => 3, 'name' => 'CE'],
     ],
 
+    
+    'cargo' => [
+        ['id' => 1, 'name' => 'Supervisor'],
+        ['id' => 2, 'name' => 'Empleado'],
+    ],
+
 
     'tipo_estado' =>[
 
