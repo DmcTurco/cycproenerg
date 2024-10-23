@@ -20,6 +20,7 @@ use App\Models\Instalacion;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use App\Helpers\TipoDocumentoHelper;
 use App\Models\Estado;
+use App\Models\EstadoSolicitud;
 
 class ClientController extends Controller
 {
@@ -152,7 +153,7 @@ class ClientController extends Controller
             $solicitante = $this->processSolicitante($row);
             $estado = $this->processEstado($row);
             $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estado);
-            $estadoSolicitud = $this->processEstadoSolicitud($row, $estado, $solicitud);
+            $this->processEstadoSolicitud($estado, $solicitud);
             $ubicacion = $this->processUbicacion($row, $solicitud);
             $proyecto = $this->processProyecto($row, $solicitud);
             $instalacion = $this->processInstalacion($row, $solicitud);
@@ -202,8 +203,10 @@ class ClientController extends Controller
     {
         $tipo_documento_id = TipoDocumentoHelper::obtenerTipoDocumento(trim($row['G']));
         return Solicitante::updateOrCreate(
-            ['numero_documento' => trim($row['H']),
-            'tipo_documento' => $tipo_documento_id,],
+            [
+                'numero_documento' => trim($row['H']),
+                'tipo_documento' => $tipo_documento_id,
+            ],
             [
                 'nombre' => trim($row['I']),
                 'celular' => trim($row['K']),
@@ -270,12 +273,28 @@ class ClientController extends Controller
         );
     }
 
-    public function processEstadoSolicitud($row, $estado, $solicitud) {
+    // Función que procesa y registra el estado en la tabla estado_solicitud
+    public function processEstadoSolicitud( $estado, $solicitud)
+    {
+        // Verificamos si el estado de la solicitud es "02"
+        if ($estado->codigo == "02") {
+            // Obtener el estado "pendiente" del array de configuración (asumimos que el primer estado en config es pendiente)
+            $estadoPendiente = config('const.tipo_estado')[0]['id']; // Estado "pendiente"
 
-       if ($solicitud->estado->codigo == 02) {
-        $solicitud->estados()->sync(config('const.tipo_estado'));
-       }
+            // Usamos firstOrCreate para evitar duplicados. Si ya existe no se creará un nuevo registro
+            EstadoSolicitud::firstOrCreate(
+                [
+                    'solicitud_id' => $solicitud->id, // Condición de búsqueda
+                    'estado_id' => $estadoPendiente   // Condición de búsqueda
+                ],
+                [
+                    'solicitud_id' => $solicitud->id, // Si no existe, se crea con estos valores
+                    'estado_id' => $estadoPendiente
+                ]
+            );
+        }
     }
+
 
     private function processUbicacion($row, $solicitud)
     {

@@ -24,7 +24,7 @@
                             data-nombre = "{{ $registro->solicitante->nombre }}"
                             data-direccion = "{{ $registro->ubicacion->direccion }}"
                            
-                            data-categoria = "{{ $registro->proyecto->categoria }}"
+
                             data-solicitante-id = "{{ $registro->solicitante->id }}">
                             <i class="fas fa-arrow-left"></i>
                         </td>
@@ -62,7 +62,7 @@
             $('#tabla-respuestas').on('click', '.añadir-solicitud', function() {
 
                 let solicitanteID = $(this).data('solicitante-id');
-                let categoria = $(this).data('categoria');
+          
                 let numSolicitud = $(this).data('num-solicitud');
                 let numDocIdentificacion = $(this).data('num-doc-identificacion');
                 let nombre = $(this).data('nombre');
@@ -88,7 +88,7 @@
                             data: {
                                 _token: _token,
                                 solicitanteID: solicitanteID,
-                                categoria: categoria,
+
                                 numSolicitud: numSolicitud,
                                 numDocIdentificacion: numDocIdentificacion,
                                 nombre: nombre,
@@ -141,11 +141,7 @@
                                         ${item.solicitante.numero_documento_identificacion}
                                     </span>
                                 </td>
-                                <td class="align-middle text-center text-sm">
-                                    <span class="text-xs font-weight-bold">
-                                        ${item.proyecto.categoria}
-                                    </span>
-                                </td>
+
                                 <td class="align-middle text-center text-sm">
                                     <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
                                         data-target="#myModal" data-head-id="${item.id}">
