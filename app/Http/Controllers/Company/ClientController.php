@@ -69,6 +69,9 @@ class ClientController extends Controller
         return view('company.pages.clients.index', compact('clientesConSolicitudes', 'estados', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
     }
 
+    public function information($id){
+
+    }
 
 
     private function getTipoDocumentoName($id)
@@ -254,8 +257,6 @@ class ClientController extends Controller
         return $iniciales;
     }
 
-
-
     private function processSolicitud($row, $solicitante, $empresa, $concesionaria, $estado)
     {
         return Solicitud::updateOrCreate(
@@ -294,7 +295,6 @@ class ClientController extends Controller
             );
         }
     }
-
 
     private function processUbicacion($row, $solicitud)
     {

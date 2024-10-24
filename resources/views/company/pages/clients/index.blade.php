@@ -8,6 +8,7 @@
                 <div class="card">
                     <div class="card-header pb-0">
                         @include('company.pages.clients.form')
+                        @include('company.pages.clients.information')
                         <a class="btn btn-info OpenModal py-2 px-3" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#uploadModal">Abrir Portal de Carga</a>
                         <hr>
@@ -78,11 +79,13 @@
                         <div class="row mt-3">
                             <div class="col-lg-6 col-7">
                                 <h6>Solicitudes</h6>
-                                <span class="text-center text-uppercase text-secondary text-xxs ">Total de solicitudes: <strong>{{ $totalSolicitudes }}</strong></span>
+                                <span class="text-center text-uppercase text-secondary text-xxs ">Total de solicitudes:
+                                    <strong>{{ $totalSolicitudes }}</strong></span>
                             </div>
                             <div class="col-lg-6 col-5 my-auto text-end">
-                                
-                                <span class="text-center text-uppercase text-secondary text-xxs ">Total de solicitudes según la busqueda: <strong>{{ $totalSolicitudesFiltradas }}</strong></span>
+
+                                <span class="text-center text-uppercase text-secondary text-xxs ">Total de solicitudes según
+                                    la busqueda: <strong>{{ $totalSolicitudesFiltradas }}</strong></span>
                             </div>
                         </div>
                     </div>
@@ -150,8 +153,14 @@
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
-                                                        {{ optional( $solicitud->estado)->nombre ?? 'N/A' }}
+                                                        {{ optional($solicitud->estado)->nombre ?? 'N/A' }}
                                                     </span>
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
+                                                    <a class="mx-3  OpenModal" data-toggle="modal"
+                                                        data-target="#myModalInformation" data-head-id="">
+                                                        <i class="fa fa-info-circle fa-lg" aria-hidden="true"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -176,4 +185,22 @@
         </div>
     </div>
 
+    <script>
+        $(document).ready(function() {
+            initModal('.OpenModal', '/company/technicals/', {
+                id: 'head-id',
+                titleEdit: "Editar",
+                titleCreate: "Registrar",
+                submitTextEdit: "Actualizar",
+                submitTextCreate: "Guardar",
+                modalID: '#myModalInformation',
+                dataTransform: function(response) {
+                    return response.tecnico;
+                }
+            });
+        });
+    </script>
+    
+
 @endsection
+
