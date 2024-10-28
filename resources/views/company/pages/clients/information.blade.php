@@ -1,270 +1,357 @@
-<!-- Modal -->
-<div class="modal fade" id="myModalInformation" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
-    data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog modal-xl">
+<div class="modal fade" id="myModalInformation" tabindex="-1" role="dialog" aria-labelledby="informationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-inspinia text-primary" id="title">
-                    create
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <h5 class="modal-title" id="title">Detalles de la Solicitud</h5>
+                <button type="button" class="btn-close text-info" data-bs-dismiss="modal" aria-label="Close"
+                    style=" font-size:30px">
+                    <i class="bi bi-x"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="myForm" action="" method="POST" novalidate>
-                    @csrf
-                    <input id="companyId" type="hidden" name="companyId">
-
-                    <div class="section-wrapper bg-white rounded p-4 mb-4">
-                        <h6 class="section-title text-muted mb-4">Información</h6>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-                                        <input type="text" class="form-control" id="name" name="name" readonly value="texasdfds"
-                                            >
-                                    </div>
-                                 
+                <!-- Div específico para el loader -->
+                <div class="custom-tabs mb-3">
+                    <button type="button" class="tab-btn active" data-tab="solicitud">Solicitud</button>
+                    <button type="button" class="tab-btn" data-tab="solicitante">Solicitante</button>
+                    <button type="button" class="tab-btn" data-tab="ubicacion">Ubicación</button>
+                    <button type="button" class="tab-btn" data-tab="instalacion">Instalación</button>
+                    <button type="button" class="tab-btn" data-tab="proyecto">Proyecto</button>
+                    <button type="button" class="tab-btn" data-tab="asesor">Asesor</button>
+                </div>
+                <form id="myForm" class="needs-validation" novalidate>
+                    <!-- Datos de la Solicitud -->
+                    <div id="solicitud" class="tab-content active">
+                        <div class="section-wrapper bg-white rounded p-4 mb-4">
+                            <h6 class="section-title text-muted mb-4">Datos de la Solicitud</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Número de Solicitud</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="numero_solicitud" readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Número de Suministro</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="numero_suministro" readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Número de Contrato</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="numero_contrato_suministro" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-
-                                        <input type="text" class="form-control" id="kana" name="company_kana"
-                                            style="border: none;">
-                                    </div>
-                                   
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Estado</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="estado_solicitud" readonly>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Fecha Aprobación</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="fecha_aprobacion_contrato" readonly>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Fecha Registro</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="fecha_registro_portal" readonly>
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
 
-                    {{-- <!-- Representative Section -->
-                    <div class="section-wrapper bg-white rounded p-4">
-                        <h6 class="section-title text-muted mb-4">{{ __('admin.representative') }}</h6>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">{{ __('admin.name') }}</span>
-                                        </div>
-                                        <input type="text" class="form-control" id="employee_name"
-                                            name="employee_name" style="border: none;">
-                                    </div>
-                                    <div class="invalid-feedback" id="employee_nameError"></div>
+                    <!-- Datos del Solicitante -->
+                    <div id="solicitante" class="tab-content">
+                        <div class="section-wrapper bg-white rounded p-4 mb-4">
+                            <h6 class="section-title text-muted mb-4">Datos del Solicitante</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="solicitante_nombre" readonly>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">{{ __('admin.kana') }}</span>
-                                        </div>
-                                        <input type="text" class="form-control" id="employee_kana"
-                                            name="employee_kana" style="border: none;">
-                                    </div>
-                                    <div class="invalid-feedback" id="employee_kanaError"></div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Tipo Documento</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="solicitante_tipo_documento" readonly>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-12 mb-3">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-                                        <div class="input-group-prepend">
-                                            <label for="employee_email"
-                                                class="input-group-text">{{ __('admin.email') }}</label>
-                                        </div>
-                                        <input type="email" class="form-control" id="employee_email"
-                                            name="employee_email" style="border: none;">
-                                    </div>
-                                    <div class="invalid-feedback" id="employee_emailError"></div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Número Documento</label>
+                                    <input type="text" class="form-control text-center text-center"
+                                        id="solicitante_numero_documento" readonly>
                                 </div>
-                            </div>
 
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">{{ __('admin.phone') }}</span>
-                                        </div>
-                                        <input type="text" class="form-control" id="employee_phone"
-                                            name="employee_phone" style="border: none;">
-                                    </div>
-                                    <div class="invalid-feedback" id="employee_phoneError"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="text" class="form-control text-center" id="solicitante_email"
+                                        readonly>
                                 </div>
-                            </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Celular</label>
+                                    <input type="text" class="form-control text-center " id="solicitante_celular"
+                                        readonly>
+                                </div>
 
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">{{ __('admin.phone2') }}</span>
-                                        </div>
-                                        <input type="text" class="form-control" id="employee_phone2"
-                                            name="employee_phone2" style="border: none;">
-                                    </div>
-                                    <div class="invalid-feedback" id="employee_phone2Error"></div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Usuario FISE</label>
+                                    <input type="text" class="form-control text-center"
+                                        id="solicitante_usuario_fise" readonly>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <div class="input-group shadow-sm">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">{{ __('admin.password') }}</span>
-                                        </div>
-                                        <input type="password" class="form-control" id="employee_password"
-                                            name="employee_password" style="border: none;">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary toggle-password" type="button">
-                                                <i class="fa fa-eye-slash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="invalid-feedback" id="employee_passwordError"></div>
+                    <!-- Datos de Ubicación -->
+                    <div id="ubicacion" class="tab-content">
+                        <div class="section-wrapper bg-white rounded p-4 mb-4">
+                            <h6 class="section-title text-muted mb-4">Datos de Ubicación</h6>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Dirección</label>
+                                    <input type="text" class="form-control text-center" id="direccion" readonly>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Ubicación</label>
+                                    <input type="text" class="form-control text-center" id="ubicacion" readonly>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Departamento</label>
+                                    <input type="text" class="form-control text-center" id="departamento"
+                                        readonly>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Provincia</label>
+                                    <input type="text" class="form-control text-center" id="provincia" readonly>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Distrito</label>
+                                    <input type="text" class="form-control text-center" id="distrito" readonly>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">codigo Mz</label>
+                                    <input type="text" class="form-control text-center" id="codigo_manzana" readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nombre Malla</label>
+                                    <input type="text" class="form-control text-center" id="nombre_malla"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">zona no gasificada</label>
+                                    <input type="text" class="form-control text-center" id="venta_zona_no_gasificada" readonly>
                                 </div>
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
 
-                    <div class="text-center mt-4">
-                        <button id="submitBtn" type="submit" class="btn btn-primary px-4 py-2">
-                            {{ __('admin.save') }}
-                        </button>
+                    <!-- Datos de Instalación -->
+                    <div id="instalacion" class="tab-content">
+                        <div class="section-wrapper bg-white rounded p-4 mb-4">
+                            <h6 class="section-title text-muted mb-4">Datos de Instalación</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tipo Instalación</label>
+                                    <input type="text" class="form-control text-center" id="tipo_instalacion"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tipo Acometida</label>
+                                    <input type="text" class="form-control text-center" id="tipo_acometida"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Número de Puntos</label>
+                                    <input type="text" class="form-control text-center"
+                                        id="numero_puntos_instalacion" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos del Proyecto -->
+                    <div id="proyecto" class="tab-content">
+                        <div class="section-wrapper bg-white rounded p-4 mb-4">
+                            <h6 class="section-title text-muted mb-4">Datos del Proyecto</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Tipo Proyecto</label>
+                                    <input type="text" class="form-control text-center" id="tipo_proyecto"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Código Proyecto</label>
+                                    <input type="text" class="form-control text-center" id="codigo_proyecto"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Categoría</label>
+                                    <input type="text" class="form-control text-center" id="categoria_proyecto"
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos del Asesor -->
+                    <div id="asesor" class="tab-content">
+                        <div class="section-wrapper bg-white rounded p-4 mb-4">
+                            <h6 class="section-title text-muted mb-4">Datos del Asesor</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nombre</label>
+                                    <input type="text" class="form-control text-center" id="asesor_nombre"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="text" class="form-control text-center" id="asesor_email"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control text-center" id="asesor_telefono"
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
+
 <style>
+    /* Estilo para los inputs readonly */
+    .form-control [readonly] {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        cursor: default;
+    }
+
+    /* Estilo para las etiquetas */
+    .form-label {
+        font-weight: 500;
+        text-align: center;
+        display: block;
+    }
+
+    /* Estilo para los títulos de sección */
+    .section-title {
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+
+    /* Estilo para las secciones */
+    .section-wrapper {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    /* Estilo para el modal */
+    .modal-dialog {
+        max-width: 800px;
+    }
+
     .modal-content {
-        border: none;
-        border-radius: 0.5rem;
+        border-radius: 12px;
     }
 
     .modal-header {
         background-color: #f8f9fa;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #e9ecef;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
     }
 
+    /* Estilo para hacer el scroll más suave */
     .modal-body {
-        padding: 1.5rem;
-        background-color: #f8f9fa;
+        height: 500px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
     }
 
-    .section-wrapper {
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    .modal-body::-webkit-scrollbar {
+        width: 6px;
     }
 
-    .section-title {
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
+    .modal-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
     }
 
-    .input-group {
-        border: 1px solid #e9ecef;
-        border-radius: 0.375rem;
-        transition: all 0.2s ease-in-out;
+    .modal-body::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
     }
 
-    .input-group:focus-within {
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    .custom-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 10px;
     }
 
-    .input-group-text {
-        min-width: 120px;
-        background-color: #f8f9fa;
+    .tab-btn {
+        padding: 8px 16px;
         border: none;
-        color: #495057;
-        font-size: 0.875rem;
+        background: none;
+        color: #6c757d;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
     }
 
-    .form-control {
-        height: calc(1.5em + 1rem + 2px);
+    .tab-btn:hover {
+        color: #007bff;
     }
 
-    .form-control:focus {
-        box-shadow: none;
-    }
-
-    select.form-control {
-        padding-right: 1.75rem;
-        background-position: right 0.75rem center;
-    }
-
-    .btn-primary {
+    .tab-btn.active {
+        color: #007bff;
         font-weight: 500;
-        letter-spacing: 0.5px;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
 
-    .toggle-password {
-        border: none;
-        background: transparent;
-        height: 100%;
-        color: #6c757d;
-        padding: 0 1rem;
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #007bff;
     }
 
-    .toggle-password:hover {
-        color: #495057;
+    .tab-content {
+        display: none;
     }
 
-    .toggle-password:focus {
-        box-shadow: none;
-        outline: none;
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
     }
 
-    .invalid-feedback {
-        margin-top: 0.25rem;
-        margin-left: 0.5rem;
-        font-size: 80%;
-    }
-
-    .input-group-append .btn {
-        border: none;
-        background: transparent;
-        color: #6c757d;
-        padding: 0 1rem;
-    }
-
-    .input-group-append .btn:hover {
-        color: #495057;
-    }
-
-    .input-group-append .btn:focus {
-        box-shadow: none;
-        outline: none;
-    }
-
-    .fa-spinner {
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
         }
 
-        100% {
-            transform: rotate(360deg);
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
 </style>
