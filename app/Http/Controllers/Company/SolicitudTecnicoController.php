@@ -24,33 +24,93 @@ class SolicitudTecnicoController extends Controller
             'reasignado' => collect($estados)->where('name', 'reasignado')->first()['id']
         ];
     }
-
     public function index($tecnicoId)
     {
         $tecnico = Tecnico::findOrFail($tecnicoId);
         $estados = $this->getEstados();
 
-        $solicitudesDisponibles = DB::select("
-            SELECT 
-                s.*,
-                e.estado_id,
-                sol.numero_documento,
-                sol.nombre as solicitante_nombre,
-                u.direccion,
-                p.categoria_proyecto
-            FROM solicituds s
-            INNER JOIN estado_solicitud e ON s.id = e.solicitud_id
-            LEFT JOIN solicitantes sol ON s.solicitante_id = sol.id
-            LEFT JOIN ubicacions u ON s.id = u.solicitud_id
-            LEFT JOIN proyectos p ON s.id = p.solicitud_id
-            WHERE e.estado_id IN (?, ?)
-            ORDER BY s.id ASC
-        ", [$estados['pendiente'], $estados['reasignado']]);
+        // Construir los CASE statements para estados
+        $estadosCase = $this->buildEstadosCase();
 
-        dd($solicitudesDisponibles);
+        $solicitudesDisponibles = DB::table('solicituds as s')
+            ->select([
+                's.*',
+                'e.estado_id',
+                DB::raw($estadosCase['nombre']),
+                DB::raw($estadosCase['badge']),
+                'sol.numero_documento',
+                'sol.nombre as solicitante_nombre',
+                'u.direccion',
+                'u.departamento',
+                'u.provincia',
+                'u.distrito',
+                'p.categoria_proyecto'
+            ])
+            ->join('estado_solicitud as e', 's.id', '=', 'e.solicitud_id')
+            ->leftJoin('solicitantes as sol', 's.solicitante_id', '=', 'sol.id')
+            ->leftJoin('ubicacions as u', 's.id', '=', 'u.solicitud_id')
+            ->leftJoin('proyectos as p', 's.id', '=', 'p.solicitud_id')
+            ->whereIn('e.estado_id', [$estados['pendiente'], $estados['reasignado']])
+            ->orderBy('s.id', 'ASC')
+            ->paginate(10);
+
         return view('company.pages.solicitudesTecnico.index', compact('tecnico', 'solicitudesDisponibles'));
     }
 
+    private function buildEstadosCase()
+    {
+        $nombreCase = "CASE e.estado_id ";
+        $badgeCase = "CASE e.estado_id ";
+
+        foreach (Config::get('const.tipo_estado') as $estado) {
+            $nombreCase .= " WHEN {$estado['id']} THEN '{$estado['name']}'";
+            $badgeCase .= " WHEN {$estado['id']} THEN '{$estado['badge']}'";
+        }
+
+        return [
+            'nombre' => $nombreCase . " END as estado_nombre",
+            'badge' => $badgeCase . " END as estado_badge"
+        ];
+    }
+
+    // public function index($tecnicoId)
+    // {
+    //     $tecnico = Tecnico::findOrFail($tecnicoId);
+    //     $estados = $this->getEstados();
+
+    //     // CASE para el nombre y clase del badge
+    //     $estadosCase = "CASE e.estado_id ";
+    //     $badgeCase = "CASE e.estado_id ";
+
+    //     foreach (Config::get('const.tipo_estado') as $estado) {
+    //         $estadosCase .= " WHEN {$estado['id']} THEN '{$estado['name']}'";
+    //         $badgeCase .= " WHEN {$estado['id']} THEN '{$estado['badge']}'";
+    //     }
+
+    //     $estadosCase .= " END as estado_nombre";
+    //     $badgeCase .= " END as estado_badge";
+
+    //     $solicitudesDisponibles = DB::select("
+    //         SELECT 
+    //             s.*,
+    //             e.estado_id,
+    //             {$estadosCase},
+    //             {$badgeCase},
+    //             sol.numero_documento,
+    //             sol.nombre as solicitante_nombre,
+    //             u.direccion,
+    //             p.categoria_proyecto
+    //         FROM solicituds s
+    //         INNER JOIN estado_solicitud e ON s.id = e.solicitud_id
+    //         LEFT JOIN solicitantes sol ON s.solicitante_id = sol.id
+    //         LEFT JOIN ubicacions u ON s.id = u.solicitud_id
+    //         LEFT JOIN proyectos p ON s.id = p.solicitud_id
+    //         WHERE e.estado_id IN (?, ?)
+    //         ORDER BY s.id ASC
+    //     ", [$estados['pendiente'], $estados['reasignado']]);
+
+    //     return view('company.pages.solicitudesTecnico.index', compact('tecnico', 'solicitudesDisponibles'));
+    // }
 
 
 

@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="d-flex justify-content-between" style="width:100%; margin:0 auto ">
-        <div class="">{{ $tecnico->nombre }}</div>
+        <div class=""><span><strong>Tecnico Asignado:</strong> </span>{{ $tecnico->nombre }}</div>
         <a href="{{ route('company.technicals.index') }}" class="btn btn-info px-3 py-2">
             ATRAS
         </a>
@@ -88,7 +88,7 @@
         <!---------------->
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
 
-            <div class="card" style="height: 100%; padding: 0 20px" >
+            <div class="card" style="height: 100%; padding: 0 20px">
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between mt-3">
                         <div class="">
@@ -101,29 +101,60 @@
                         <table class="table align-items-center mb-0" id="tabla-solicitudes">
                             <thead>
                                 <tr>
-                                    <th
+                                    <th style="width: 15%" 
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Número de solicitud</th>
-                                    <th
+                                        N. solicitud
+                                    </th>
+                                    <th style="width: 40%" 
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Número de documento</th>
-                                    <th
+                                        Nombre
+                                    </th>
+                                    <th style="width: 20%" 
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Nombre</th>
-                                    <th
+                                        Dep-Prov-Dist
+                                    </th>
+                                    <th style="width: 15%" 
                                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Acciones
+                                        Estado
                                     </th>
                                 </tr>
                             </thead>
                             <tbody id="tbody">
- 
+                                @if (count($solicitudesDisponibles ?? []) > 0)
+                                    @foreach ($solicitudesDisponibles as $solicitud)
+                                        <tr>
+                                            <td style="width: 20%" class="align-middle text-center">
+                                                <span class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
+                                            </td>
+                                            <td style="width: 30%" class="align-middle text-center">
+                                                <span class="text-xs font-weight-bold">{{ $solicitud->solicitante_nombre }}</span>
+                                            </td>
+                                            <td style="width: 35%" class="align-middle text-info">
+                                                <p class="text-xs font-weight-bold mb-0">{{ $solicitud->departamento }}-{{ $solicitud->provincia }}</p>
+                                                <p class="text-xs text-secondary mb-0">{{ $solicitud->distrito }}</p>
+                                                {{-- <span class="text-xs font-weight-bold">
+                                                    {{ $solicitud->departamento }}-{{ $solicitud->provincia }}-{{ $solicitud->distrito }}
+                                                </span> --}}
+                                            </td>
+                                            <td style="width: 15%" class="align-middle text-center text-sm">
+                                                <span class="badge badge-sm {{ $solicitud->estado_badge }} p-2">
+                                                    {{ $solicitud->estado_nombre }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td class="align-middle text-center text-sm font-weight-bold" colspan="4">
+                                            No existen solicitudes registradas
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
-
                         </table>
                         <br>
                         <div class="d-flex justify-content-center">
-                            {{-- {{ $solicitudesIndex->links('pagination::bootstrap-4') }} --}}
+                            {{ $solicitudesDisponibles->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
@@ -320,5 +351,26 @@
 
         });
     </script> --}}
+    <style>
+        #tabla-solicitudes {
+            table-layout: fixed; /* Esto es clave para mantener los anchos fijos */
+            width: 100%;
+        }
+    
+        #tabla-solicitudes th,
+        #tabla-solicitudes td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    
+        /* Si necesitas que el texto largo se muestre en múltiples líneas en vez de truncarse */
+        /*
+        #tabla-solicitudes td {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        */
+    </style>
 
 @endsection

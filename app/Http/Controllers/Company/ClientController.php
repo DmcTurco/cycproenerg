@@ -37,7 +37,7 @@ class ClientController extends Controller
         }
 
         if ($request->filled('estado')) {
-            $query->where('estado_solicitud', $request->estado);
+            $query->where('estado_id', $request->estado);
         }
 
         if ($request->filled('dni')) {

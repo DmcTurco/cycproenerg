@@ -33,7 +33,7 @@ class SolicitudController extends Controller
                     s.numero_contrato_suministro,
                     s.fecha_aprobacion_contrato,
                     s.fecha_registro_portal,
-                    s.estado_solicitud,
+                    s.estado_id,
                     est.codigo as estado_codigo,
                     est.nombre as estado_nombre,
                     est.abreviatura as estado_abreviatura,
@@ -99,7 +99,7 @@ class SolicitudController extends Controller
                 LEFT JOIN PROYECTOS p ON s.id = p.solicitud_id
                 LEFT JOIN UBICACIONS u ON s.id = u.solicitud_id
                 LEFT JOIN ASESORES a ON s.asesor_id = a.id
-                LEFT JOIN ESTADOS est ON CAST(s.estado_solicitud AS bigint) = est.id
+                LEFT JOIN ESTADOS est ON CAST(s.estado_id AS bigint) = est.id
                 WHERE s.id = ?
             ", [$id]);
 
