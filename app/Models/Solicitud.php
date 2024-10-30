@@ -22,7 +22,7 @@ class Solicitud extends Model
         'numero_contrato_suministro',
         'fecha_aprobacion_contrato',
         'fecha_registro_portal',
-        'estado_solicitud',
+        'estado_id',
         'solicitante_id',
         'empresa_id',
         'concesionaria_id',
@@ -60,7 +60,7 @@ class Solicitud extends Model
 
     public function estado()
     {
-        return $this->belongsTo(Estado::class, 'estado_solicitud');
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 
     // Modelo Solicitud

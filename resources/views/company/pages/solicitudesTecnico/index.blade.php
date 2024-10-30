@@ -16,7 +16,7 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between mt-3">
                         <div class="">
-                            <h6>Solicitudes</h6>
+                            <h6>Solicitudes agregadas</h6>
                         </div>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                         </table>
                         <br>
                         <div class="d-flex justify-content-center">
-                            {{ $solicitudesIndex->links('pagination::bootstrap-4') }}
+                            {{-- {{ $solicitudesIndex->links('pagination::bootstrap-4') }} --}}
                         </div>
                     </div>
                 </div>
@@ -88,68 +88,48 @@
         <!---------------->
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
 
-            <div class="card" style="height: 100%; padding: 0 20px" id="informacion">
-                <form id="form-solicitudes" action="" method="POST" style="max-height: 100%">
-                    @csrf
-                    <input type="hidden" id="tecnicoID" name="tecnicoID" value="{{ $tecnico->id }}">
-                    <div class="card-header pb-0">
-                        <div class="mt-3 d-flex justify-content-between">
-                            <div class="">
-                                <h6>Información</h6>
-                            </div>
-                            <div class="">
-                                <label for="" style="opacity: 0">r</label>
-                                <button type="submit" id="submit_formulario_informacion" class="btn btn-info px-3 py-2">
-                                    Buscar
-                                </button>
-                            </div>
+            <div class="card" style="height: 100%; padding: 0 20px" >
+                <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between mt-3">
+                        <div class="">
+                            <h6>Solicitudes en espera</h6>
                         </div>
                     </div>
-                    <div class="card-body px-0" style="margin-top: -23px">
-                        <div class="row">
-                            <input id="solicitudID" type="hidden" value="" name="solicitudID">
-                            <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="numero_solicitud"
-                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    Número de solicitud:</label>
-                                <input type="number" class="new-form-control" id="numero_solicitud" name="numero_solicitud"
-                                    value="" min="0" step="1" style="text-align: right">
-                                <div class="invalid-feedback" id="numero_solicitudError"></div>
-                            </div>
-                            <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="numero_documento_identificacion" style="font-size: 12px"
-                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    N° Documento de identidad:</label>
-                                <input type="text" class="new-form-control" id="numero_documento_identificacion"
-                                    name="numero_documento_identificacion" value="" style="text-align: right">
-                                <div class="invalid-feedback" id="numero_documento_identificacionError"></div>
-                            </div>
-                            <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="nombre"
-                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    Nombre del cliente:</label>
-                                <input type="text" class="new-form-control" id="nombre" name="nombre"
-                                    value="">
-                                <div class="invalid-feedback" id="nombreError"></div>
-                            </div>
-                            <div class="col-md-3 d-flex flex-column justify-content-end" style="height:80px">
-                                <label for="direccion"
-                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    Dirección:</label>
-                                <input type="text" class="new-form-control" id="direccion" name="direccion"
-                                    value="">
-                                <div class="invalid-feedback" id="direccionError"></div>
-                            </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0" id="tabla-solicitudes">
+                            <thead>
+                                <tr>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Número de solicitud</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Número de documento</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Nombre</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody">
+ 
+                            </tbody>
 
-                        </div>
-
+                        </table>
                         <br>
+                        <div class="d-flex justify-content-center">
+                            {{-- {{ $solicitudesIndex->links('pagination::bootstrap-4') }} --}}
+                        </div>
                     </div>
-                    <div id="invalid-feedback" class="d-flex justify-content-center">
-                </form>
+                </div>
+
             </div>
-            <div id="resultados" class="" style="height: 100%">
-            </div>
+
         </div>
     </div>
     </div>
@@ -177,7 +157,7 @@
     @endif
 
 
-    <script>
+    {{-- <script>
         $(document).ready(function() {
 
             // Borrar Solicitud
@@ -339,6 +319,6 @@
 
 
         });
-    </script>
+    </script> --}}
 
 @endsection

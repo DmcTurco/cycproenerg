@@ -269,7 +269,7 @@ class ClientController extends Controller
                 'numero_contrato_suministro' => trim($row['D']) ?: null,
                 'fecha_aprobacion_contrato' => $this->parseDate(trim($row['F'])),
                 'fecha_registro_portal' => $this->parseDate(trim($row['X'])),
-                'estado_solicitud' => $estado->id,
+                'estado_id' => $estado->id,
             ]
         );
     }
