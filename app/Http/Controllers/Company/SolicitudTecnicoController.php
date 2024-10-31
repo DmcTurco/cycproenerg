@@ -54,7 +54,32 @@ class SolicitudTecnicoController extends Controller
             ->orderBy('s.id', 'ASC')
             ->paginate(10);
 
-        return view('company.pages.solicitudesTecnico.index', compact('tecnico', 'solicitudesDisponibles'));
+        // Agregar esto: Solicitudes ya asignadas al técnico
+        $solicitudesAsignadas = DB::table('solicituds as s')
+            ->select([
+                's.*',
+                'e.estado_id',
+                DB::raw($estadosCase['nombre']),
+                DB::raw($estadosCase['badge']),
+                'sol.numero_documento',
+                'sol.nombre as solicitante_nombre',
+                'u.direccion',
+                'p.categoria_proyecto'
+            ])
+            ->join('solicitud_tecnico as st', 's.id', '=', 'st.solicitud_id')
+            ->join('estado_solicitud as e', 's.id', '=', 'e.solicitud_id')
+            ->leftJoin('solicitantes as sol', 's.solicitante_id', '=', 'sol.id')
+            ->leftJoin('ubicacions as u', 's.id', '=', 'u.solicitud_id')
+            ->leftJoin('proyectos as p', 's.id', '=', 'p.solicitud_id')
+            ->where('st.tecnico_id', $tecnicoId)
+            ->orderBy('st.created_at', 'DESC')
+            ->paginate(10);
+
+            return view('company.pages.solicitudesTecnico.index', compact(
+                'tecnico', 
+                'solicitudesDisponibles',
+                'solicitudesAsignadas'
+            ));
     }
 
     private function buildEstadosCase()
@@ -72,6 +97,33 @@ class SolicitudTecnicoController extends Controller
             'badge' => $badgeCase . " END as estado_badge"
         ];
     }
+
+
+    public function store(Request $request, $tecnicoId)
+    {
+        try {
+            DB::beginTransaction();
+
+            $tecnico = Tecnico::findOrFail($tecnicoId);
+            $solicitudId = $request->solicitud_id;
+
+            // Asignar solicitud al técnico
+            $tecnico->solicitudes()->attach($solicitudId);
+
+            // Actualizar estado a "asignado" (2)
+            DB::table('estado_solicitud')
+                ->where('solicitud_id', $solicitudId)
+                ->update(['estado_id' => 2]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Solicitud asignada correctamente']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Error al asignar solicitud: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al asignar solicitud'], 500);
+        }
+    }
+
 
     // public function index($tecnicoId)
     // {
