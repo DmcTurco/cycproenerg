@@ -14,7 +14,7 @@
                 <div class="custom-tabs mb-3">
                     <button type="button" class="tab-btn active" data-tab="solicitud">Solicitud</button>
                     <button type="button" class="tab-btn" data-tab="solicitante">Solicitante</button>
-                    <button type="button" class="tab-btn" data-tab="ubicacion">Ubicación</button>
+                    <button type="button" class="tab-btn" data-tab="ubicacionTab">Ubicación</button>
                     <button type="button" class="tab-btn" data-tab="instalacion">Instalación</button>
                     <button type="button" class="tab-btn" data-tab="proyecto">Proyecto</button>
                     <button type="button" class="tab-btn" data-tab="asesor">Asesor</button>
@@ -105,7 +105,7 @@
                     </div>
 
                     <!-- Datos de Ubicación -->
-                    <div id="ubicacion" class="tab-content">
+                    <div id="ubicacionTab" class="tab-content">
                         <div class="section-wrapper bg-white rounded p-4 mb-4">
                             <h6 class="section-title text-muted mb-4">Datos de Ubicación</h6>
                             <div class="row">
@@ -113,6 +113,9 @@
                                     <label class="form-label">Dirección</label>
                                     <input type="text" class="form-control text-center" id="direccion" readonly>
                                 </div>
+                            </div>
+                            <div class="row">
+                                
                             </div>
                             <div class="row">
                                 <div class="col-md-3 mb-3">

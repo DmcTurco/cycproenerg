@@ -20,10 +20,11 @@ class Tecnico extends Model
         'cargo',
     ];
 
-    public function solicitudes() {
-        return $this->belongsToMany(Solicitud::class, 'solicitud_tecnico', 'tecnico_id', 'solicitud_id')->withPivot('categoria')->withTimestamps();
+    public function solicitudes()
+    {
+        return $this->belongsToMany(Solicitud::class, 'solicitud_tecnico', 'tecnico_id', 'solicitud_id')
+            ->withTimestamps();
     }
-
     // public function numeroSolicitudes() {
     //     return $this->solicitudes()->count();
     // }

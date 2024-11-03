@@ -1,18 +1,16 @@
 @extends('company.layouts.user_type.auth')
 
 @section('content')
-
     <div class="d-flex justify-content-between" style="width:100%; margin:0 auto ">
         <div class=""><span><strong>Tecnico Asignado:</strong> </span>{{ $tecnico->nombre }}</div>
         <a href="{{ route('company.technicals.index') }}" class="btn btn-info px-3 py-2">
             ATRAS
         </a>
     </div>
-    <div class="row mb-4" style="height: 100%">
-
+    <div class="row mb-4">
+        <!-- Solicitudes Asignadas -->
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
-
-            <div class="card" style="height: 100%; padding: 0 20px">
+            <div class="card" style="min-height: 700px; height: 100%; padding: 0 20px">
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between mt-3">
                         <div class="">
@@ -20,164 +18,62 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body px-0 pb-2">
-                    <div class="table-responsive">
-                        <table class="table align-items-center mb-0">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        N. SOLICITUD</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        NOMBRE</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        DEP-PROV-DIST</th>
-                                    <th
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        ESTADO
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="solicitudes-asignadas" class="drop-zone">
-                                @if (count($solicitudesAsignadas ?? []) > 0)
-                                    @foreach ($solicitudesAsignadas as $solicitud)
-                                        <tr>
-                                            <td style="width: 20%" class="align-middle text-center">
-                                                <span
-                                                    class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
-                                            </td>
-                                            <td style="width: 30%" class="align-middle text-center">
-                                                <span
-                                                    class="text-xs font-weight-bold">{{ $solicitud->solicitante_nombre }}</span>
-                                            </td>
-                                            <td style="width: 35%" class="align-middle text-info">
-                                                <p class="text-xs font-weight-bold mb-0">
-                                                    {{ $solicitud->departamento }}-{{ $solicitud->provincia }}</p>
-                                                <p class="text-xs text-secondary mb-0">{{ $solicitud->distrito }}</p>
-                                                {{-- <span class="text-xs font-weight-bold">
-                                                    {{ $solicitud->departamento }}-{{ $solicitud->provincia }}-{{ $solicitud->distrito }}
-                                                </span> --}}
-                                            </td>
-                                            <td style="width: 15%" class="align-middle text-center text-sm">
-                                                <span class="badge badge-sm {{ $solicitud->estado_badge }} p-2">
-                                                    {{ $solicitud->estado_nombre }}
-                                                </span>
-                                            </td>
-
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr class="empty-row">
-                                        <td colspan="4" class="text-center py-5" style="height: 100px;">
-                                            Arrastra aquí las solicitudes para asignarlas
-                                        </td>
-                                    </tr>
-                                @endif
-                            </tbody>
-
-                        </table>
-                        <br>
-                        <div class="d-flex justify-content-center">
-                            {{-- {{ $solicitudesIndex->links('pagination::bootstrap-4') }} --}}
-                        </div>
-                    </div>
+                <div class="card-body px-0 pb-2 drop-zone" id="solicitudes-asignadas">
+                    @include('company.pages.solicitudesTecnico.partials.tabla-asignadas')
                 </div>
             </div>
         </div>
-        <!---------------->
+
+        <!-- Solicitudes en Espera -->
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
-
-            <div class="card" style="height: 100%; padding: 0 20px">
+            <div class="card" style="min-height: 700px; height: 100%; padding: 0 20px">
                 <div class="card-header pb-0">
-                    <div class="d-flex justify-content-between mt-3">
-                        <div class="">
-                            <h6>Solicitudes en espera</h6>
+                    <form action="{{ route('company.technicals.requests.index', $tecnico->id) }}" method="GET">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>Solicitudes en espera</h6>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-outline">
+                                    {{-- <label class="form-label">Buscar por N° solicitud</label> --}}
+                                    <input type="text" class="form-control" name="numero_solicitud" 
+                                           value="{{ request('numero_solicitud') }}" placeholder="Buscar por N° solicitud">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-outline">
+                                    {{-- <label class="form-label">Buscar por distrito</label> --}}
+                                    <input type="text" class="form-control" name="distrito" 
+                                           value="{{ request('distrito') }}" placeholder="Buscar por distrito">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-info btn-sm">
+                                    <i class="fas fa-search" style="font-size: 12px;"></i></button>
+                                <a href="{{ route('company.technicals.requests.index', $tecnico->id) }}" 
+                                    class="btn btn-outline-secondary btn-sm">
+                                    <i class="fa fa-trash" style="font-size: 12px;"></i>
+                                </a>
+                                {{-- @if(request('numero_solicitud') || request('distrito'))
+                                    <a href="{{ route('company.technicals.requests.index', $tecnico->id) }}" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                       <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                @endif --}}
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
                 <div class="card-body px-0 pb-2">
-                    <div class="table-responsive">
-                        <table class="table align-items-center mb-0" id="tabla-solicitudes">
-                            <thead>
-                                <tr>
-                                    <th style="width: 15%"
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        N. solicitud
-                                    </th>
-                                    <th style="width: 40%"
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Nombre
-                                    </th>
-                                    <th style="width: 20%"
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Dep-Prov-Dist
-                                    </th>
-                                    <th style="width: 15%"
-                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                        Estado
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="solicitudes-pendientes" class="drop-zone">
-                                @if (count($solicitudesDisponibles ?? []) > 0)
-                                    @foreach ($solicitudesDisponibles as $solicitud)
-                                        <tr class="draggable" draggable="true" data-id="{{ $solicitud->id }}"
-                                            data-solicitud="{{ json_encode($solicitud) }}">
-                                            <td style="width: 20%" class="align-middle text-center">
-                                                <span
-                                                    class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
-                                            </td>
-                                            <td style="width: 30%" class="align-middle text-center">
-                                                <span
-                                                    class="text-xs font-weight-bold">{{ $solicitud->solicitante_nombre }}</span>
-                                            </td>
-                                            <td style="width: 35%" class="align-middle text-info">
-                                                <p class="text-xs font-weight-bold mb-0">
-                                                    {{ $solicitud->departamento }}-{{ $solicitud->provincia }}</p>
-                                                <p class="text-xs text-secondary mb-0">{{ $solicitud->distrito }}</p>
-                                                {{-- <span class="text-xs font-weight-bold">
-                                                    {{ $solicitud->departamento }}-{{ $solicitud->provincia }}-{{ $solicitud->distrito }}
-                                                </span> --}}
-                                            </td>
-                                            <td style="width: 15%" class="align-middle text-center text-sm">
-                                                <span class="badge badge-sm {{ $solicitud->estado_badge }} p-2">
-                                                    {{ $solicitud->estado_nombre }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td class="align-middle text-center text-sm font-weight-bold" colspan="4">
-                                            No existen solicitudes registradas
-                                        </td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                        <br>
-                        <div class="d-flex justify-content-center">
-                            {{ $solicitudesDisponibles->links('pagination::bootstrap-4') }}
-                        </div>
-                    </div>
+                    @include('company.pages.solicitudesTecnico.partials.tabla-disponibles')
                 </div>
-
             </div>
-
         </div>
     </div>
-    </div>
 
-    <form id="form-delete"
-        action="{{ route('company.technicals.requests.destroy', ['technical' => $tecnico->id, 'request' => ':request']) }}"
-        method="POST" class="d-inline">
-        @csrf
-        @method('DELETE')
-    </form>
 
-    @include('company.pages.solicitudesTecnico.form')
+
+    @include('company.pages.solicitudesTecnico.ubicacion')
 
     @if (session('message') || session('error'))
         <script>
@@ -193,170 +89,7 @@
     @endif
 
 
-    {{-- <script>
-        $(document).ready(function() {
-
-            // Borrar Solicitud
-            $('#tabla-solicitudes').on('click', '.delete-btn', function() {
-                var solicitudId = $(this).data('head-id');
-                var newAction = $('#form-delete').attr('action').replace(':request', solicitudId);
-                var _token = $('#form-delete input[name="_token"]').val();
-
-                confirmDelete(function() {
-                    // Realizar la eliminación mediante AJAX
-                    $.ajax({
-                        url: newAction,
-                        type: 'DELETE', // Método para eliminar
-                        data: {
-                            _token: _token
-                        },
-                        success: function(response) {
-
-                            $.ajax({
-                                url: "/company/getDataIndex/{{ $tecnico->id }}",
-                                type: 'GET',
-                                success: function(response) {
-
-                                    let tbdoy = $('#tbody');
-                                    tbdoy.empty();
-                                    if (response.solicitudes.data.length >0) {
-                                        response.solicitudes.data.forEach(
-                                            function(item) {
-                                                tbdoy.append(`
-                                                    <tr data-id="${item.id}">
-                                                        <td class="align-middle text-center text-sm">
-                                                            <span
-                                                                class="text-xs font-weight-bold">${item.numero_solicitud}</span>
-                                                        </td>
-                                                        <td class="align-middle text-center text-sm">
-                                                            <span class="text-xs font-weight-bold">
-                                                                ${item.solicitante.numero_documento_identificacion}
-                                                            </span>
-                                                        </td>
-                                                        <td class="align-middle text-center text-sm">
-                                                            <span class="text-xs font-weight-bold">
-                                                                ${item.proyecto.categoria}
-                                                            </span>
-                                                        </td>
-                                                        <td class="align-middle text-center text-sm">
-                                                            <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
-                                                                data-target="#myModal" data-head-id="${item.id}">
-                                                                <i class="fa fa-edit fa-lg text-info"></i>
-                                                            </a>
-                                                            <a class="delete-btn" data-head-id="${item.id}">
-                                                                <i class="far fa-trash-alt fa-lg text-danger"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>`
-                                                );
-                                            });
-                                    } else {
-                                        $(tbdoy).append(
-                                            '<p>No existen solicitudes para este técnico.</p>'
-                                            );
-                                    }
-                                },
-                                error: function(response) {
-                                    console.log('Error al borrar registro');
-                                }
-
-                            });
-
-                            //     // Opcional: Actualiza la tabla o elimina el elemento visualmente
-                            //     $('#fila-' + solicitudId)
-                            // .remove(); // Asegúrate de tener un identificador para la fila
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'No se pudo eliminar el registro',
-                            });
-                        }
-                    });
-                });
-            });
-            //Editar Solicitud
-            $(document).ready(function() {
-                $('.edit-form-data').on('click', function() {
-                    var solicitudId = $(this).data('head-id');
-                    $('#myModal input#solicitudID').val(solicitudId);
-                })
-            });
-
-            //Obtiene resultados de la busqueda
-            $('#informacion').on('click', '.page-link', function(e) {
-
-                e.preventDefault();
-                let url = $(this).attr('href');
-
-                //Extaemos parametros de la url
-                let params = new URLSearchParams(url.split('?')[1]);
-                let requesData = {};
-                params.forEach((value, key) => {
-                    requesData[key] = value;
-                });
-
-                let type = 'GET';
-                let invalidFeedback = $('#invalid-feedback');
-                $.ajax({
-                    url: url,
-                    type: type,
-                    data: requesData,
-                    success: function(response) {
-                        invalidFeedback.empty();
-                        $('#resultados').html(
-                            response); // Mostrar resultados en el modal
-                    },
-                    error: function(response) {
-                        if (response.status == 422) {
-                            var errors = response.responseJSON.errors;
-                            // Maneja errores si es necesario
-                        }
-                    }
-                });
-
-            });
-
-            $('#informacion').on('click', '#submit_formulario_informacion', function() {
-                let type = 'POST';
-                let url = '{{ route('company.obtenerRegistros') }}';
-
-                $('#form-solicitudes').off('submit').on('submit', function(event) {
-
-                    event.preventDefault();
-                    let invalidFeedback = $('#invalid-feedback');
-
-                    $.ajax({
-                        url: url,
-                        type: type,
-                        data: $(this).serialize(),
-                        success: function(response) {
-                            invalidFeedback.empty();
-                            $('#resultados').html(
-                                response); // Mostrar resultados en el modal
-                        },
-                        error: function(response) {
-
-                            if (response.status == 422) {
-
-                                var errors = response.responseJSON.errors;
-                                $('#no_hay_registros').remove();
-                                invalidFeedback.empty();
-                                invalidFeedback.html(
-                                    `<p class="text-danger font-weight-bold" style="font-size:14px">${errors.atleast_one}</p>`
-                                )
-                            }
-                        }
-                    });
-                });
-
-            })
-
-
-        });
-    </script> --}}
-    <style>
+    {{-- <style>
         #tabla-solicitudes {
             table-layout: fixed;
             /* Esto es clave para mantener los anchos fijos */
@@ -372,13 +105,45 @@
 
         /* Si necesitas que el texto largo se muestre en múltiples líneas en vez de truncarse */
         /*
-                                #tabla-solicitudes td {
-                                    white-space: normal;
-                                    word-wrap: break-word;
-                                }
-                                */
+                                                                #tabla-solicitudes td {
+                                                                    white-space: normal;
+                                                                    word-wrap: break-word;
+                                                                }
+                                                                */
+        /* Estilos adicionales para mantener consistencia */
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
+        .table-responsive {
+            /* height: 600px; */
+            overflow-y: auto;
+            border-radius: 0.5rem;
+        }
 
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 1;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table th,
+        .table td {
+            width: auto;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        /* drag and drop */
         .draggable {
             cursor: move;
         }
@@ -388,10 +153,9 @@
         }
 
         .drop-zone {
-            min-height: 150px !important;
-            /* Aumenta la altura mínima */
-            border: 2px dashed #eee;
-            /* Borde visible */
+            min-height: 500px;
+            height: 100%;
+
             transition: all 0.3s ease;
             position: relative;
         }
@@ -411,37 +175,148 @@
             background-color: rgba(0, 123, 255, 0.1);
             border: 2px dashed #0d6efd;
         }
+    </style> --}}
+    <style>
+        
+        /* Estilos de Card */
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 700px;
+            height: 100%;
+            padding: 0 20px;
+        }
+
+        /* Estilos de Tabla */
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 1;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table th,
+        .table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        /* Estilos de Paginación */
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        /* Estilos Drag and Drop */
+        .draggable {
+            cursor: move;
+            transition: background-color 0.2s ease;
+        }
+
+        .draggable.dragging {
+            opacity: 0.5;
+            background-color: #e9ecef;
+        }
+
+        .draggable:hover {
+            background-color: #f8f9fa;
+        }
+
+        .drop-zone {
+            min-height: 500px;
+            height: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .drop-zone.drag-over {
+            background-color: rgba(13, 110, 253, 0.05);
+            border: 2px dashed #0d6efd;
+        }
+
+        .drop-zone:empty::after {
+            content: 'Arrastra aquí las solicitudes para asignarlas';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+
+
+
+        /* Asegurar que el mapa se muestre correctamente en el modal */
+
+        /* Agregar a tus estilos */
+        .ver-ubicacion {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ver-ubicacion:hover {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-right: none;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
     </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const tecnicoId = '{{ $tecnico->id }}'; // Agregar esta línea
-            const solicitudesPendientes = document.querySelectorAll('.draggable');
-            const dropZonas = document.querySelectorAll('.drop-zone');
+            const tecnicoId = '{{ $tecnico->id }}';
+            initDragAndDrop();
 
-            // Configurar los elementos arrastrables
-            solicitudesPendientes.forEach(item => {
-                item.addEventListener('dragstart', handleDragStart);
-                item.addEventListener('dragend', handleDragEnd);
-            });
+            function initDragAndDrop() {
+                const solicitudesPendientes = document.querySelectorAll('.draggable');
+                const dropZonas = document.querySelectorAll('.drop-zone');
 
-            // Configurar las zonas de soltar
-            dropZonas.forEach(zona => {
-                zona.addEventListener('dragover', handleDragOver);
-                zona.addEventListener('dragenter', handleDragEnter);
-                zona.addEventListener('dragleave', handleDragLeave);
-                zona.addEventListener('drop', handleDrop);
-            });
+                solicitudesPendientes.forEach(item => {
+                    item.addEventListener('dragstart', handleDragStart);
+                    item.addEventListener('dragend', handleDragEnd);
+                });
+
+                dropZonas.forEach(zona => {
+                    zona.addEventListener('dragover', handleDragOver);
+                    zona.addEventListener('dragenter', handleDragEnter);
+                    zona.addEventListener('dragleave', handleDragLeave);
+                    zona.addEventListener('drop', handleDrop);
+                });
+            }
 
             function handleDragStart(e) {
-                console.log('Drag start'); // Agregar log
                 e.target.classList.add('dragging');
                 e.dataTransfer.setData('text/plain', e.target.dataset.id);
                 e.dataTransfer.setData('application/json', e.target.dataset.solicitud);
             }
 
             function handleDragEnd(e) {
-                console.log('Drag end'); // Agregar log
                 e.target.classList.remove('dragging');
             }
 
@@ -466,11 +341,8 @@
                 const solicitudId = e.dataTransfer.getData('text/plain');
                 const solicitudData = JSON.parse(e.dataTransfer.getData('application/json'));
 
-                console.log('Drop en zona:', dropZone.id); // Agregar log
-                console.log('Solicitud ID:', solicitudId); // Agregar log
-
-                // Si se suelta en la zona asignada
-                if (dropZone.id === 'solicitudes-asignadas') {
+                // Verificar si el drop zone es el card-body de solicitudes asignadas
+                if (dropZone && dropZone.id === 'solicitudes-asignadas') {
                     asignarSolicitud(solicitudId, solicitudData);
                 }
             }
@@ -482,9 +354,19 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Sí, asignar',
-                    cancelButtonText: 'Cancelar'
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Añadir aquí el loading
+                        Swal.fire({
+                            title: 'Asignando solicitud...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
                         $.ajax({
                             url: `/company/technicals/${tecnicoId}/requests`,
                             method: 'POST',
@@ -495,7 +377,8 @@
                                 solicitud_id: solicitudId
                             },
                             success: function(response) {
-                                console.log('Asignación exitosa:', response); // Agregar log
+                                Swal.close();
+
                                 Swal.fire(
                                     '¡Asignado!',
                                     'La solicitud ha sido asignada correctamente.',
@@ -505,18 +388,56 @@
                                 });
                             },
                             error: function(error) {
-                                console.error('Error en asignación:', error); // Agregar log
+
+                                Swal.close();
+
                                 Swal.fire(
                                     'Error',
                                     'No se pudo asignar la solicitud.',
                                     'error'
                                 );
+
                             }
                         });
                     }
                 });
             }
+
+            // Para el mapa
+            $('.ver-ubicacion').on('click', function(e) {
+                e.preventDefault();
+                const data = $(this).data();
+
+                $('#modal-departamento').text(data.departamento);
+                $('#modal-provincia').text(data.provincia);
+                $('#modal-distrito').text(data.distrito);
+
+                // Inicializar mapa
+                if (data.ubicacion) {
+                    const [lat, lng] = data.ubicacion.split(',').map(Number);
+
+                    // Si estás usando Google Maps
+                    const map = new google.maps.Map(document.getElementById('mapa'), {
+                        center: {
+                            lat,
+                            lng
+                        },
+                        zoom: 15
+                    });
+
+                    new google.maps.Marker({
+                        position: {
+                            lat,
+                            lng
+                        },
+                        map,
+                        title: `${data.distrito}, ${data.provincia}`
+                    });
+                }
+
+                $('#ubicacionModal').modal('show');
+            });
+
         });
     </script>
-
 @endsection

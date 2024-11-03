@@ -15,14 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('tecnico_id');
             $table->unsignedBigInteger('solicitud_id')->unique();
-            $table->text('categoria');
             $table->timestamps();
             $table->softDeletes();
-
+            // Foráneas
             $table->foreign('tecnico_id')->references('id')->on('tecnicos');
             $table->foreign('solicitud_id')->references('id')->on('solicituds');
-            
-            $table->unique(['tecnico_id', 'solicitud_id']);
+
         });
     }
 

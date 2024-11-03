@@ -36,7 +36,8 @@
     <!--sweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{-- <i class="fa fa-life-ring" aria-hidden="true"></i> --}} 
-
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCTuazTT4ftRrTOscHQYPabgJPLiBS9YXc
+                     &sensor=false&region=ES&callback=initialize"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 </head>

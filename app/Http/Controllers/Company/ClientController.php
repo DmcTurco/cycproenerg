@@ -69,10 +69,6 @@ class ClientController extends Controller
         return view('company.pages.clients.index', compact('clientesConSolicitudes', 'estados', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
     }
 
-    public function information($id){
-
-    }
-
 
     private function getTipoDocumentoName($id)
     {

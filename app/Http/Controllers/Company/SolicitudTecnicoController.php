@@ -24,14 +24,13 @@ class SolicitudTecnicoController extends Controller
             'reasignado' => collect($estados)->where('name', 'reasignado')->first()['id']
         ];
     }
-    public function index($tecnicoId)
+    public function index($tecnicoId, Request $request) // Añadir Request
     {
         $tecnico = Tecnico::findOrFail($tecnicoId);
         $estados = $this->getEstados();
-
-        // Construir los CASE statements para estados
         $estadosCase = $this->buildEstadosCase();
-
+    
+        // Query base para solicitudes disponibles
         $solicitudesDisponibles = DB::table('solicituds as s')
             ->select([
                 's.*',
@@ -44,17 +43,31 @@ class SolicitudTecnicoController extends Controller
                 'u.departamento',
                 'u.provincia',
                 'u.distrito',
+                'u.ubicacion',
                 'p.categoria_proyecto'
             ])
             ->join('estado_solicitud as e', 's.id', '=', 'e.solicitud_id')
             ->leftJoin('solicitantes as sol', 's.solicitante_id', '=', 'sol.id')
             ->leftJoin('ubicacions as u', 's.id', '=', 'u.solicitud_id')
             ->leftJoin('proyectos as p', 's.id', '=', 'p.solicitud_id')
-            ->whereIn('e.estado_id', [$estados['pendiente'], $estados['reasignado']])
+            ->whereIn('e.estado_id', [$estados['pendiente'], $estados['reasignado']]);
+    
+        // Aplicar filtros de búsqueda
+        if ($request->filled('numero_solicitud')) {
+            $solicitudesDisponibles->where('s.numero_solicitud', 'like', '%' . $request->numero_solicitud . '%');
+        }
+    
+        if ($request->filled('distrito')) {
+            $solicitudesDisponibles->where('u.distrito', 'ilike', '%' . $request->distrito . '%');
+        }
+    
+        // Ejecutar query con ordenamiento y paginación
+        $solicitudesDisponibles = $solicitudesDisponibles
             ->orderBy('s.id', 'ASC')
-            ->paginate(10);
-
-        // Agregar esto: Solicitudes ya asignadas al técnico
+            ->paginate(10, ['*'], 'disponibles_page')
+            ->appends($request->all()); // Mantener parámetros de búsqueda en paginación
+    
+        // Query para solicitudes asignadas (sin cambios)
         $solicitudesAsignadas = DB::table('solicituds as s')
             ->select([
                 's.*',
@@ -64,6 +77,10 @@ class SolicitudTecnicoController extends Controller
                 'sol.numero_documento',
                 'sol.nombre as solicitante_nombre',
                 'u.direccion',
+                'u.departamento',
+                'u.provincia',
+                'u.distrito',
+                'u.ubicacion',
                 'p.categoria_proyecto'
             ])
             ->join('solicitud_tecnico as st', 's.id', '=', 'st.solicitud_id')
@@ -73,13 +90,10 @@ class SolicitudTecnicoController extends Controller
             ->leftJoin('proyectos as p', 's.id', '=', 'p.solicitud_id')
             ->where('st.tecnico_id', $tecnicoId)
             ->orderBy('st.created_at', 'DESC')
-            ->paginate(10);
-
-            return view('company.pages.solicitudesTecnico.index', compact(
-                'tecnico', 
-                'solicitudesDisponibles',
-                'solicitudesAsignadas'
-            ));
+            ->paginate(10, ['*'], 'asignadas_page');
+    
+        return view('company.pages.solicitudesTecnico.index', 
+            compact('tecnico', 'solicitudesAsignadas', 'solicitudesDisponibles'));
     }
 
     private function buildEstadosCase()
