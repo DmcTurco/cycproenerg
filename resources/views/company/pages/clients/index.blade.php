@@ -9,14 +9,14 @@
                     <div class="card-header pb-0">
                         @include('company.pages.clients.form')
                         @include('company.pages.clients.information')
-                        <a class="btn btn-info  py-2 px-3" class="btn btn-primary" data-bs-toggle="modal"
+                        <a class="btn btn-info" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#uploadModal">Abrir Portal de Carga</a>
                         <hr>
-                        <div class="row">
-                            <form method="GET" action="{{ route('company.client.index') }}"
-                                class="d-flex align-items-center justify-content-between">
-                                <!-- Número de Solicitud -->
-                                <div class=" d-flex align-items-center">
+
+                        <form method="GET" action="{{ route('company.client.index') }}">
+                            <!-- Número de Solicitud -->
+                            <div class="row">
+                                <div class="col-md-2">
                                     <div class="input-group input-group-outline">
                                         <label class="form-label">Numero de Solicitud</label>
                                         <input type="text" name="numero_solicitud" class="form-control"
@@ -25,7 +25,7 @@
                                 </div>
 
                                 <!-- DNI -->
-                                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                                <div class="col-md-2">
                                     <div class="input-group input-group-outline">
                                         <label class="form-label">DNI</label>
                                         <input type="text" name="dni" class="form-control"
@@ -34,7 +34,7 @@
                                 </div>
 
                                 <!-- Nombre -->
-                                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                                <div class="col-md-2">
                                     <div class="input-group input-group-outline">
                                         <label class="form-label">Nombre</label>
                                         <input type="text" name="nombre" class="form-control"
@@ -43,7 +43,7 @@
                                 </div>
 
                                 <!-- Número de Suministro -->
-                                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                                <div class="col-md-2">
                                     <div class="input-group input-group-outline">
                                         <label class="form-label">Numero De Suministro</label>
                                         <input type="text" name="numero_suministro" class="form-control"
@@ -52,7 +52,7 @@
                                 </div>
 
                                 <!-- Estado (Select) -->
-                                <div class="ms-md-auto pe-md-1 d-flex align-items-center">
+                                <div class="col-md-2">
                                     <div class="input-group input-group-outline">
                                         {{-- <label class="form-label">Estado</label> --}}
                                         <select name="estado" class="form-control">
@@ -67,13 +67,16 @@
                                     </div>
                                 </div>
 
-                                <!-- Botón Buscar -->
-                                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                                    <button type="submit" class="btn btn-primary">Buscar</button>
-                                    <a href="{{ route('company.client.index') }}" class="btn btn-secondary">Limpiar</a>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-info ">
+                                        <i class="fas fa-search" style="font-size: 12px;"></i></button>
+                                    <a href="{{ route('company.client.index') }}" class="btn btn-secondary"> <i
+                                            class="fa fa-trash" style="font-size: 12px;"></i></a>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                            <!-- Botón Buscar -->
+                        </form>
+
                         <hr>
 
                         <div class="row mt-3">
@@ -188,16 +191,16 @@
 
     <script>
         $(document).ready(function() {
-                // Función para manejar las pestañas
+            // Función para manejar las pestañas
             function initTabs() {
                 $('.tab-btn').click(function() {
                     // Remover clase active de todos los botones y contenidos
                     $('.tab-btn').removeClass('active');
                     $('.tab-content').removeClass('active');
-                    
+
                     // Agregar clase active al botón clickeado
                     $(this).addClass('active');
-                    
+
                     // Mostrar el contenido correspondiente
                     const tabId = $(this).data('tab');
                     $(`#${tabId}`).addClass('active');
@@ -226,77 +229,118 @@
                             const solicitud = response.data;
 
                             // Actualizar el título del modal
-                            $('#title').text('Detalles de Solicitud -' + solicitud.numero_solicitud);
+                            $('#title').text('Detalles de Solicitud -' + solicitud
+                                .numero_solicitud);
 
                             // Datos de la Solicitud
-                            $('#numero_solicitud').val(solicitud.numero_solicitud ||'No especificado');
-                            $('#numero_suministro').val(solicitud.numero_suministro ||'No especificado');
-                            $('#numero_contrato_suministro').val(solicitud.numero_contrato_suministro || 'No especificado');
-                            $('#fecha_aprobacion_contrato').val(solicitud.fecha_aprobacion_contrato || 'No especificado');
-                            $('#fecha_registro_portal').val(solicitud.fecha_registro_portal ||'No especificado');
-                            $('#estado_solicitud').val(solicitud.estado_nombre ||'No especificado');
+                            $('#numero_solicitud').val(solicitud.numero_solicitud ||
+                                'No especificado');
+                            $('#numero_suministro').val(solicitud.numero_suministro ||
+                                'No especificado');
+                            $('#numero_contrato_suministro').val(solicitud
+                                .numero_contrato_suministro || 'No especificado');
+                            $('#fecha_aprobacion_contrato').val(solicitud
+                                .fecha_aprobacion_contrato || 'No especificado');
+                            $('#fecha_registro_portal').val(solicitud.fecha_registro_portal ||
+                                'No especificado');
+                            $('#estado_solicitud').val(solicitud.estado_nombre ||
+                                'No especificado');
 
                             // Datos del Solicitante
-                            $('#solicitante_tipo_documento').val(solicitud.solicitante_tipo_documento_nombre || 'No especificado');
-                            $('#solicitante_numero_documento').val(solicitud.solicitante_numero_documento || 'No especificado');
-                            $('#solicitante_nombre').val(solicitud.solicitante_nombre ||'No especificado');
-                            $('#solicitante_celular').val(solicitud.solicitante_celular ||'No especificado');
-                            $('#solicitante_email').val(solicitud.solicitante_email ||'No especificado');
-                            $('#solicitante_usuario_fise').val(solicitud.solicitante_usuario_fise || 'No especificado');
+                            $('#solicitante_tipo_documento').val(solicitud
+                                .solicitante_tipo_documento_nombre || 'No especificado');
+                            $('#solicitante_numero_documento').val(solicitud
+                                .solicitante_numero_documento || 'No especificado');
+                            $('#solicitante_nombre').val(solicitud.solicitante_nombre ||
+                                'No especificado');
+                            $('#solicitante_celular').val(solicitud.solicitante_celular ||
+                                'No especificado');
+                            $('#solicitante_email').val(solicitud.solicitante_email ||
+                                'No especificado');
+                            $('#solicitante_usuario_fise').val(solicitud
+                                .solicitante_usuario_fise || 'No especificado');
 
                             // Datos de la Empresa
-                            $('#empresa_tipo_documento').val(solicitud.empresa_tipo_documento ||'No especificado');
-                            $('#empresa_numero_documento').val(solicitud.empresa_numero_documento || 'No especificado');
-                            $('#empresa_nombre').val(solicitud.empresa_nombre ||'No especificado');
-                            $('#empresa_registro_gas').val(solicitud.empresa_registro_gas ||'No especificado');
+                            $('#empresa_tipo_documento').val(solicitud.empresa_tipo_documento ||
+                                'No especificado');
+                            $('#empresa_numero_documento').val(solicitud
+                                .empresa_numero_documento || 'No especificado');
+                            $('#empresa_nombre').val(solicitud.empresa_nombre ||
+                                'No especificado');
+                            $('#empresa_registro_gas').val(solicitud.empresa_registro_gas ||
+                                'No especificado');
 
                             // Datos de la Concesionaria
-                            $('#concesionaria_tipo_documento').val(solicitud.concesionaria_tipo_documento || 'No especificado');
-                            $('#concesionaria_numero_documento').val(solicitud.concesionaria_numero_documento || 'No especificado');
-                            $('#concesionaria_nombre').val(solicitud.concesionaria_nombre ||'No especificado');
+                            $('#concesionaria_tipo_documento').val(solicitud
+                                .concesionaria_tipo_documento || 'No especificado');
+                            $('#concesionaria_numero_documento').val(solicitud
+                                .concesionaria_numero_documento || 'No especificado');
+                            $('#concesionaria_nombre').val(solicitud.concesionaria_nombre ||
+                                'No especificado');
 
                             // Datos de Instalación
-                            $('#tipo_instalacion').val(solicitud.tipo_instalacion ||'No especificado');
-                            $('#tipo_acometida').val(solicitud.tipo_acometida ||'No especificado');
-                            $('#numero_puntos_instalacion').val(solicitud.numero_puntos_instalacion || 'No especificado');
-                            $('#fecha_finalizacion_instalacion_interna').val(solicitud.fecha_finalizacion_instalacion_interna || 'No especificado'
+                            $('#tipo_instalacion').val(solicitud.tipo_instalacion ||
+                                'No especificado');
+                            $('#tipo_acometida').val(solicitud.tipo_acometida ||
+                                'No especificado');
+                            $('#numero_puntos_instalacion').val(solicitud
+                                .numero_puntos_instalacion || 'No especificado');
+                            $('#fecha_finalizacion_instalacion_interna').val(solicitud
+                                .fecha_finalizacion_instalacion_interna || 'No especificado'
                             );
-                            $('#fecha_finalizacion_instalacion_acometida').val(solicitud.fecha_finalizacion_instalacion_acometida ||'No especificado');
-                            $('#resultado_instalacion_tc').val(solicitud.resultado_instalacion_tc || 'No especificado');
-                            $('#fecha_programacion_habilitacion').val(solicitud.fecha_programacion_habilitacion || 'No especificado');
+                            $('#fecha_finalizacion_instalacion_acometida').val(solicitud
+                                .fecha_finalizacion_instalacion_acometida ||
+                                'No especificado');
+                            $('#resultado_instalacion_tc').val(solicitud
+                                .resultado_instalacion_tc || 'No especificado');
+                            $('#fecha_programacion_habilitacion').val(solicitud
+                                .fecha_programacion_habilitacion || 'No especificado');
 
                             // Datos del Proyecto
-                            $('#tipo_proyecto').val(solicitud.tipo_proyecto || 'No especificado');
-                            $('#codigo_proyecto').val(solicitud.codigo_proyecto || 'No especificado');
-                            $('#categoria_proyecto').val(solicitud.categoria_proyecto || 'No especificado');
-                            $('#sub_categoria_proyecto').val(solicitud.sub_categoria_proyecto || 'No especificado');
-                            $('#codigo_objeto_conexion').val(solicitud.codigo_objeto_conexion || 'No especificado');
+                            $('#tipo_proyecto').val(solicitud.tipo_proyecto ||
+                                'No especificado');
+                            $('#codigo_proyecto').val(solicitud.codigo_proyecto ||
+                                'No especificado');
+                            $('#categoria_proyecto').val(solicitud.categoria_proyecto ||
+                                'No especificado');
+                            $('#sub_categoria_proyecto').val(solicitud.sub_categoria_proyecto ||
+                                'No especificado');
+                            $('#codigo_objeto_conexion').val(solicitud.codigo_objeto_conexion ||
+                                'No especificado');
 
                             // Datos de Ubicación
                             $('#ubicacion').val(solicitud.ubicacion || 'No especificado');
-                            $('#codigo_manzana').val(solicitud.codigo_manzana || 'No especificado');
-                            $('#codigo_identificacion_interna').val(solicitud.codigo_identificacion_interna || 'No especificado');
+                            $('#codigo_manzana').val(solicitud.codigo_manzana ||
+                                'No especificado');
+                            $('#codigo_identificacion_interna').val(solicitud
+                                .codigo_identificacion_interna || 'No especificado');
                             $('#nombre_malla').val(solicitud.nombre_malla || 'No especificado');
                             $('#direccion').val(solicitud.direccion || 'No especificado');
                             $('#departamento').val(solicitud.departamento || 'No especificado');
                             $('#provincia').val(solicitud.provincia || 'No especificado');
                             $('#distrito').val(solicitud.distrito || 'No especificado');
-                            $('#venta_zona_no_gasificada').val(solicitud.venta_zona_no_gasificada || 'No especificado');
+                            $('#venta_zona_no_gasificada').val(solicitud
+                                .venta_zona_no_gasificada || 'No especificado');
 
                             // Datos del Asesor
-                            $('#asesor_nombre').val(solicitud.asesor_nombre || 'No especificado');
-                            $('#asesor_tipo_documento').val(solicitud.asesor_tipo_documento || 'No especificado');
-                            $('#asesor_numero_documento').val(solicitud.asesor_numero_documento || 'No especificado');
-                            $('#asesor_telefono').val(solicitud.asesor_telefono ||'No especificado');
+                            $('#asesor_nombre').val(solicitud.asesor_nombre ||
+                                'No especificado');
+                            $('#asesor_tipo_documento').val(solicitud.asesor_tipo_documento ||
+                                'No especificado');
+                            $('#asesor_numero_documento').val(solicitud
+                                .asesor_numero_documento || 'No especificado');
+                            $('#asesor_telefono').val(solicitud.asesor_telefono ||
+                                'No especificado');
                             $('#asesor_email').val(solicitud.asesor_email || 'No especificado');
-                            $('#asesor_direccion').val(solicitud.asesor_direccion || 'No especificado');
+                            $('#asesor_direccion').val(solicitud.asesor_direccion ||
+                                'No especificado');
 
                             // Formatear fechas si es necesario
                             formatDates();
 
                             // Inicializar las pestañas
                             initTabs();
-                    
+
                             // Mostrar la primera pestaña por defecto
                             $('.tab-btn:first').click();
 
