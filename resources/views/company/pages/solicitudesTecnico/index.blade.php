@@ -36,25 +36,28 @@
                             <div class="col-md-3">
                                 <div class="input-group input-group-outline">
                                     {{-- <label class="form-label">Buscar por N° solicitud</label> --}}
-                                    <input type="text" class="form-control" name="numero_solicitud" 
-                                           value="{{ request('numero_solicitud') }}" placeholder="Buscar por N° solicitud">
+                                    <input type="text" class="form-control" name="numero_solicitud"
+                                        value="{{ request('numero_solicitud') }}" placeholder="Buscar por N° solicitud">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group input-group-outline">
                                     {{-- <label class="form-label">Buscar por distrito</label> --}}
-                                    <input type="text" class="form-control" name="distrito" 
-                                           value="{{ request('distrito') }}" placeholder="Buscar por distrito">
+                                    <input type="text" class="form-control" name="distrito"
+                                        value="{{ request('distrito') }}" placeholder="Buscar por distrito">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <button type="submit" class="btn btn-info btn-sm">
                                     <i class="fas fa-search" style="font-size: 12px;"></i></button>
-                                <a href="{{ route('company.technicals.requests.index', $tecnico->id) }}" 
+                                <a href="{{ route('company.technicals.requests.index', $tecnico->id) }}"
                                     class="btn btn-outline-secondary btn-sm">
                                     <i class="fa fa-trash" style="font-size: 12px;"></i>
                                 </a>
-                                {{-- @if(request('numero_solicitud') || request('distrito'))
+                                <button type="button" id="asignarMultiple" class="btn btn-success btn-sm" disabled>
+                                    <i class="fas fa-tasks" style="font-size: 12px;"></i>
+                                </button>
+                                {{-- @if (request('numero_solicitud') || request('distrito'))
                                     <a href="{{ route('company.technicals.requests.index', $tecnico->id) }}" 
                                        class="btn btn-outline-secondary btn-sm">
                                        <i class="fa fa-trash" aria-hidden="true"></i>
@@ -88,96 +91,7 @@
         </script>
     @endif
 
-
-    {{-- <style>
-        #tabla-solicitudes {
-            table-layout: fixed;
-            /* Esto es clave para mantener los anchos fijos */
-            width: 100%;
-        }
-
-        #tabla-solicitudes th,
-        #tabla-solicitudes td {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* Si necesitas que el texto largo se muestre en múltiples líneas en vez de truncarse */
-        /*
-                                                                #tabla-solicitudes td {
-                                                                    white-space: normal;
-                                                                    word-wrap: break-word;
-                                                                }
-                                                                */
-        /* Estilos adicionales para mantener consistencia */
-        .card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .table-responsive {
-            /* height: 600px; */
-            overflow-y: auto;
-            border-radius: 0.5rem;
-        }
-
-        .table thead th {
-            position: sticky;
-            top: 0;
-            background-color: white;
-            z-index: 1;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .table th,
-        .table td {
-            width: auto;
-            white-space: nowrap;
-        }
-
-        tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-        }
-
-        .pagination {
-            margin-bottom: 0;
-        }
-
-        /* drag and drop */
-        .draggable {
-            cursor: move;
-        }
-
-        .draggable:hover {
-            background-color: #f8f9fa;
-        }
-
-        .drop-zone {
-            min-height: 500px;
-            height: 100%;
-
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        /* Opcional: Mensaje cuando está vacío */
-        .drop-zone:empty::after {
-            content: 'Arrastra aquí las solicitudes para asignarlas';
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            color: #999;
-            font-size: 14px;
-        }
-
-        .drop-zone.drag-over {
-            background-color: rgba(0, 123, 255, 0.1);
-            border: 2px dashed #0d6efd;
-        }
-    </style> --}}
     <style>
-        
         /* Estilos de Card */
         .card {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -259,9 +173,6 @@
             font-weight: 500;
         }
 
-
-
-
         /* Asegurar que el mapa se muestre correctamente en el modal */
 
         /* Agregar a tus estilos */
@@ -285,6 +196,25 @@
         .form-control:focus {
             border-color: #0d6efd;
             box-shadow: none;
+        }
+
+
+        /* Efecto hover para el botón de eliminar */
+        .delete-solicitud {
+            transition: transform 0.2s ease;
+        }
+
+        .delete-solicitud:hover {
+            transform: scale(1.2);
+        }
+
+        /* Efecto para el icono del basurero */
+        .fa-trash {
+            transition: color 0.3s ease;
+        }
+
+        .delete-solicitud:hover .fa-trash {
+            color: #dc3545;
         }
     </style>
 
@@ -381,10 +311,14 @@
 
                                 Swal.fire(
                                     '¡Asignado!',
-                                    'La solicitud ha sido asignada correctamente.',
+                                        response.message,
                                     'success'
                                 ).then(() => {
                                     location.reload();
+
+                                    // if (response.redirect) {
+                                    //     window.location.href = response.redirect;
+                                    // }
                                 });
                             },
                             error: function(error) {
@@ -402,6 +336,7 @@
                     }
                 });
             }
+
 
             // Para el mapa
             $('.ver-ubicacion').on('click', function(e) {
@@ -438,6 +373,81 @@
                 $('#ubicacionModal').modal('show');
             });
 
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Manejar eliminación de solicitud
+            const tecnicoId = '{{ $tecnico->id }}';
+            $('.delete-solicitud').on('click', function() {
+                const solicitudId = $(this).data('id');
+                const numeroSolicitud = $(this).data('numero');
+                const row = $(this).closest('tr');
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: `¿Deseas eliminar la solicitud ${numeroSolicitud}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Animar la fila
+                        row.addClass('fade-out-row');
+
+                        // Animación de la fila hacia un "basurero" virtual
+                        row.animate({
+                            opacity: 0,
+                            right: '-100%'
+                        }, 500, function() {
+                            // Hacer la petición AJAX para eliminar
+                            $.ajax({
+                                url: `/company/technicals/${tecnicoId}/requests/${solicitudId}`, //url: `/company/technicals/${tecnicoId}/requests`,
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                success: function(response) {
+                                    // Eliminar la fila con animación
+                                    row.slideUp(300, function() {
+                                        row.remove();
+                                    });
+
+                                    Swal.fire(
+                                        '¡Eliminado!',
+                                        response.message,
+                                        'success'
+                                    ).then(() => {
+                                        location.reload();
+                                        // if (response.redirect) {
+                                        //     window.location.href =
+                                        //         response.redirect;
+                                        // }
+                                    });
+                                },
+                                error: function() {
+                                    // Revertir animación si hay error
+                                    row.removeClass('fade-out-row');
+                                    row.css({
+                                        opacity: 1,
+                                        right: 0
+                                    });
+
+                                    Swal.fire(
+                                        'Error',
+                                        'No se pudo eliminar la solicitud.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endsection

@@ -2,6 +2,9 @@
     <table class="table mb-0">
         <thead>
             <tr>
+                <th class="text-center">
+                    <input type="checkbox" id="selectAll" class="form-check-input">
+                </th>
                 <th style="width: 15%"
                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     N. solicitud
@@ -25,6 +28,11 @@
                 @foreach ($solicitudesDisponibles as $solicitud)
                     <tr class="draggable" draggable="true" data-id="{{ $solicitud->id }}"
                         data-solicitud="{{ json_encode($solicitud) }}">
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input solicitud-checkbox" 
+                                   data-id="{{ $solicitud->id }}"
+                                   data-solicitud="{{ json_encode($solicitud) }}">
+                        </td>
                         <td style="width: 20%" class="align-middle text-center">
                             <span class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
                         </td>

@@ -10,8 +10,7 @@
                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Nombre
                 </th>
-                <th style="width: 20%"
-                    class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                <th style="width: 20%" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Dep-Prov-Dist
                 </th>
                 <th style="width: 15%"
@@ -25,12 +24,10 @@
                 @foreach ($solicitudesAsignadas as $solicitud)
                     <tr>
                         <td style="width: 20%" class="align-middle text-center">
-                            <span
-                                class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
+                            <span class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
                         </td>
                         <td style="width: 30%" class="align-middle text-center">
-                            <span
-                                class="text-xs font-weight-bold">{{ $solicitud->solicitante_nombre }}</span>
+                            <span class="text-xs font-weight-bold">{{ $solicitud->solicitante_nombre }}</span>
                         </td>
                         <td style="width: 35%" class="align-middle text-info">
                             <p class="text-xs font-weight-bold mb-0">
@@ -38,9 +35,10 @@
                             <p class="text-xs text-secondary mb-0">{{ $solicitud->distrito }}</p>
                         </td>
                         <td style="width: 15%" class="align-middle text-center text-sm">
-                            <span class="badge badge-sm {{ $solicitud->estado_badge }} p-2">
+                            <button class="badge badge-sm {{ $solicitud->estado_badge }} p-2 delete-solicitud"
+                                data-id="{{ $solicitud->id }}">
                                 {{ $solicitud->estado_nombre }}
-                            </span>
+                            </button>
                         </td>
 
                     </tr>
@@ -54,8 +52,10 @@
             @endif
         </tbody>
 
-    </table>    
+    </table>
     <div class="d-flex justify-content-center mt-3">
         {{ $solicitudesAsignadas->links('pagination::bootstrap-4') }}
     </div>
 </div>
+
+
