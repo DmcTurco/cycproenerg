@@ -200,13 +200,7 @@
         }
 
         /* Nuevos estilos para selección múltiple */
-        /* .form-check-input {
-                        cursor: pointer;
-                    } */
 
-        .selected-row {
-            background-color: rgba(13, 110, 253, 0.1) !important;
-        }
 
         #asignarMultiple:disabled {
             opacity: 0.6;
@@ -229,12 +223,64 @@
             cursor: pointer;
         }
 
-        tr[draggable="true"] {
+        /* Estilos para mejorar la visibilidad de los checkboxes */
+        .form-check-input {
+            width: 18px;
+            /* Aumentar un poco el tamaño */
+            height: 18px;
+            border: 2px solid #dee2e6;
+            /* Agregar borde visible */
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            /* Fondo blanco para mejor contraste */
+        }
+
+        .form-check-input:checked {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        .form-check-input:indeterminate {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        /* Mejorar el hover de los checkboxes */
+        .form-check-input:hover:not(:checked) {
+            border-color: #555555;
+        }
+
+        /* Estilos para las filas seleccionadas */
+        .selected-row {
+            background-color: rgba(13, 110, 253, 0.1) !important;
+        }
+
+        /* Estilos para el drag and drop */
+        tr[draggable="true"]:not(.selected-row) {
             cursor: move;
         }
 
-        tr[draggable="false"] {
+        tr.selected-row {
             cursor: default;
+        }
+
+        /* Centrar verticalmente el checkbox en la celda */
+        td.text-center .form-check-input,
+        th.text-center .form-check-input {
+            vertical-align: middle;
+            position: relative;
+            top: 0;
+        }
+
+        /* Contenedor del checkbox para mejor alineación */
+        .checkbox-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
         }
     </style>
 
@@ -249,45 +295,73 @@
                 const solicitudCheckboxes = document.querySelectorAll('.solicitud-checkbox');
                 const asignarMultipleBtn = document.getElementById('asignarMultiple');
 
-                // Manejar selección de todas las solicitudes
-                selectAllCheckbox?.addEventListener('change', function() {
-                    const checkboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = this.checked;
-                        const row = checkbox.closest('tr');
-                        if (row) {
-                            row.classList.toggle('selected-row', this.checked);
-                            row.setAttribute('draggable', !this.checked);
+                // Manejar clics en las filas
+                document.querySelectorAll('tbody tr').forEach(row => {
+                    row.addEventListener('click', function(e) {
+                        // Si el clic fue en el checkbox o en un enlace, no hacer nada
+                        if (e.target.type === 'checkbox' || e.target.tagName === 'A' ||
+                            e.target.closest('a') || e.target.closest('.actions')) {
+                            return;
+                        }
+
+                        // Buscar el checkbox dentro de la fila
+                        const checkbox = this.querySelector('.solicitud-checkbox');
+                        if (checkbox && !checkbox.disabled) {
+                            checkbox.checked = !checkbox.checked;
+                            // Disparar el evento change manualmente
+                            checkbox.dispatchEvent(new Event('change'));
                         }
                     });
-                    updateAsignarButton();
                 });
 
-                // Manejar selección individual
+                // También modificar la parte del selectAll
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.addEventListener('change', function() {
+                        const checkboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)');
+                        checkboxes.forEach(checkbox => {
+                            checkbox.checked = this.checked;
+                            const row = checkbox.closest('tr');
+                            if (row) {
+                                row.classList.toggle('selected-row', this.checked);
+                                row.setAttribute('draggable', 'true'); // Mantener draggable
+                            }
+                        });
+                        updateAsignarButton();
+                    });
+                }
+
+                // Handler para checkboxes individuales
                 solicitudCheckboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', function() {
-                        const row = this.closest('tr');
-                        if (row) {
-                            row.classList.toggle('selected-row', this.checked);
-                            row.setAttribute('draggable', !this.checked);
-                        }
+                        updateRowState(this);
                         updateSelectAllCheckbox();
                         updateAsignarButton();
                     });
-
-                    // Prevenir inicio de drag cuando se hace click en el checkbox
-                    checkbox.addEventListener('mousedown', function(e) {
-                        e.stopPropagation();
-                    });
                 });
 
-                // Actualizar estado del botón "Seleccionar todos"
+                function updateRowState(checkbox) {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        row.classList.toggle('selected-row', checkbox.checked);
+                        // Mantener el draggable siempre activo
+                        row.setAttribute('draggable', 'true');
+                    }
+                }
+
+                // Actualizar estado del checkbox "Seleccionar todos"
                 function updateSelectAllCheckbox() {
                     if (!selectAllCheckbox) return;
                     const totalCheckboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)').length;
                     const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
-                    selectAllCheckbox.checked = totalCheckboxes === checkedCheckboxes && totalCheckboxes > 0;
-                    selectAllCheckbox.indeterminate = checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes;
+
+                    // Estado indeterminado cuando hay algunos pero no todos seleccionados
+                    if (checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes) {
+                        selectAllCheckbox.indeterminate = true;
+                        selectAllCheckbox.checked = false;
+                    } else {
+                        selectAllCheckbox.indeterminate = false;
+                        selectAllCheckbox.checked = checkedCheckboxes === totalCheckboxes && totalCheckboxes > 0;
+                    }
                 }
 
                 // Actualizar estado del botón de asignación múltiple
@@ -295,23 +369,95 @@
                     const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
                     asignarMultipleBtn.disabled = checkedCheckboxes === 0;
                 }
-
-                // Manejar asignación múltiple
-                asignarMultipleBtn.addEventListener('click', handleMultipleAssignment);
             }
 
-            function handleMultipleAssignment() {
-                const selectedSolicitudes = Array.from(document.querySelectorAll('.solicitud-checkbox:checked'))
-                    .map(checkbox => ({
-                        id: checkbox.dataset.id,
-                        solicitud: JSON.parse(checkbox.dataset.solicitud)
-                    }));
+            function initDragAndDrop() {
+                const solicitudesPendientes = document.querySelectorAll('.draggable');
+                const dropZonas = document.querySelectorAll('.drop-zone');
 
-                if (selectedSolicitudes.length === 0) return;
+                solicitudesPendientes.forEach(item => {
+                    item.addEventListener('dragstart', handleDragStart);
+                    item.addEventListener('dragend', handleDragEnd);
+                });
+
+                dropZonas.forEach(zona => {
+                    zona.addEventListener('dragover', handleDragOver);
+                    zona.addEventListener('dragenter', handleDragEnter);
+                    zona.addEventListener('dragleave', handleDragLeave);
+                    zona.addEventListener('drop', handleDrop);
+                });
+            }
+
+            function handleDragStart(e) {
+                const selectedRows = document.querySelectorAll('.solicitud-checkbox:checked');
+
+                if (selectedRows.length > 0) {
+                    // Si hay filas seleccionadas, recolectar todos los IDs y datos
+                    const selectedIds = Array.from(selectedRows).map(checkbox => checkbox.dataset.id);
+                    const selectedData = Array.from(selectedRows).map(checkbox => JSON.parse(checkbox.dataset
+                        .solicitud));
+
+                    e.dataTransfer.setData('text/plain', JSON.stringify(selectedIds));
+                    e.dataTransfer.setData('application/json', JSON.stringify(selectedData));
+
+                    // Agregar clase visual a todas las filas seleccionadas
+                    selectedRows.forEach(checkbox => {
+                        checkbox.closest('tr').classList.add('dragging');
+                    });
+                } else {
+                    // Si no hay selección, usar la fila que se está arrastrando
+                    e.target.classList.add('dragging');
+                    const solicitudId = e.target.dataset.id;
+                    const solicitudData = e.target.dataset.solicitud;
+
+                    e.dataTransfer.setData('text/plain', JSON.stringify([solicitudId]));
+                    e.dataTransfer.setData('application/json', JSON.stringify([JSON.parse(solicitudData)]));
+                }
+            }
+
+            function handleDragEnd(e) {
+                // Remover clase visual de todas las filas
+                document.querySelectorAll('.dragging').forEach(row => {
+                    row.classList.remove('dragging');
+                });
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+            }
+
+            function handleDragEnter(e) {
+                e.preventDefault();
+                e.target.closest('.drop-zone')?.classList.add('drag-over');
+            }
+
+            function handleDragLeave(e) {
+                e.target.closest('.drop-zone')?.classList.remove('drag-over');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                const dropZone = e.target.closest('.drop-zone');
+                if (dropZone) {
+                    dropZone.classList.remove('drag-over');
+
+                    const solicitudIds = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    const solicitudesData = JSON.parse(e.dataTransfer.getData('application/json'));
+
+                    if (dropZone.id === 'solicitudes-asignadas') {
+                        asignarSolicitudes(solicitudIds, solicitudesData);
+                    }
+                }
+            }
+
+            function asignarSolicitudes(solicitudIds, solicitudesData) {
+                const mensaje = solicitudIds.length > 1 ?
+                    `¿Deseas asignar las ${solicitudIds.length} solicitudes seleccionadas?` :
+                    `¿Deseas asignar la solicitud ${solicitudesData[0].numero_solicitud}?`;
 
                 Swal.fire({
-                    title: '¿Deseas asignar las solicitudes seleccionadas?',
-                    text: `Se asignarán ${selectedSolicitudes.length} solicitudes`,
+                    title: '¿Deseas asignar solicitudes?',
+                    text: mensaje,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Sí, asignar',
@@ -335,15 +481,19 @@
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
                             data: {
-                                solicitudes: selectedSolicitudes.map(s => s.id)
+                                solicitudes: solicitudIds
                             },
                             success: function(response) {
                                 Swal.close();
-                                Swal.fire(
-                                    '¡Asignado!',
-                                    'Las solicitudes han sido asignadas exitosamente.',
-                                    'success'
-                                ).then(() => {
+                                Swal.fire({
+                                    title: '¡Asignado!',
+                                    text: solicitudIds.length > 1 ?
+                                        'Las solicitudes han sido asignadas exitosamente.' :
+                                        'La solicitud ha sido asignada exitosamente.',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
                                     location.reload();
                                 });
                             },
@@ -359,246 +509,6 @@
                     }
                 });
             }
-
-            function initDragAndDrop() {
-                const solicitudesPendientes = document.querySelectorAll('.draggable');
-                const dropZonas = document.querySelectorAll('.drop-zone');
-
-                solicitudesPendientes.forEach(item => {
-                    item.addEventListener('dragstart', handleDragStart);
-                    item.addEventListener('dragend', handleDragEnd);
-                });
-
-                dropZonas.forEach(zona => {
-                    zona.addEventListener('dragover', handleDragOver);
-                    zona.addEventListener('dragenter', handleDragEnter);
-                    zona.addEventListener('dragleave', handleDragLeave);
-                    zona.addEventListener('drop', handleDrop);
-                });
-            }
-
-            // function initMultipleSelection() {
-            //     const selectAllCheckbox = document.getElementById('selectAll');
-            //     const solicitudCheckBox = document.querySelectorAll('.solicitud-checkbox');
-
-            //     // Agregar botón de asignación múltiple si no existe
-            //     if (!document.getElementById('asignarMultiple')) {
-            //         const buttonContainer = document.querySelector('.card-header .row .col-md-3:last-child');
-            //         const asignarButton = document.createElement('button');
-            //         asignarButton.id = 'asignarMultiple';
-            //         asignarButton.className = 'btn btn-success btn-sm ms-2';
-            //         asignarButton.innerHTML = '<i class="fas fa-tasks"></i> Asignar seleccionados';
-            //         asignarButton.disabled = true;
-            //         buttonContainer.appendChild(asignarButton);
-            //     }
-
-            //     const asignarMultipleBtn = document.getElementById('asignarMultiple');
-
-            //     // Manejar selección de todas las solicitudes
-            //     selectAllCheckbox.addEventListener('change', function() {
-            //         const checkboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)');
-            //         checkboxes.forEach(checkbox => {
-            //             checkbox.checked = this.checked;
-            //             const row = checkbox.closest('tr');
-            //             if (row) {
-            //                 row.classList.toggle('selected-row', this.checked);
-            //                 // Deshabilitar drag and drop si está seleccionado
-            //                 row.setAttribute('draggable', !this.checked);
-            //             }
-            //         });
-            //         updateAsignarButton();
-            //     });
-
-            //     // Manejar selección individual
-            //     solicitudCheckboxes.forEach(checkbox => {
-            //         checkbox.addEventListener('change', function() {
-            //             const row = this.closest('tr');
-            //             if (row) {
-            //                 row.classList.toggle('selected-row', this.checked);
-            //                 // Deshabilitar drag and drop si está seleccionado
-            //                 row.setAttribute('draggable', !this.checked);
-            //             }
-            //             updateSelectAllCheckbox();
-            //             updateAsignarButton();
-            //         });
-
-            //         // Prevenir inicio de drag cuando se hace click en el checkbox
-            //         checkbox.addEventListener('mousedown', function(e) {
-            //             e.stopPropagation();
-            //         });
-            //     });
-
-            //     // Actualizar estado del botón "Seleccionar todos"
-            //     function updateSelectAllCheckbox() {
-            //         const totalCheckboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)').length;
-            //         const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
-            //         selectAllCheckbox.checked = totalCheckboxes === checkedCheckboxes && totalCheckboxes > 0;
-            //         selectAllCheckbox.indeterminate = checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes;
-            //     }
-
-            //     // Actualizar estado del botón de asignación múltiple
-            //     function updateAsignarButton() {
-            //         const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
-            //         asignarMultipleBtn.disabled = checkedCheckboxes === 0;
-            //     }
-
-            //     // Manejar asignación múltiple
-            //     asignarMultipleBtn.addEventListener('click', function() {
-            //         const selectedSolicitudes = Array.from(document.querySelectorAll(
-            //                 '.solicitud-checkbox:checked'))
-            //             .map(checkbox => ({
-            //                 id: checkbox.dataset.id,
-            //                 solicitud: JSON.parse(checkbox.dataset.solicitud)
-            //             }));
-
-            //         if (selectedSolicitudes.length === 0) return;
-
-            //         Swal.fire({
-            //             title: '¿Deseas asignar las solicitudes seleccionadas?',
-            //             text: `Se asignarán ${selectedSolicitudes.length} solicitudes`,
-            //             icon: 'question',
-            //             showCancelButton: true,
-            //             confirmButtonText: 'Sí, asignar',
-            //             cancelButtonText: 'Cancelar',
-            //             confirmButtonColor: '#3085d6',
-            //             cancelButtonColor: '#d33'
-            //         }).then((result) => {
-            //             if (result.isConfirmed) {
-            //                 Swal.fire({
-            //                     title: 'Asignando solicitudes...',
-            //                     allowOutsideClick: false,
-            //                     didOpen: () => {
-            //                         Swal.showLoading();
-            //                     }
-            //                 });
-
-            //                 $.ajax({
-            //                     url: `/company/technicals/${tecnicoId}/requests`,
-            //                     method: 'POST',
-            //                     headers: {
-            //                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            //                     },
-            //                     data: {
-            //                         solicitudes: selectedSolicitudes.map(s => s.id)
-            //                     },
-            //                     success: function(response) {
-            //                         Swal.close();
-            //                         Swal.fire(
-            //                             '¡Asignado!',
-            //                             'Las solicitudes han sido asignadas exitosamente.',
-            //                             'success'
-            //                         ).then(() => {
-            //                             location.reload();
-            //                         });
-            //                     },
-            //                     error: function(error) {
-            //                         Swal.close();
-            //                         Swal.fire(
-            //                             'Error',
-            //                             'No se pudieron asignar las solicitudes.',
-            //                             'error'
-            //                         );
-            //                     }
-            //                 });
-            //             }
-            //         });
-            //     });
-
-
-
-            // }
-
-            function handleDragStart(e) {
-                e.target.classList.add('dragging');
-                e.dataTransfer.setData('text/plain', e.target.dataset.id);
-                e.dataTransfer.setData('application/json', e.target.dataset.solicitud);
-            }
-
-            function handleDragEnd(e) {
-                e.target.classList.remove('dragging');
-            }
-
-            function handleDragOver(e) {
-                e.preventDefault();
-            }
-
-            function handleDragEnter(e) {
-                e.preventDefault();
-                e.target.closest('.drop-zone').classList.add('drag-over');
-            }
-
-            function handleDragLeave(e) {
-                e.target.closest('.drop-zone').classList.remove('drag-over');
-            }
-
-            function handleDrop(e) {
-                e.preventDefault();
-                const dropZone = e.target.closest('.drop-zone');
-                dropZone.classList.remove('drag-over');
-
-                const solicitudId = e.dataTransfer.getData('text/plain');
-                const solicitudData = JSON.parse(e.dataTransfer.getData('application/json'));
-
-                // Verificar si el drop zone es el card-body de solicitudes asignadas
-                if (dropZone && dropZone.id === 'solicitudes-asignadas') {
-                    asignarSolicitud(solicitudId, solicitudData);
-                }
-            }
-
-            function asignarSolicitud(solicitudId, solicitudData) {
-                Swal.fire({
-                    title: '¿Deseas asignar esta solicitud?',
-                    text: `Asignar solicitud ${solicitudData.numero_solicitud}`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, asignar',
-                    cancelButtonText: 'Cancelar',
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Añadir aquí el loading
-                        Swal.fire({
-                            title: 'Asignando solicitud...',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-                        $.ajax({
-                            url: `/company/technicals/${tecnicoId}/requests`,
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            data: {
-                                solicitud_id: solicitudId
-                            },
-                            success: function(response) {
-                                Swal.close();
-
-                                Swal.fire(
-                                    '¡Asignado!',
-                                    response.message,
-                                    'success'
-                                ).then(() => {
-                                    location.reload();
-                                });
-                            },
-                            error: function(error) {
-                                Swal.close();
-                                Swal.fire(
-                                    'Error',
-                                    'No se pudo asignar la solicitud.',
-                                    'error'
-                                );
-
-                            }
-                        });
-                    }
-                });
-            }
-
 
             // Para el mapa
             $('.ver-ubicacion').on('click', function(e) {
