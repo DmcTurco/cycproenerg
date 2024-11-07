@@ -274,7 +274,7 @@ class ClientController extends Controller
     public function processEstadoSolicitud( $estado, $solicitud)
     {
         // Verificamos si el estado de la solicitud es "02"
-        if ($estado->codigo == "02") {
+        if (in_array($estado->codigo, ["01", "01.1", "02"])) {
             // Obtener el estado "pendiente" del array de configuración (asumimos que el primer estado en config es pendiente)
             $estadoPendiente = config('const.tipo_estado')[0]['id']; // Estado "pendiente"
 

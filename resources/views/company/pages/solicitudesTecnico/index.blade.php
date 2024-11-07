@@ -31,25 +31,27 @@
                     <form action="{{ route('company.technicals.requests.index', $tecnico->id) }}" method="GET">
                         <div class="row">
                             <div class="col-md-3">
-                                <h6>Solicitudes en espera</h6>
-                            </div>
-                            <div class="col-md-3">
                                 <div class="input-group input-group-outline">
-                                    {{-- <label class="form-label">Buscar por N° solicitud</label> --}}
                                     <input type="text" class="form-control" name="numero_solicitud"
                                         value="{{ request('numero_solicitud') }}" placeholder="Buscar por N° solicitud">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group input-group-outline">
-                                    {{-- <label class="form-label">Buscar por distrito</label> --}}
                                     <input type="text" class="form-control" name="distrito"
                                         value="{{ request('distrito') }}" placeholder="Buscar por distrito">
                                 </div>
                             </div>
                             <div class="col-md-3">
+                                <div class="input-group input-group-outline">
+                                    <input type="text" class="form-control" name="categoria_proyecto"
+                                        value="{{ request('categoria_proyecto') }}" placeholder="Buscar por Categoria">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <button type="submit" class="btn btn-info btn-sm">
-                                    <i class="fas fa-search" style="font-size: 12px;"></i></button>
+                                    <i class="fas fa-search" style="font-size: 12px;"></i>
+                                </button>
                                 <a href="{{ route('company.technicals.requests.index', $tecnico->id) }}"
                                     class="btn btn-outline-secondary btn-sm">
                                     <i class="fa fa-trash" style="font-size: 12px;"></i>
@@ -57,12 +59,6 @@
                                 <button type="button" id="asignarMultiple" class="btn btn-success btn-sm" disabled>
                                     <i class="fas fa-tasks" style="font-size: 12px;"></i>
                                 </button>
-                                {{-- @if (request('numero_solicitud') || request('distrito'))
-                                    <a href="{{ route('company.technicals.requests.index', $tecnico->id) }}" 
-                                       class="btn btn-outline-secondary btn-sm">
-                                       <i class="fa fa-trash" aria-hidden="true"></i>
-                                    </a>
-                                @endif --}}
                             </div>
                         </div>
                     </form>
@@ -128,11 +124,6 @@
 
         tbody tr:hover {
             background-color: rgba(0, 123, 255, 0.05);
-        }
-
-        /* Estilos de Paginación */
-        .pagination {
-            margin-bottom: 0;
         }
 
         /* Estilos Drag and Drop */
@@ -208,13 +199,42 @@
             transform: scale(1.2);
         }
 
-        /* Efecto para el icono del basurero */
-        .fa-trash {
-            transition: color 0.3s ease;
+        /* Nuevos estilos para selección múltiple */
+        /* .form-check-input {
+                        cursor: pointer;
+                    } */
+
+        .selected-row {
+            background-color: rgba(13, 110, 253, 0.1) !important;
         }
 
-        .delete-solicitud:hover .fa-trash {
-            color: #dc3545;
+        #asignarMultiple:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #asignarMultiple {
+            transition: all 0.3s ease;
+        }
+
+        #asignarMultiple:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+
+
+
+        .solicitud-checkbox {
+            cursor: pointer;
+        }
+
+        tr[draggable="true"] {
+            cursor: move;
+        }
+
+        tr[draggable="false"] {
+            cursor: default;
         }
     </style>
 
@@ -222,6 +242,123 @@
         document.addEventListener('DOMContentLoaded', function() {
             const tecnicoId = '{{ $tecnico->id }}';
             initDragAndDrop();
+            initMultipleSelection();
+
+            function initMultipleSelection() {
+                const selectAllCheckbox = document.getElementById('selectAll');
+                const solicitudCheckboxes = document.querySelectorAll('.solicitud-checkbox');
+                const asignarMultipleBtn = document.getElementById('asignarMultiple');
+
+                // Manejar selección de todas las solicitudes
+                selectAllCheckbox?.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                        const row = checkbox.closest('tr');
+                        if (row) {
+                            row.classList.toggle('selected-row', this.checked);
+                            row.setAttribute('draggable', !this.checked);
+                        }
+                    });
+                    updateAsignarButton();
+                });
+
+                // Manejar selección individual
+                solicitudCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const row = this.closest('tr');
+                        if (row) {
+                            row.classList.toggle('selected-row', this.checked);
+                            row.setAttribute('draggable', !this.checked);
+                        }
+                        updateSelectAllCheckbox();
+                        updateAsignarButton();
+                    });
+
+                    // Prevenir inicio de drag cuando se hace click en el checkbox
+                    checkbox.addEventListener('mousedown', function(e) {
+                        e.stopPropagation();
+                    });
+                });
+
+                // Actualizar estado del botón "Seleccionar todos"
+                function updateSelectAllCheckbox() {
+                    if (!selectAllCheckbox) return;
+                    const totalCheckboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)').length;
+                    const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
+                    selectAllCheckbox.checked = totalCheckboxes === checkedCheckboxes && totalCheckboxes > 0;
+                    selectAllCheckbox.indeterminate = checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes;
+                }
+
+                // Actualizar estado del botón de asignación múltiple
+                function updateAsignarButton() {
+                    const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
+                    asignarMultipleBtn.disabled = checkedCheckboxes === 0;
+                }
+
+                // Manejar asignación múltiple
+                asignarMultipleBtn.addEventListener('click', handleMultipleAssignment);
+            }
+
+            function handleMultipleAssignment() {
+                const selectedSolicitudes = Array.from(document.querySelectorAll('.solicitud-checkbox:checked'))
+                    .map(checkbox => ({
+                        id: checkbox.dataset.id,
+                        solicitud: JSON.parse(checkbox.dataset.solicitud)
+                    }));
+
+                if (selectedSolicitudes.length === 0) return;
+
+                Swal.fire({
+                    title: '¿Deseas asignar las solicitudes seleccionadas?',
+                    text: `Se asignarán ${selectedSolicitudes.length} solicitudes`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, asignar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Asignando solicitudes...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $.ajax({
+                            url: `/company/technicals/${tecnicoId}/requests`,
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            data: {
+                                solicitudes: selectedSolicitudes.map(s => s.id)
+                            },
+                            success: function(response) {
+                                Swal.close();
+                                Swal.fire(
+                                    '¡Asignado!',
+                                    'Las solicitudes han sido asignadas exitosamente.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(error) {
+                                Swal.close();
+                                Swal.fire(
+                                    'Error',
+                                    'No se pudieron asignar las solicitudes.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            }
 
             function initDragAndDrop() {
                 const solicitudesPendientes = document.querySelectorAll('.draggable');
@@ -239,6 +376,137 @@
                     zona.addEventListener('drop', handleDrop);
                 });
             }
+
+            // function initMultipleSelection() {
+            //     const selectAllCheckbox = document.getElementById('selectAll');
+            //     const solicitudCheckBox = document.querySelectorAll('.solicitud-checkbox');
+
+            //     // Agregar botón de asignación múltiple si no existe
+            //     if (!document.getElementById('asignarMultiple')) {
+            //         const buttonContainer = document.querySelector('.card-header .row .col-md-3:last-child');
+            //         const asignarButton = document.createElement('button');
+            //         asignarButton.id = 'asignarMultiple';
+            //         asignarButton.className = 'btn btn-success btn-sm ms-2';
+            //         asignarButton.innerHTML = '<i class="fas fa-tasks"></i> Asignar seleccionados';
+            //         asignarButton.disabled = true;
+            //         buttonContainer.appendChild(asignarButton);
+            //     }
+
+            //     const asignarMultipleBtn = document.getElementById('asignarMultiple');
+
+            //     // Manejar selección de todas las solicitudes
+            //     selectAllCheckbox.addEventListener('change', function() {
+            //         const checkboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)');
+            //         checkboxes.forEach(checkbox => {
+            //             checkbox.checked = this.checked;
+            //             const row = checkbox.closest('tr');
+            //             if (row) {
+            //                 row.classList.toggle('selected-row', this.checked);
+            //                 // Deshabilitar drag and drop si está seleccionado
+            //                 row.setAttribute('draggable', !this.checked);
+            //             }
+            //         });
+            //         updateAsignarButton();
+            //     });
+
+            //     // Manejar selección individual
+            //     solicitudCheckboxes.forEach(checkbox => {
+            //         checkbox.addEventListener('change', function() {
+            //             const row = this.closest('tr');
+            //             if (row) {
+            //                 row.classList.toggle('selected-row', this.checked);
+            //                 // Deshabilitar drag and drop si está seleccionado
+            //                 row.setAttribute('draggable', !this.checked);
+            //             }
+            //             updateSelectAllCheckbox();
+            //             updateAsignarButton();
+            //         });
+
+            //         // Prevenir inicio de drag cuando se hace click en el checkbox
+            //         checkbox.addEventListener('mousedown', function(e) {
+            //             e.stopPropagation();
+            //         });
+            //     });
+
+            //     // Actualizar estado del botón "Seleccionar todos"
+            //     function updateSelectAllCheckbox() {
+            //         const totalCheckboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)').length;
+            //         const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
+            //         selectAllCheckbox.checked = totalCheckboxes === checkedCheckboxes && totalCheckboxes > 0;
+            //         selectAllCheckbox.indeterminate = checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes;
+            //     }
+
+            //     // Actualizar estado del botón de asignación múltiple
+            //     function updateAsignarButton() {
+            //         const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
+            //         asignarMultipleBtn.disabled = checkedCheckboxes === 0;
+            //     }
+
+            //     // Manejar asignación múltiple
+            //     asignarMultipleBtn.addEventListener('click', function() {
+            //         const selectedSolicitudes = Array.from(document.querySelectorAll(
+            //                 '.solicitud-checkbox:checked'))
+            //             .map(checkbox => ({
+            //                 id: checkbox.dataset.id,
+            //                 solicitud: JSON.parse(checkbox.dataset.solicitud)
+            //             }));
+
+            //         if (selectedSolicitudes.length === 0) return;
+
+            //         Swal.fire({
+            //             title: '¿Deseas asignar las solicitudes seleccionadas?',
+            //             text: `Se asignarán ${selectedSolicitudes.length} solicitudes`,
+            //             icon: 'question',
+            //             showCancelButton: true,
+            //             confirmButtonText: 'Sí, asignar',
+            //             cancelButtonText: 'Cancelar',
+            //             confirmButtonColor: '#3085d6',
+            //             cancelButtonColor: '#d33'
+            //         }).then((result) => {
+            //             if (result.isConfirmed) {
+            //                 Swal.fire({
+            //                     title: 'Asignando solicitudes...',
+            //                     allowOutsideClick: false,
+            //                     didOpen: () => {
+            //                         Swal.showLoading();
+            //                     }
+            //                 });
+
+            //                 $.ajax({
+            //                     url: `/company/technicals/${tecnicoId}/requests`,
+            //                     method: 'POST',
+            //                     headers: {
+            //                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            //                     },
+            //                     data: {
+            //                         solicitudes: selectedSolicitudes.map(s => s.id)
+            //                     },
+            //                     success: function(response) {
+            //                         Swal.close();
+            //                         Swal.fire(
+            //                             '¡Asignado!',
+            //                             'Las solicitudes han sido asignadas exitosamente.',
+            //                             'success'
+            //                         ).then(() => {
+            //                             location.reload();
+            //                         });
+            //                     },
+            //                     error: function(error) {
+            //                         Swal.close();
+            //                         Swal.fire(
+            //                             'Error',
+            //                             'No se pudieron asignar las solicitudes.',
+            //                             'error'
+            //                         );
+            //                     }
+            //                 });
+            //             }
+            //         });
+            //     });
+
+
+
+            // }
 
             function handleDragStart(e) {
                 e.target.classList.add('dragging');
@@ -311,20 +579,14 @@
 
                                 Swal.fire(
                                     '¡Asignado!',
-                                        response.message,
+                                    response.message,
                                     'success'
                                 ).then(() => {
                                     location.reload();
-
-                                    // if (response.redirect) {
-                                    //     window.location.href = response.redirect;
-                                    // }
                                 });
                             },
                             error: function(error) {
-
                                 Swal.close();
-
                                 Swal.fire(
                                     'Error',
                                     'No se pudo asignar la solicitud.',
@@ -406,7 +668,7 @@
                         }, 500, function() {
                             // Hacer la petición AJAX para eliminar
                             $.ajax({
-                                url: `/company/technicals/${tecnicoId}/requests/${solicitudId}`, //url: `/company/technicals/${tecnicoId}/requests`,
+                                url: `/company/technicals/${tecnicoId}/requests/${solicitudId}`,
                                 method: 'DELETE',
                                 headers: {
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -423,10 +685,6 @@
                                         'success'
                                     ).then(() => {
                                         location.reload();
-                                        // if (response.redirect) {
-                                        //     window.location.href =
-                                        //         response.redirect;
-                                        // }
                                     });
                                 },
                                 error: function() {
