@@ -6,11 +6,11 @@
                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     N. solicitud
                 </th>
-                <th style="width: 35%"
+                <th style="width: 30%"
                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Nombre
                 </th>
-                <th style="width: 20%" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                <th style="width: 18%" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Dep-Prov-Dist
                 </th>
                 <th style="width: 15%"

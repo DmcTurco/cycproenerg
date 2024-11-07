@@ -14,7 +14,7 @@
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between mt-3">
                         <div class="">
-                            <h6>Solicitudes asignadas</h6>
+                            <h6>Solicitudes Asignadas</h6>
                         </div>
                     </div>
                 </div>
@@ -28,6 +28,7 @@
         <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
             <div class="card" style="min-height: 700px; height: 100%; padding: 0 20px">
                 <div class="card-header pb-0">
+                    <h6>Solicitudes Disponibles</h6>
                     <form action="{{ route('company.technicals.requests.index', $tecnico->id) }}" method="GET">
                         <div class="row">
                             <div class="col-md-3">
@@ -215,9 +216,6 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-
-
-
 
         .solicitud-checkbox {
             cursor: pointer;
