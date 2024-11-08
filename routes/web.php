@@ -41,6 +41,8 @@ Route::prefix(MyApp::COMPANIES_SUBDIR)->middleware('auth:company')->name('compan
     Route::resource('advisers', Company\AsesorController::class);
     Route::get('technicals/{technical}/requests/search', [Company\SolicitudTecnicoController::class, 'search'])
     ->name('company.technicals.requests.search');
+    Route::delete('technicals/{tecnico}/requests/bulk-delete', [Company\SolicitudTecnicoController::class, 'destroyMultiple'])
+    ->name('company.technicals.requests.bulk-delete');
     
     Route::resource('technicals.requests', Company\SolicitudTecnicoController::class);
     Route::any('technicals-getrecords-request', [Company\SolicitudTecnicoController::class, 'obtenerRegistros'])->name('obtenerRegistros');

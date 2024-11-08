@@ -2,18 +2,21 @@
     <table class="table  mb-0">
         <thead>
             <tr>
-                <th style="width: 15%"
+                <th class="text-center" style="width: 10%">
+                    <input type="checkbox" id="selectAllAsignadas" class="form-check-input">
+                </th>
+                <th style="width: 12%"
                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     N. solicitud
                 </th>
-                <th style="width: 30%"
+                <th style="width: 33%"
                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Nombre
                 </th>
-                <th style="width: 18%" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                <th style="width: 15%" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Dep-Prov-Dist
                 </th>
-                <th style="width: 15%"
+                <th style="width: 13%"
                     class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Proyecto
                 </th>
@@ -27,6 +30,14 @@
             @if (count($solicitudesAsignadas ?? []) > 0)
                 @foreach ($solicitudesAsignadas as $solicitud)
                     <tr>
+                        <td class="text-center">
+                            <div class="checkbox-container">
+                                <input type="checkbox" 
+                                       class="form-check-input solicitud-asignada-checkbox" 
+                                       data-id="{{ $solicitud->id }}"
+                                       data-numero="{{ $solicitud->numero_solicitud }}">
+                            </div>
+                        </td>
                         <td style="width: 20%" class="align-middle text-center">
                             <span class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
                         </td>
@@ -52,7 +63,7 @@
                 @endforeach
             @else
                 <tr class="empty-row">
-                    <td colspan="5" class="text-center py-5" style="height: 500px;">
+                    <td colspan="6" class="text-center py-5" style="height: 500px;">
                         Arrastra aquí las solicitudes para asignarlas
                     </td>
                 </tr>

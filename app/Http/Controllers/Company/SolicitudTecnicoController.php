@@ -30,6 +30,7 @@ class SolicitudTecnicoController extends Controller
         $tecnico = Tecnico::findOrFail($tecnicoId);
         $estados = $this->getEstados();
         $estadosCase = $this->buildEstadosCase();
+
         // Query base que se reutiliza
         $baseQuery = DB::table('solicituds as s')
             ->select([
@@ -39,7 +40,7 @@ class SolicitudTecnicoController extends Controller
                 DB::raw($estadosCase['nombre']),
                 DB::raw($estadosCase['badge']),
                 'sol.numero_documento',
-                'sol.nombre as solicitante_nombre',
+                'sol.nombre as solicitante_nombre', // Usamos el nombre del solicitante de la tabla solicitantes
                 'u.direccion',
                 'u.departamento',
                 'u.provincia',
@@ -57,15 +58,25 @@ class SolicitudTecnicoController extends Controller
         $solicitudesDisponibles = clone $baseQuery;
         $solicitudesDisponibles->whereIn('es.estado_id', [$estados['pendiente'], $estados['reasignado']]);
 
-        // Aplicar filtros si existen
-        if ($request->filled('numero_solicitud')) {
-            $solicitudesDisponibles->where('s.numero_solicitud', 'like', '%' . $request->numero_solicitud . '%');
-        }
-        if ($request->filled('distrito')) {
-            $solicitudesDisponibles->where('u.distrito', 'ilike', '%' . $request->distrito . '%');
-        }
-        if ($request->filled('categoria_proyecto')) {
-            $solicitudesDisponibles->where('p.categoria_proyecto', 'ilike', '%' . $request->categoria_proyecto . '%');
+        // Búsqueda mejorada
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $searchWords = preg_split('/\s+/', trim($searchTerm));
+
+            $solicitudesDisponibles->where(function ($query) use ($searchWords) {
+                foreach ($searchWords as $word) {
+                    $query->where(function ($subQuery) use ($word) {
+                        $subQuery->where(function ($innerQuery) use ($word) {
+                            $innerQuery->where('s.numero_solicitud', 'ilike', '%' . $word . '%')
+                                ->orWhere('u.distrito', 'ilike', '%' . $word . '%')
+                                ->orWhere('p.categoria_proyecto', 'ilike', '%' . $word . '%')
+                                ->orWhere('sol.nombre', 'ilike', '%' . $word . '%')
+                                ->orWhere('u.departamento', 'ilike', '%' . $word . '%')
+                                ->orWhere('u.provincia', 'ilike', '%' . $word . '%');
+                        });
+                    });
+                }
+            });
         }
 
         $solicitudesDisponibles = $solicitudesDisponibles
@@ -109,28 +120,28 @@ class SolicitudTecnicoController extends Controller
     {
         try {
             DB::beginTransaction();
-    
+
             $tecnico = Tecnico::findOrFail($tecnicoId);
-            
+
             // Verificar si es una asignación múltiple o individual
             $solicitudIds = $request->has('solicitudes') ? $request->solicitudes : [$request->solicitud_id];
-    
+
             foreach ($solicitudIds as $solicitudId) {
                 // Asignar solicitud al técnico
                 $tecnico->solicitudes()->attach($solicitudId);
-    
+
                 // Actualizar estado a "asignado" (2)
                 DB::table('estado_solicitud')
                     ->where('solicitud_id', $solicitudId)
                     ->update(['estado_id' => 2]);
             }
-    
+
             DB::commit();
             return response()->json([
                 'success' => true,
                 'redirect' => route('company.technicals.requests.index', $tecnicoId),
-                'message' => count($solicitudIds) > 1 
-                    ? 'Solicitudes asignadas correctamente' 
+                'message' => count($solicitudIds) > 1
+                    ? 'Solicitudes asignadas correctamente'
                     : 'Solicitud asignada correctamente'
             ]);
         } catch (\Exception $e) {
@@ -139,6 +150,7 @@ class SolicitudTecnicoController extends Controller
             return response()->json(['success' => false, 'message' => 'Error al asignar solicitud(es)'], 500);
         }
     }
+    // Método original para eliminación individual
     public function destroy($tecnicoId, $solicitudId)
     {
         try {
@@ -163,7 +175,52 @@ class SolicitudTecnicoController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
+            Log::error('Error al eliminar solicitud: ' . $e->getMessage());
             return response()->json(['success' => false], 500);
+        }
+    }
+
+    // Nuevo método para eliminación múltiple
+    public function destroyMultiple($tecnicoId, Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $tecnico = Tecnico::findOrFail($tecnicoId);
+            $solicitudIds = $request->input('solicitudes', []);
+
+            if (empty($solicitudIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se seleccionaron solicitudes para eliminar'
+                ], 400);
+            }
+
+            // Verificar que todas las solicitudes existen
+            Solicitud::whereIn('id', $solicitudIds)->get();
+
+            // Desasignar las solicitudes
+            $tecnico->solicitudes()->detach($solicitudIds);
+
+            // Actualizar estado a pendiente (1)
+            DB::table('estado_solicitud')
+                ->whereIn('solicitud_id', $solicitudIds)
+                ->update(['estado_id' => 1]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'redirect' => route('company.technicals.requests.index', $tecnicoId),
+                'message' => 'Las solicitudes han sido eliminadas exitosamente'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error al eliminar solicitudes: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar las solicitudes'
+            ], 500);
         }
     }
 }

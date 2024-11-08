@@ -1,0 +1,271 @@
+/* ==========================================================================
+   Technician Requests Styles
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Variables
+   ========================================================================== */
+   :root {
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --border-color: #dee2e6;
+    --hover-bg: rgba(0, 123, 255, 0.05);
+    --checkbox-color: #555555;
+    --error-color: #dc3545;
+    --text-muted: #6c757d;
+    --primary-blue: #0d6efd;
+}
+
+/* ==========================================================================
+   2. Layout Components
+   ========================================================================== */
+/* Card Container */
+.card {
+    box-shadow: 0 4px 6px var(--shadow-color);
+    min-height: 700px;
+    height: 100%;
+    padding: 0 20px;
+}
+
+/* Form Controls */
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: none;
+}
+
+/* ==========================================================================
+   3. Table Styles
+   ========================================================================== */
+.table-responsive {
+    border-radius: 0.5rem;
+    overflow-y: auto;
+}
+
+.table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.table th,
+.table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+/* ==========================================================================
+   4. Selection & Checkbox Styles 
+   ========================================================================== */
+.form-check-input {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+}
+
+.form-check-input:checked,
+.form-check-input:indeterminate {
+    background-color: var(--checkbox-color);
+    border-color: var(--checkbox-color);
+}
+
+.form-check-input:hover:not(:checked) {
+    border-color: var(--checkbox-color);
+}
+
+.checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+}
+
+/* Checkbox Alignment */
+td.text-center .form-check-input,
+th.text-center .form-check-input {
+    vertical-align: middle;
+    position: relative;
+    top: 0;
+}
+
+/* Selected State */
+.selected-row {
+    background-color: var(--hover-bg) !important;
+}
+
+/* ==========================================================================
+   5. Drag and Drop Functionality
+   ========================================================================== */
+.draggable {
+    cursor: move;
+    transition: background-color 0.2s ease;
+}
+
+.draggable.dragging {
+    opacity: 0.5;
+    background-color: #e9ecef;
+}
+
+.draggable:hover {
+    background-color: #f8f9fa;
+}
+
+.drop-zone {
+    min-height: 500px;
+    height: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.drop-zone.drag-over {
+    background-color: rgba(13, 110, 253, 0.05);
+    border: 2px dashed var(--primary-blue);
+}
+
+/* Empty State Message */
+.drop-zone:empty::after {
+    content: 'Arrastra aquí las solicitudes para asignarlas';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   6. Interactive Elements
+   ========================================================================== */
+/* Location Link */
+.ver-ubicacion {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ver-ubicacion:hover {
+    color: var(--primary-blue);
+}
+
+/* Assign Button */
+#asignarMultiple {
+    transition: all 0.3s ease;
+}
+
+#asignarMultiple:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#asignarMultiple:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+
+/* Delete Button */
+.delete-solicitud {
+    transition: transform 0.2s ease;
+}
+
+.delete-solicitud:hover {
+    transform: scale(1.2);
+}
+
+/* ==========================================================================
+   7. Map Error State
+   ========================================================================== */
+.no-location-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 300px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.map-error-animation {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+}
+
+.map-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px;
+    color: var(--error-color);
+    z-index: 2;
+    animation: bounce 1.5s infinite;
+}
+
+.radar-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--error-color);
+    border-radius: 50%;
+    opacity: 0;
+    animation: radar 2s infinite;
+}
+
+.error-message {
+    color: var(--text-muted);
+}
+
+.error-message h6 {
+    color: var(--error-color);
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   8. Animations
+   ========================================================================== */
+@keyframes bounce {
+    0%, 100% { transform: translate(-50%, -50%); }
+    50% { transform: translate(-50%, -65%); }
+}
+
+@keyframes radar {
+    0% {
+        width: 60px;
+        height: 60px;
+        opacity: 1;
+    }
+    100% {
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+    }
+}
