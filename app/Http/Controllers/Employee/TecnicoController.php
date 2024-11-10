@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tecnico;
@@ -13,7 +13,7 @@ class TecnicoController extends Controller
     public function index() {
 
         $tecnicos = Tecnico::orderBy('id', 'desc')->paginate(10);
-        return view('company.pages.tecnicos.index', compact('tecnicos') );
+        return view('employee.pages.tecnicos.index', compact('tecnicos') );
     }
 
     public function store(Request $request)
@@ -44,7 +44,7 @@ class TecnicoController extends Controller
                 'cargo' => $request->cargo,
             ]);
             session()->flash('message', __('Actualización éxitosa') );
-            return response()->json(['redirect' => route('company.technicals.index')]);
+            return response()->json(['redirect' => route('employee.technicals.index')]);
 
         } else {
 
@@ -57,7 +57,7 @@ class TecnicoController extends Controller
             ]);
 
             session()->flash('message', __('Registro éxitoso') );
-            return response()->json(['redirect' => route('company.technicals.index')]);
+            return response()->json(['redirect' => route('employee.technicals.index')]);
         }
     }
 
@@ -71,7 +71,7 @@ class TecnicoController extends Controller
         $tecnico = Tecnico::findOrFail($id);
 
         $tecnico->delete();
-        return redirect()->route('company.technicals.index');
+        return redirect()->route('employee.technicals.index');
     }
 
 

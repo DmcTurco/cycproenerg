@@ -88,7 +88,7 @@ function initDragAndDrop(tecnicoId) {
                 });
 
                 $.ajax({
-                    url: `/company/technicals/${tecnicoId}/requests`,
+                    url: `/employee/technicals/${tecnicoId}/requests`,
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers\Employee;
 
 use App\Models\Solicitante;
 use App\Models\Solicitud;
@@ -93,9 +93,7 @@ class SolicitudTecnicoController extends Controller
             ->paginate(10, ['*'], 'asignadas_page')
             ->appends($request->all());
 
-        return view(
-            'company.pages.solicitudesTecnico.index',
-            compact('tecnico', 'solicitudesAsignadas', 'solicitudesDisponibles')
+        return view('employee.pages.solicitudesTecnico.index',compact('tecnico', 'solicitudesAsignadas', 'solicitudesDisponibles')
         );
     }
 
@@ -139,10 +137,8 @@ class SolicitudTecnicoController extends Controller
             DB::commit();
             return response()->json([
                 'success' => true,
-                'redirect' => route('company.technicals.requests.index', $tecnicoId),
-                'message' => count($solicitudIds) > 1
-                    ? 'Solicitudes asignadas correctamente'
-                    : 'Solicitud asignada correctamente'
+                'redirect' => route('employee.technicals.requests.index', $tecnicoId),
+                'message' => count($solicitudIds) > 1 ? 'Solicitudes asignadas correctamente' : 'Solicitud asignada correctamente'
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -170,7 +166,7 @@ class SolicitudTecnicoController extends Controller
             DB::commit();
             return response()->json([
                 'success' => true,
-                'redirect' => route('company.technicals.requests.index', $tecnicoId),
+                'redirect' => route('employee.technicals.requests.index', $tecnicoId),
                 'message' => 'La solicitud ha sido eliminada.'
             ]);
         } catch (\Exception $e) {
@@ -211,7 +207,7 @@ class SolicitudTecnicoController extends Controller
 
             return response()->json([
                 'success' => true,
-                'redirect' => route('company.technicals.requests.index', $tecnicoId),
+                'redirect' => route('employee.technicals.requests.index', $tecnicoId),
                 'message' => 'Las solicitudes han sido eliminadas exitosamente'
             ]);
         } catch (\Exception $e) {

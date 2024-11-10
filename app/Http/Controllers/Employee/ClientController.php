@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -66,7 +66,7 @@ class ClientController extends Controller
             $solicitud->tipo_documento_nombre = $this->getTipoDocumentoName(optional($solicitud->solicitante)->tipo_documento);
         }
 
-        return view('company.pages.clients.index', compact('clientesConSolicitudes', 'estados', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
+        return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
     }
 
 

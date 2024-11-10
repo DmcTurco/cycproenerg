@@ -4,15 +4,24 @@ function initMultipleSelection(tecnicoId) {
     const solicitudCheckboxes = document.querySelectorAll('.solicitud-checkbox');
     const asignarMultipleBtn = document.getElementById('asignarMultiple');
 
-    // Manejar clics en las filas
+    const selectAllAsignadasCheckbox = document.getElementById('selectAllAsignadas');
+    const solicitudAsignadasCheckboxes = document.querySelectorAll('.solicitud-asignada-checkbox');
+    const eliminarMultipleBtn = document.getElementById('eliminarMultiple');
+
+    // Manejar clics en las filas de ambas tablas
     document.querySelectorAll('tbody tr').forEach(row => {
-        row.addEventListener('click', function(e) {
+        row.addEventListener('click', function (e) {
+            // Si el clic fue en un elemento que no debe disparar la selección
             if (e.target.type === 'checkbox' || e.target.tagName === 'A' ||
-                e.target.closest('a') || e.target.closest('.actions')) {
+                e.target.closest('a') || e.target.closest('.actions') ||
+                e.target.closest('button')) {
                 return;
             }
 
-            const checkbox = this.querySelector('.solicitud-checkbox');
+            // Buscar checkbox en la fila (tanto para disponibles como asignadas)
+            const checkbox = this.querySelector('.solicitud-checkbox') ||
+                this.querySelector('.solicitud-asignada-checkbox');
+
             if (checkbox && !checkbox.disabled) {
                 checkbox.checked = !checkbox.checked;
                 checkbox.dispatchEvent(new Event('change'));
@@ -20,29 +29,50 @@ function initMultipleSelection(tecnicoId) {
         });
     });
 
+
     if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
+        selectAllCheckbox.addEventListener('change', function () {
             const checkboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)');
             checkboxes.forEach(checkbox => {
                 checkbox.checked = this.checked;
-                const row = checkbox.closest('tr');
-                if (row) {
-                    row.classList.toggle('selected-row', this.checked);
-                    row.setAttribute('draggable', 'true');
-                }
+                updateRowState(checkbox);
             });
             updateAsignarButton();
         });
     }
 
+    // Manejador para "Seleccionar todos" en tabla de asignadas
+    if (selectAllAsignadasCheckbox) {
+        selectAllAsignadasCheckbox.addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.solicitud-asignada-checkbox:not(:disabled)');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+                updateRowState(checkbox);
+            });
+            updateEliminarButton();
+        });
+    }
+
+
+    // Event listeners para checkboxes individuales en tabla de disponibles
     solicitudCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
+        checkbox.addEventListener('change', function () {
             updateRowState(this);
-            updateSelectAllCheckbox();
+            updateSelectAllState(selectAllCheckbox, '.solicitud-checkbox');
             updateAsignarButton();
+        });
+    })
+    // Event listeners para checkboxes individuales en tabla de asignadas
+    solicitudAsignadasCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            updateRowState(this);
+            updateSelectAllState(selectAllAsignadasCheckbox, '.solicitud-asignada-checkbox');
+            updateEliminarButton();
         });
     });
 
+
+    // Funciones de actualización de estado
     function updateRowState(checkbox) {
         const row = checkbox.closest('tr');
         if (row) {
@@ -51,10 +81,11 @@ function initMultipleSelection(tecnicoId) {
         }
     }
 
-    function updateSelectAllCheckbox() {
+
+    function updateSelectAllState(selectAllCheckbox, checkboxClass) {
         if (!selectAllCheckbox) return;
-        const totalCheckboxes = document.querySelectorAll('.solicitud-checkbox:not(:disabled)').length;
-        const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
+        const totalCheckboxes = document.querySelectorAll(`${checkboxClass}:not(:disabled)`).length;
+        const checkedCheckboxes = document.querySelectorAll(`${checkboxClass}:checked`).length;
 
         if (checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes) {
             selectAllCheckbox.indeterminate = true;
@@ -66,7 +97,14 @@ function initMultipleSelection(tecnicoId) {
     }
 
     function updateAsignarButton() {
+        if (!asignarMultipleBtn) return;
         const checkedCheckboxes = document.querySelectorAll('.solicitud-checkbox:checked').length;
         asignarMultipleBtn.disabled = checkedCheckboxes === 0;
+    }
+
+    function updateEliminarButton() {
+        if (!eliminarMultipleBtn) return;
+        const checkedCheckboxes = document.querySelectorAll('.solicitud-asignada-checkbox:checked').length;
+        eliminarMultipleBtn.disabled = checkedCheckboxes === 0;
     }
 }

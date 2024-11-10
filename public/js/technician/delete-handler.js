@@ -83,7 +83,7 @@ function handleDelete(solicitudId, row, tecnicoId) {
         right: '-100%'
     }, 500, function() {
         $.ajax({
-            url: `/company/technicals/${tecnicoId}/requests/${solicitudId}`,
+            url: `/employee/technicals/${tecnicoId}/requests/${solicitudId}`,
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -136,7 +136,7 @@ function handleMultipleDelete(solicitudes, tecnicoId) {
 
     // Realizar la petición de eliminación múltiple
     $.ajax({
-        url: `/company/technicals/${tecnicoId}/requests/bulk-delete`,
+        url: `/employee/technicals/${tecnicoId}/requests/bulk-delete`,
         method: 'DELETE',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
