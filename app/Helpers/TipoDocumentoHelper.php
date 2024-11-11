@@ -3,14 +3,29 @@ namespace App\Helpers;
 
 class TipoDocumentoHelper
 {
-    public static function obtenerTipoDocumento($valorDocumento)
+    private static $tiposDocumento = null;
+
+    private static function getTiposDocumento()
     {
-        $tipos_documento = config('const.tipo_documeto');
+        if (self::$tiposDocumento === null) {
+            self::$tiposDocumento = collect(config('const.tipo_documeto'));
+        }
+        return self::$tiposDocumento;
+    }
+
+    public static function getTypeDocument($valorDocumento)
+    {
+        if (empty($valorDocumento)) return null;
         
-        $tipo_documento = collect($tipos_documento)->first(function ($tipo) use ($valorDocumento) {
-            return $tipo['name'] === trim($valorDocumento);
-        });
+        return self::getTiposDocumento()
+            ->firstWhere('name', trim($valorDocumento))['id'] ?? null;
+    }
+
+    public static function getTypeDocumentName($id)
+    {
+        if (empty($id)) return 'N/A';
         
-        return $tipo_documento ? $tipo_documento['id'] : null;
+        return self::getTiposDocumento()
+            ->firstWhere('id', $id)['name'] ?? 'N/A';
     }
 }

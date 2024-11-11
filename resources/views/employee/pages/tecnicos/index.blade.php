@@ -83,7 +83,7 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td class="align-middle text-center text-sm" colspan="5">No existen técnicos
+                                            <td class="align-middle text-center text-sm" colspan="6">No existen técnicos
                                         </tr>
                                     @endif
                                 </tbody>

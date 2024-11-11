@@ -62,25 +62,15 @@ class ClientController extends Controller
 
         $totalSolicitudesFiltradas = $query->count();
 
-        foreach ($clientesConSolicitudes as $solicitud) {
-            $solicitud->tipo_documento_nombre = $this->getTipoDocumentoName(optional($solicitud->solicitante)->tipo_documento);
-        }
-
+        // Transformar los resultados usando el helper
+        $clientesConSolicitudes->through(function ($solicitud) {
+            $solicitud->tipo_documento_nombre = TipoDocumentoHelper::getTypeDocumentName(
+                optional($solicitud->solicitante)->tipo_documento
+            );
+            return $solicitud;
+        });
         return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
     }
-
-
-    private function getTipoDocumentoName($id)
-    {
-        $tipos_documento = config('const.tipo_documeto');
-        foreach ($tipos_documento as $tipo) {
-            if ($tipo['id'] == $id) {
-                return $tipo['name'];
-            }
-        }
-        return 'N/A';
-    }
-
 
     private function parseDate($date)
     {
@@ -89,6 +79,7 @@ class ClientController extends Controller
         }
         return date('Y-m-d', strtotime($date));
     }
+
 
     public function change(Request $request)
     {
@@ -174,7 +165,7 @@ class ClientController extends Controller
 
     private function processEmpresa($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::obtenerTipoDocumento(trim($row['AK']));
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AK']));
 
         return Empresa::firstOrCreate(
             ['numero_documento' => trim($row['AL'])],
@@ -188,7 +179,7 @@ class ClientController extends Controller
 
     private function processConcesionaria($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::obtenerTipoDocumento(trim($row['AO']));
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AO']));
         return Concesionaria::firstOrCreate(
             ['numero_documento' => trim($row['AP'])],
             [
@@ -200,7 +191,7 @@ class ClientController extends Controller
 
     private function processSolicitante($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::obtenerTipoDocumento(trim($row['G']));
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['G']));
         return Solicitante::updateOrCreate(
             [
                 'numero_documento' => trim($row['H']),
@@ -270,22 +261,20 @@ class ClientController extends Controller
         );
     }
 
-    // Función que procesa y registra el estado en la tabla estado_solicitud
+
     public function processEstadoSolicitud( $estado, $solicitud)
     {
-        // Verificamos si el estado de la solicitud es "02"
+
         if (in_array($estado->codigo, ["01", "01.1", "02"])) {
-            // Obtener el estado "pendiente" del array de configuración (asumimos que el primer estado en config es pendiente)
             $estadoPendiente = config('const.tipo_estado')[0]['id']; // Estado "pendiente"
 
-            // Usamos firstOrCreate para evitar duplicados. Si ya existe no se creará un nuevo registro
             EstadoSolicitud::firstOrCreate(
                 [
-                    'solicitud_id' => $solicitud->id, // Condición de búsqueda
-                    'estado_id' => $estadoPendiente   // Condición de búsqueda
+                    'solicitud_id' => $solicitud->id, 
+                    'estado_id' => $estadoPendiente  
                 ],
                 [
-                    'solicitud_id' => $solicitud->id, // Si no existe, se crea con estos valores
+                    'solicitud_id' => $solicitud->id,
                     'estado_id' => $estadoPendiente
                 ]
             );

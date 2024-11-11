@@ -25,7 +25,5 @@ class Tecnico extends Model
         return $this->belongsToMany(Solicitud::class, 'solicitud_tecnico', 'tecnico_id', 'solicitud_id')
             ->withTimestamps();
     }
-    // public function numeroSolicitudes() {
-    //     return $this->solicitudes()->count();
-    // }
+
 }

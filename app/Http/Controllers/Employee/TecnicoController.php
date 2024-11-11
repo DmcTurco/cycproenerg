@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Employee;
 
+use App\Helpers\TipoDocumentoHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Tecnico;
 use Illuminate\Http\Request;
@@ -13,6 +14,10 @@ class TecnicoController extends Controller
     public function index() {
 
         $tecnicos = Tecnico::orderBy('id', 'desc')->paginate(10);
+
+        foreach ($tecnicos as $tecnico) {
+            $tecnico->tipo_documento_name =TipoDocumentoHelper::getTypeDocumentName($tecnico->tipo_documento);
+        }
         return view('employee.pages.tecnicos.index', compact('tecnicos') );
     }
 
