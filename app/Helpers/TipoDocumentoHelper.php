@@ -4,6 +4,7 @@ namespace App\Helpers;
 class TipoDocumentoHelper
 {
     private static $tiposDocumento = null;
+    private static $tiposCargo = null;
 
     private static function getTiposDocumento()
     {
@@ -11,6 +12,13 @@ class TipoDocumentoHelper
             self::$tiposDocumento = collect(config('const.tipo_documeto'));
         }
         return self::$tiposDocumento;
+    }
+
+    private static function getTipoCargo(){
+        if (self::$tiposCargo === null) {
+            self::$tiposCargo = collect(config('const.cargo'));
+        }
+        return self::$tiposCargo;
     }
 
     public static function getTypeDocument($valorDocumento)
@@ -26,6 +34,14 @@ class TipoDocumentoHelper
         if (empty($id)) return 'N/A';
         
         return self::getTiposDocumento()
+            ->firstWhere('id', $id)['name'] ?? 'N/A';
+    }
+
+    public static function getTypeCargoName($id)
+    {
+        if (empty($id)) return 'N/A';
+        
+        return self::getTipoCargo()
             ->firstWhere('id', $id)['name'] ?? 'N/A';
     }
 }

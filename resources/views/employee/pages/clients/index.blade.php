@@ -129,10 +129,15 @@
                                         @foreach ($clientesConSolicitudes as $solicitud)
                                             <tr>
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">
-                                                        {{ $solicitud->tipo_documento_nombre ?? 'N/A' }}-
-                                                        {{ $solicitud->solicitante->numero_documento }}
-                                                    </span>
+                                                    <p class="text-sm mb-0">
+                                                        <span class="badge bg-light text-dark">
+                                                            {{ $solicitud->tipo_documento_nombre }}
+                                                        </span>
+                                                        -
+                                                        <span class="text-xs font-weight-bold">
+                                                            {{ $solicitud->solicitante->numero_documento }}
+                                                        </span>
+                                                    </p>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">

@@ -6,19 +6,24 @@ use App\Helpers\TipoDocumentoHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Tecnico;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TecnicoController extends Controller
 {
 
-    public function index() {
-
-        $tecnicos = Tecnico::orderBy('id', 'desc')->paginate(10);
-
-        foreach ($tecnicos as $tecnico) {
-            $tecnico->tipo_documento_name =TipoDocumentoHelper::getTypeDocumentName($tecnico->tipo_documento);
-        }
-        return view('employee.pages.tecnicos.index', compact('tecnicos') );
+    public function index() 
+    { 
+        $tecnicos = Tecnico::withCount('solicitudes')
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->through(function ($tecnico) {
+                $tecnico->tipo_documento_nombre = TipoDocumentoHelper::getTypeDocumentName($tecnico->tipo_documento);
+                $tecnico->tipo_cargo_name = TipoDocumentoHelper::getTypeCargoName($tecnico->cargo);
+                return $tecnico;
+            });
+        
+        return view('employee.pages.tecnicos.index', compact('tecnicos'));
     }
 
     public function store(Request $request)
