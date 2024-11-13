@@ -22,7 +22,7 @@ class Solicitud extends Model
         'numero_contrato_suministro',
         'fecha_aprobacion_contrato',
         'fecha_registro_portal',
-        'estado_id',
+        'estado_portal_id',
         'solicitante_id',
         'empresa_id',
         'concesionaria_id',
@@ -58,15 +58,15 @@ class Solicitud extends Model
         return $this->belongsTo(Concesionaria::class, 'concesionaria_id');
     }
 
-    public function estado()
+    public function estadoPortal()
     {
-        return $this->belongsTo(Estado::class, 'estado_id');
+        return $this->belongsTo(EstadoPortal::class, 'estado_portal_id');
     }
 
     // Modelo Solicitud
     public function estadoSolicitud()
     {
-        return $this->hasOne(EstadoSolicitud::class, 'solicitud_id');
+        return $this->hasOne(EstadoInterno::class, 'solicitud_id');
     }
 
 

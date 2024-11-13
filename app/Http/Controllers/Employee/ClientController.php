@@ -19,8 +19,8 @@ use App\Models\Ubicacion;
 use App\Models\Instalacion;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use App\Helpers\TipoDocumentoHelper;
-use App\Models\Estado;
-use App\Models\EstadoSolicitud;
+use App\Models\EstadoPortal;
+use App\Models\EstadoInterno;
 
 class ClientController extends Controller
 {
@@ -28,16 +28,16 @@ class ClientController extends Controller
     public function index(Request $request)
     {
 
-        $estados = Estado::orderBy('nombre', 'DESC')->get();
+        $estados_Portal = EstadoPortal::orderBy('nombre', 'DESC')->get();
 
-        $query = Solicitud::with('estado');
+        $query = Solicitud::with('estadoPortal');
 
         if ($request->filled('numero_solicitud')) {
             $query->where('numero_solicitud', 'like', '%' . $request->numero_solicitud . '%');
         }
 
         if ($request->filled('estado')) {
-            $query->where('estado_id', $request->estado);
+            $query->where('estado_portal_id', $request->estado);
         }
 
         if ($request->filled('dni')) {
@@ -69,7 +69,7 @@ class ClientController extends Controller
             );
             return $solicitud;
         });
-        return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
+        return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados_Portal', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
     }
 
     private function parseDate($date)
@@ -141,9 +141,9 @@ class ClientController extends Controller
             $empresa = $this->processEmpresa($row);
             $concesionaria = $this->processConcesionaria($row);
             $solicitante = $this->processSolicitante($row);
-            $estado = $this->processEstado($row);
-            $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estado);
-            $this->processEstadoSolicitud($estado, $solicitud);
+            $estadoPortal = $this->processEstadoPortal($row);
+            $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estadoPortal);
+            $this->processEstadoInterno($estadoPortal, $solicitud);
             $ubicacion = $this->processUbicacion($row, $solicitud);
             $proyecto = $this->processProyecto($row, $solicitud);
             $instalacion = $this->processInstalacion($row, $solicitud);
@@ -206,7 +206,7 @@ class ClientController extends Controller
         );
     }
 
-    private function processEstado($row)
+    private function processEstadoPortal($row)
     {
         // Procesar el estado
         $estadoCompleto = trim($row['CO']);
@@ -216,7 +216,7 @@ class ClientController extends Controller
         $abreviatura = $this->obtenerAbreviatura($nombre);
 
         // Crear el estado si no existe
-        return Estado::firstOrCreate(
+        return EstadoPortal::firstOrCreate(
             ['codigo' => $codigo],
             [
                 'nombre' => $nombre,
@@ -244,7 +244,7 @@ class ClientController extends Controller
         return $iniciales;
     }
 
-    private function processSolicitud($row, $solicitante, $empresa, $concesionaria, $estado)
+    private function processSolicitud($row, $solicitante, $empresa, $concesionaria, $estadoPortal)
     {
         return Solicitud::updateOrCreate(
             ['numero_solicitud' => trim($row['A'])],
@@ -256,28 +256,29 @@ class ClientController extends Controller
                 'numero_contrato_suministro' => trim($row['D']) ?: null,
                 'fecha_aprobacion_contrato' => $this->parseDate(trim($row['F'])),
                 'fecha_registro_portal' => $this->parseDate(trim($row['X'])),
-                'estado_id' => $estado->id,
+                'estado_portal_id' => $estadoPortal->id,
             ]
         );
     }
 
 
-    public function processEstadoSolicitud( $estado, $solicitud)
+    public function processEstadoInterno($estadoPortal, $solicitud)
     {
-
-        if (in_array($estado->codigo, ["01", "01.1", "02"])) {
+        if (in_array($estadoPortal->codigo, ["01", "01.1", "02"])) {
             $estadoPendiente = config('const.tipo_estado')[0]['id']; // Estado "pendiente"
-
-            EstadoSolicitud::firstOrCreate(
-                [
-                    'solicitud_id' => $solicitud->id, 
-                    'estado_id' => $estadoPendiente  
-                ],
-                [
+            
+            // Verificamos si ya existe un estado interno para esta solicitud
+            $existeEstadoInterno = EstadoInterno::where('solicitud_id', $solicitud->id)->exists();
+            
+            // Solo creamos el estado interno si no existe ninguno
+            if (!$existeEstadoInterno) {
+                EstadoInterno::create([
                     'solicitud_id' => $solicitud->id,
-                    'estado_id' => $estadoPendiente
-                ]
-            );
+                    'estado_const_id' => $estadoPendiente
+                ]);
+            }
+            // Si ya existe un estado interno, no hacemos nada para mantener el estado actual
+            // (especialmente importante si ya está asignado a un técnico)
         }
     }
 

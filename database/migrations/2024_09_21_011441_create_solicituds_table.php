@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('numero_contrato_suministro')->nullable();
             $table->date('fecha_aprobacion_contrato')->nullable();
             $table->date('fecha_registro_portal')->nullable();
-            $table->unsignedBigInteger('estado_id')->nullable();
+            $table->unsignedBigInteger('estado_portal_id')->nullable();
             $table->unsignedBigInteger('solicitante_id')->nullable();
             $table->unsignedBigInteger('empresa_id')->nullable();
             $table->unsignedBigInteger('concesionaria_id')->nullable();

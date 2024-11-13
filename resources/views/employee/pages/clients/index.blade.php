@@ -57,7 +57,7 @@
                                         {{-- <label class="form-label">Estado</label> --}}
                                         <select name="estado" class="form-control">
                                             <option value="">Seleccione el estado</option>
-                                            @foreach ($estados as $estado)
+                                            @foreach ($estados_Portal as $estado)
                                                 <option value="{{ $estado->id }}"
                                                     {{ request('estado') == $estado->id ? 'selected' : '' }}>
                                                     {{ $estado->nombre }}
@@ -161,7 +161,7 @@
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xs font-weight-bold">
-                                                        {{ optional($solicitud->estado)->nombre ?? 'N/A' }}
+                                                        {{ optional($solicitud->estadoPortal)->nombre ?? 'N/A' }}
                                                     </span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">

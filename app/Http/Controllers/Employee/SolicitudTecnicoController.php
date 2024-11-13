@@ -35,8 +35,8 @@ class SolicitudTecnicoController extends Controller
         $baseQuery = DB::table('solicituds as s')
             ->select([
                 's.*',
-                'es.estado_id',
-                'e.abreviatura',
+                'ei.estado_const_id',
+                'ep.abreviatura',
                 DB::raw($estadosCase['nombre']),
                 DB::raw($estadosCase['badge']),
                 'sol.numero_documento',
@@ -48,15 +48,15 @@ class SolicitudTecnicoController extends Controller
                 'u.ubicacion',
                 'p.categoria_proyecto'
             ])
-            ->join('estado_solicitud as es', 's.id', '=', 'es.solicitud_id')
-            ->join('estados as e', 's.estado_id', '=', 'e.id')
+            ->join('estado_internos as ei', 's.id', '=', 'ei.solicitud_id')
+            ->join('estado_portals as ep', 's.estado_portal_id', '=', 'ep.id')
             ->leftJoin('solicitantes as sol', 's.solicitante_id', '=', 'sol.id')
             ->leftJoin('ubicacions as u', 's.id', '=', 'u.solicitud_id')
             ->leftJoin('proyectos as p', 's.id', '=', 'p.solicitud_id');
 
         // Solicitudes disponibles (con búsqueda)
         $solicitudesDisponibles = clone $baseQuery;
-        $solicitudesDisponibles->whereIn('es.estado_id', [$estados['pendiente'], $estados['reasignado']]);
+        $solicitudesDisponibles->whereIn('ei.estado_const_id', [$estados['pendiente'], $estados['reasignado']]);
 
         // Búsqueda mejorada
         if ($request->filled('search')) {
@@ -99,8 +99,8 @@ class SolicitudTecnicoController extends Controller
 
     private function buildEstadosCase()
     {
-        $nombreCase = "CASE es.estado_id ";
-        $badgeCase = "CASE es.estado_id ";
+        $nombreCase = "CASE ei.estado_const_id ";
+        $badgeCase = "CASE ei.estado_const_id ";
 
         foreach (Config::get('const.tipo_estado') as $estado) {
             $nombreCase .= " WHEN {$estado['id']} THEN '{$estado['name']}'";
@@ -129,9 +129,9 @@ class SolicitudTecnicoController extends Controller
                 $tecnico->solicitudes()->attach($solicitudId);
 
                 // Actualizar estado a "asignado" (2)
-                DB::table('estado_solicitud')
+                DB::table('estado_internos')
                     ->where('solicitud_id', $solicitudId)
-                    ->update(['estado_id' => 2]);
+                    ->update(['estado_const_id' => 2]);
             }
 
             DB::commit();
@@ -159,9 +159,9 @@ class SolicitudTecnicoController extends Controller
             $tecnico->solicitudes()->detach($solicitudId);
 
             // Actualizar estado a pendiente (1)
-            DB::table('estado_solicitud')
+            DB::table('estado_internos')
                 ->where('solicitud_id', $solicitudId)
-                ->update(['estado_id' => 1]);
+                ->update(['estado_const_id' => 1]);
 
             $solicitud->delete();
             DB::commit();
@@ -200,9 +200,9 @@ class SolicitudTecnicoController extends Controller
             $tecnico->solicitudes()->detach($solicitudIds);
 
             // Actualizar estado a pendiente (1)
-            DB::table('estado_solicitud')
+            DB::table('estado_internos')
                 ->whereIn('solicitud_id', $solicitudIds)
-                ->update(['estado_id' => 1]);
+                ->update(['estado_const_id' => 1]);
 
             Solicitud::whereIn('id', $solicitudIds)->delete();
 

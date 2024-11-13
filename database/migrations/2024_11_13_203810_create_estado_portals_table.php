@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('estado_solicitud', function (Blueprint $table) {
+        Schema::create('estado_portals', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('estado_id');
-            $table->unsignedBigInteger('solicitud_id');
+            $table->string('codigo', 10)->unique();
+            $table->string('nombre');
+            $table->string('abreviatura');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('estado_solicitud');
+        Schema::dropIfExists('estado_portals');
     }
 };
