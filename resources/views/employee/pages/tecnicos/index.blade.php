@@ -120,7 +120,7 @@
                                                 <td class="align-middle text-center">
                                                     <div class="d-flex align-items-center justify-content-center"
                                                         title="ver historial de solicitudes" style="height: 100%">
-                                                        <a href="#" class="btn btn-link text-secondary p-1">
+                                                        <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}" class="btn btn-link text-secondary p-1">
                                                             <i class="fas fa-history fa-lg"></i>
                                                         </a>
                                                     </div>
@@ -156,9 +156,9 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td class="align-middle text-center text-sm" colspan="5">
+                                            <td class="align-middle text-center text-sm" colspan="6">
                                                 <div class="d-flex flex-column align-items-center py-4">
-                                                    <i class="fas fa-user-slash fa-3x text-secondary mb-2"></i>
+                                                    <i class="fas fa-hard-hat fa-3x text-secondary mb-2"></i>
                                                     <p class="text-secondary mb-0">No existen técnicos registrados</p>
                                                 </div>
                                             </td>

@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="container-fluid py-4">
+    <div class="container-fluid">
         <div class="row mb-4">
             <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
                 <div class="card">
@@ -74,9 +74,12 @@
                                             </tr>
                                         @endforeach
                                     @else
-                                        <tr>
-                                            <td class="align-middle text-center text-sm text-danger font-weight-bolder" colspan="5">No existen Asesores
-                                        </tr>
+                                        <td class="align-middle text-center text-sm" colspan="6">
+                                            <div class="d-flex flex-column align-items-center py-4">
+                                                <i class="fas fa-user-tie fa-3x text-secondary mb-2"></i>
+                                                <p class="text-secondary mb-0">No existen Asesores registrados</p>
+                                            </div>
+                                        </td>
                                     @endif
                                 </tbody>
                             </table>
@@ -89,7 +92,7 @@
                 </div>
             </div>
         </div>
-
+    </div>
         {{-- <form id="form-delete" action="{{ route('company.technicals.destroy', '') }}" method="POST" class="d-inline"
             style="cursor:pointer">
             @csrf

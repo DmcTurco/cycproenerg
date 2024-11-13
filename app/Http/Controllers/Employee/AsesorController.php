@@ -13,8 +13,9 @@ class AsesorController extends Controller
 
     public function index()
     {
-        $asesores = Asesor::where('company_id', Auth::user()->id)->paginate(10);
-        return view('company.pages.asesores.index', compact('asesores'));
+        // $asesores = Asesor::where('company_id', Auth::user()->id)->paginate(10);
+        $asesores = Asesor::paginate(10);
+        return view('employee.pages.asesores.index', compact('asesores'));
     }
 
     /**

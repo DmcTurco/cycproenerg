@@ -163,6 +163,7 @@ class SolicitudTecnicoController extends Controller
                 ->where('solicitud_id', $solicitudId)
                 ->update(['estado_id' => 1]);
 
+            $solicitud->delete();
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -202,6 +203,8 @@ class SolicitudTecnicoController extends Controller
             DB::table('estado_solicitud')
                 ->whereIn('solicitud_id', $solicitudIds)
                 ->update(['estado_id' => 1]);
+
+            Solicitud::whereIn('id', $solicitudIds)->delete();
 
             DB::commit();
 

@@ -36,20 +36,6 @@ Route::prefix(MyApp::COMPANIES_SUBDIR)->middleware('auth:company')->name('compan
         return redirect()->route('company.home');
     })->withoutMiddleware('auth:company');
     Route::get('/home', [Company\CompanyController::class, 'index'])->name('home');
-    // Route::resource('client', Company\ClientController::class);
-    // Route::resource('technicals', Company\TecnicoController::class);
-    // Route::resource('advisers', Company\AsesorController::class);
-    // Route::get('technicals/{technical}/requests/search', [Company\SolicitudTecnicoController::class, 'search'])
-    // ->name('company.technicals.requests.search');
-    // Route::delete('technicals/{tecnico}/requests/bulk-delete', [Company\SolicitudTecnicoController::class, 'destroyMultiple'])
-    // ->name('company.technicals.requests.bulk-delete');
-    
-    // Route::resource('technicals.requests', Company\SolicitudTecnicoController::class);
-    // Route::any('technicals-getrecords-request', [Company\SolicitudTecnicoController::class, 'obtenerRegistros'])->name('obtenerRegistros');
-    // Route::get('/getDataIndex/{id}', [Company\SolicitudTecnicoController::class, 'obtenerSolicitudesIndex'])->name('obtenerSolicitudesIndex');
-    // Route::post('/change', [Company\ClientController::class, 'change'])->name('change');
-    // Route::get('/getFullSolicitudDetails/{id}',[Company\SolicitudController::class, 'getFullSolicitudDetails'])->name('getFullSolicitudDetails');
-    // Route::get('/home', [Company\HomeController::class, 'index'])->name('home');
 });
 
 
@@ -65,6 +51,7 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
     Route::delete('technicals/{tecnico}/requests/bulk-delete', [Employee\SolicitudTecnicoController::class, 'destroyMultiple'])->name('employee.technicals.requests.bulk-delete');
     
     Route::resource('technicals.requests', Employee\SolicitudTecnicoController::class);
+    Route::resource('technicals.record', Employee\HistorialController::class);
     Route::any('technicals-getrecords-request', [Employee\SolicitudTecnicoController::class, 'obtenerRegistros'])->name('obtenerRegistros');
     Route::get('/getDataIndex/{id}', [Employee\SolicitudTecnicoController::class, 'obtenerSolicitudesIndex'])->name('obtenerSolicitudesIndex');
     Route::post('/change', [Employee\ClientController::class, 'change'])->name('change');
