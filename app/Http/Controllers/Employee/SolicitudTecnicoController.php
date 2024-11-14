@@ -7,6 +7,7 @@ use App\Models\Solicitud;
 use App\Models\SolicitudTecnico;
 use App\Models\Tecnico;
 use App\Http\Controllers\Controller;
+use App\Models\Historial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -116,6 +117,12 @@ class SolicitudTecnicoController extends Controller
 
     public function store(Request $request, $tecnicoId)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debe iniciar sesión para continuar.');
+        }
+
+        $empleadoID = Auth::id();
+
         try {
             DB::beginTransaction();
 
@@ -132,6 +139,14 @@ class SolicitudTecnicoController extends Controller
                 DB::table('estado_internos')
                     ->where('solicitud_id', $solicitudId)
                     ->update(['estado_const_id' => 2]);
+                
+                Historial::create([
+                    'solicitud_id' => $solicitudId,
+                    'tecnico_id' => $tecnicoId,
+                    'estado_const_id' => 2, // Estado "asignado"
+                    'descripcion' => 'Solicitud asignada al técnico ' . $tecnico->nombre,
+                    'employee_id' => $empleadoID
+                ]);
             }
 
             DB::commit();
