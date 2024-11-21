@@ -26,71 +26,48 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th class="text-center" style="width: 10%">
-                                            <input type="checkbox" id="selectAll" class="form-check-input">
-                                        </th>
-                                        <th style="width: 12%"
+                                        <th style="width: 5%"
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             N. solicitud
                                         </th>
-                                        <th style="width: 33%"
+                                        <th style="width: 5%"
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Nombre
+                                            Estado
                                         </th>
-                                        <th style="width: 15%"
-                                            class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Dep-Prov-Dist
+                                        <th style="width: 30%"
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Descripcion
+                                        </th>
+                                        <th style="width: 30%"
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Registrado
                                         </th>
                                         <th style="width: 13%"
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Proyecto
-                                        </th>
-                                        <th style="width: 15%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Estado
+                                            Fecha
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody id="solicitudes-pendientes" class="drop-zone">
-                                    {{-- @if (count($solicitudesDisponibles ?? []) > 0)
-                                        @foreach ($solicitudesDisponibles as $solicitud)
-                                            <tr class="draggable" draggable="true" data-id="{{ $solicitud->id }}"
-                                                data-solicitud="{{ json_encode($solicitud) }}">
-                                                <td class="text-center">
-                                                    <input type="checkbox" class="form-check-input solicitud-checkbox"
-                                                        data-id="{{ $solicitud->id }}"
-                                                        data-solicitud="{{ json_encode($solicitud) }}">
+                                    @if (count($historial) > 0)
+                                        @foreach ($historial as $item)
+                                            <tr>
+                                                <td style="width: 10%" class="align-middle text-center">
+                                                    <span class="text-xs font-weight-bold">{{ $item->numero_solicitud }}</span>
                                                 </td>
-                                                <td style="width: 20%" class="align-middle text-center">
-                                                    <span
-                                                        class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
+                                                <td style="width: 10%" class="align-middle text-center">
+                                                    <span class="badge badge-sm {{ $item->estado_badge }} p-2">
+                                                        {{ $item->estado_nombre }}-{{ $item->abreviatura }}
+                                                    </span>
                                                 </td>
                                                 <td style="width: 30%" class="align-middle text-center">
-                                                    <span
-                                                        class="text-xs font-weight-bold">{{ $solicitud->solicitante_nombre }}</span>
+                                                    <span class="text-xs font-weight-bold">{{ $item->descripcion }}</span>
                                                 </td>
-                                                <td style="width: 35%" class="align-middle text-info">
-                                                    <a href="#" class="ver-ubicacion"
-                                                        data-departamento="{{ $solicitud->departamento }}"
-                                                        data-provincia="{{ $solicitud->provincia }}"
-                                                        data-distrito="{{ $solicitud->distrito }}"
-                                                        data-ubicacion="{{ $solicitud->ubicacion }}">
-                                                        <p class="text-xs font-weight-bold mb-0 text-info">
-                                                            {{ $solicitud->departamento }}-{{ $solicitud->provincia }}
-                                                        </p>
-                                                        <p class="text-xs text-secondary mb-0">
-                                                            {{ $solicitud->distrito }}
-                                                        </p>
-                                                    </a>
+                                                <td style="width: 30%" class="align-middle text-center">
+                                                    <span class="text-xs font-weight-bold">Registrado por: {{ $item->name }}</span>
                                                 </td>
-                                                <td class="align-middle text-center">
-                                                    <span
-                                                        class="text-xs font-weight-bold">{{ $solicitud->categoria_proyecto }}</span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="badge badge-sm {{ $solicitud->estado_badge }} p-2">
-                                                        {{ $solicitud->estado_nombre }}-{{ $solicitud->abreviatura }}
-                                                    </span>
+                                                <td style="width: 30%" class="align-middle text-center">
+                                                    <span class="text-xs font-weight-bold">{{ $item->created_at }}</span>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -100,7 +77,7 @@
                                                 No existen solicitudes registradas
                                             </td>
                                         </tr>
-                                    @endif --}}
+                                    @endif
                                 </tbody>
                             </table>
                             <div class="d-flex justify-content-center mt-3">

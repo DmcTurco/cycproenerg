@@ -1,5 +1,6 @@
 <?php
 namespace App\Helpers;
+use Illuminate\Support\Facades\Config;
 
 class TipoDocumentoHelper
 {
@@ -43,5 +44,21 @@ class TipoDocumentoHelper
         
         return self::getTipoCargo()
             ->firstWhere('id', $id)['name'] ?? 'N/A';
+    }
+
+    public static function buildEstadosCase()
+    {
+        $nombreCase = "CASE ei.estado_const_id ";
+        $badgeCase = "CASE ei.estado_const_id ";
+
+        foreach (Config::get('const.tipo_estado') as $estado) {
+            $nombreCase .= " WHEN {$estado['id']} THEN '{$estado['name']}'";
+            $badgeCase .= " WHEN {$estado['id']} THEN '{$estado['badge']}'";
+        }
+
+        return [
+            'nombre' => $nombreCase . " END as estado_nombre",
+            'badge' => $badgeCase . " END as estado_badge"
+        ];
     }
 }

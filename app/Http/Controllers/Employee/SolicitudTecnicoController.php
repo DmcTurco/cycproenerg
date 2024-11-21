@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Employee;
 
+use App\Helpers\TipoDocumentoHelper;
 use App\Models\Solicitante;
 use App\Models\Solicitud;
 use App\Models\SolicitudTecnico;
 use App\Models\Tecnico;
 use App\Http\Controllers\Controller;
+use App\Models\EstadoInterno;
 use App\Models\Historial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +32,7 @@ class SolicitudTecnicoController extends Controller
     {
         $tecnico = Tecnico::findOrFail($tecnicoId);
         $estados = $this->getEstados();
-        $estadosCase = $this->buildEstadosCase();
+        $estadosCase = TipoDocumentoHelper::buildEstadosCase();
 
         // Query base que se reutiliza
         $baseQuery = DB::table('solicituds as s')
@@ -90,28 +92,15 @@ class SolicitudTecnicoController extends Controller
         $solicitudesAsignadas = $solicitudesAsignadas
             ->join('solicitud_tecnico as st', 's.id', '=', 'st.solicitud_id')
             ->where('st.tecnico_id', $tecnicoId)
+            ->whereNull('st.deleted_at')
             ->orderBy('st.created_at', 'DESC')
             ->paginate(10, ['*'], 'asignadas_page')
             ->appends($request->all());
 
-        return view('employee.pages.solicitudesTecnico.index',compact('tecnico', 'solicitudesAsignadas', 'solicitudesDisponibles')
+        return view(
+            'employee.pages.solicitudesTecnico.index',
+            compact('tecnico', 'solicitudesAsignadas', 'solicitudesDisponibles')
         );
-    }
-
-    private function buildEstadosCase()
-    {
-        $nombreCase = "CASE ei.estado_const_id ";
-        $badgeCase = "CASE ei.estado_const_id ";
-
-        foreach (Config::get('const.tipo_estado') as $estado) {
-            $nombreCase .= " WHEN {$estado['id']} THEN '{$estado['name']}'";
-            $badgeCase .= " WHEN {$estado['id']} THEN '{$estado['badge']}'";
-        }
-
-        return [
-            'nombre' => $nombreCase . " END as estado_nombre",
-            'badge' => $badgeCase . " END as estado_badge"
-        ];
     }
 
 
@@ -135,11 +124,9 @@ class SolicitudTecnicoController extends Controller
                 // Asignar solicitud al técnico
                 $tecnico->solicitudes()->attach($solicitudId);
 
-                // Actualizar estado a "asignado" (2)
-                DB::table('estado_internos')
-                    ->where('solicitud_id', $solicitudId)
-                    ->update(['estado_const_id' => 2]);
-                
+                EstadoInterno::whereIn('solicitud_id', $solicitudIds)
+                ->update(['estado_const_id' => 2]);
+
                 Historial::create([
                     'solicitud_id' => $solicitudId,
                     'tecnico_id' => $tecnicoId,
@@ -170,15 +157,26 @@ class SolicitudTecnicoController extends Controller
             $tecnico = Tecnico::findOrFail($tecnicoId);
             $solicitud = Solicitud::findOrFail($solicitudId);
 
-            // Desasignar la solicitud
-            $tecnico->solicitudes()->detach($solicitudId);
-
-            // Actualizar estado a pendiente (1)
-            DB::table('estado_internos')
+            // Verificar si la solicitud está asignada al técnico
+            $asignacion = SolicitudTecnico::where('tecnico_id', $tecnicoId)
                 ->where('solicitud_id', $solicitudId)
+                ->exists();
+            if (!$asignacion) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La solicitud no está asignada a este técnico'
+                ], 400);
+            }
+
+            // Eliminar la relación entre el técnico y la solicitud usando el modelo de la tabla pivote
+            SolicitudTecnico::where('tecnico_id', $tecnicoId)
+                ->where('solicitud_id', $solicitudId)
+                ->delete(); // Esto realiza la eliminación lógica en la tabla pivote
+
+            // Actualizar estado a pendiente (1) en la tabla estado_internos
+            EstadoInterno::where('solicitud_id', $solicitudId)
                 ->update(['estado_const_id' => 1]);
 
-            $solicitud->delete();
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -208,18 +206,33 @@ class SolicitudTecnicoController extends Controller
                 ], 400);
             }
 
-            // Verificar que todas las solicitudes existen
-            Solicitud::whereIn('id', $solicitudIds)->get();
-
-            // Desasignar las solicitudes
-            $tecnico->solicitudes()->detach($solicitudIds);
-
-            // Actualizar estado a pendiente (1)
-            DB::table('estado_internos')
+            // Verificar que todas las solicitudes existen y pertenecen al técnico
+            $solicitudesPertenecientes = SolicitudTecnico::where('tecnico_id', $tecnicoId)
                 ->whereIn('solicitud_id', $solicitudIds)
+                ->pluck('solicitud_id')
+                ->toArray();
+
+            if ($solicitudesPertenecientes->count() !== count($solicitudIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Algunas solicitudes no existen o ya fueron eliminadas'
+                ], 404);
+            }
+
+            // Realizar la eliminación lógica en la tabla pivote
+            SolicitudTecnico::where('tecnico_id', $tecnicoId)
+                ->whereIn('solicitud_id', $solicitudIds)
+                ->delete();
+
+            // Actualizar el estado a 'pendiente' (id 1) en la tabla estado_internos usando el modelo
+            EstadoInterno::whereIn('solicitud_id', $solicitudIds)
                 ->update(['estado_const_id' => 1]);
 
-            Solicitud::whereIn('id', $solicitudIds)->delete();
+
+            // // Actualizar estado a pendiente (1)
+            // DB::table('estado_internos')
+            //     ->whereIn('solicitud_id', $solicitudIds)
+            //     ->update(['estado_const_id' => 1]);
 
             DB::commit();
 
