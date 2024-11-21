@@ -13,13 +13,29 @@
             <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
                 <div class="card">
                     <div class="card-header pb-0">
-                        {{-- <a class="btn btn-info OpenModal py-2 px-3" data-bs-toggle="modal"
-                            data-bs-target="#myModal">Registrar</a> --}}
-                        <div class="row mt-3">
-                            <div class="col-lg-6 col-7">
-                                <h6>Historial</h6>
+                        <form action="{{ route('employee.technicals.record.index', $tecnico->id) }}" method="GET">
+                            <div class="row">
+                                <div class="col-md-6 ">
+                                    <h6>Historial</h6>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group input-group-outline">
+                                        <input type="text" class="form-control" name="search"
+                                            value="{{ request('search') }}"
+                                            placeholder="Buscar por N° solicitud">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-info btn-sm">
+                                        <i class="fas fa-search" style="font-size: 12px;"></i>
+                                    </button>
+                                    <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}"
+                                        class="btn btn-outline-secondary btn-sm">
+                                        <i class="fa fa-trash" style="font-size: 12px;"></i>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                     <div class="card-body px-0 pt-0">
                         <div class="table-responsive">
@@ -80,8 +96,8 @@
                                     @endif
                                 </tbody>
                             </table>
-                            <div class="d-flex justify-content-center mt-3">
-                                {{-- {{ $solicitudesDisponibles->links('pagination::bootstrap-4') }} --}}
+                            <div class="d-flex justify-content-center">
+                                {{ $historial->links('pagination::bootstrap-4') }}
                             </div>
                         </div>
                     </div>

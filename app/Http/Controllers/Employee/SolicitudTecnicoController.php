@@ -83,7 +83,7 @@ class SolicitudTecnicoController extends Controller
         }
 
         $solicitudesDisponibles = $solicitudesDisponibles
-            ->orderBy('s.id', 'ASC')
+            ->orderBy('s.numero_solicitud', 'DESC')
             ->paginate(10, ['*'], 'disponibles_page')
             ->appends($request->all());
 
@@ -93,7 +93,7 @@ class SolicitudTecnicoController extends Controller
             ->join('solicitud_tecnico as st', 's.id', '=', 'st.solicitud_id')
             ->where('st.tecnico_id', $tecnicoId)
             ->whereNull('st.deleted_at')
-            ->orderBy('st.created_at', 'DESC')
+            ->orderBy('s.numero_solicitud', 'DESC')
             ->paginate(10, ['*'], 'asignadas_page')
             ->appends($request->all());
 
@@ -125,7 +125,7 @@ class SolicitudTecnicoController extends Controller
                 $tecnico->solicitudes()->attach($solicitudId);
 
                 EstadoInterno::whereIn('solicitud_id', $solicitudIds)
-                ->update(['estado_const_id' => 2]);
+                    ->update(['estado_const_id' => 2]);
 
                 Historial::create([
                     'solicitud_id' => $solicitudId,
@@ -177,6 +177,10 @@ class SolicitudTecnicoController extends Controller
             EstadoInterno::where('solicitud_id', $solicitudId)
                 ->update(['estado_const_id' => 1]);
 
+            Historial::where('tecnico_id', $tecnicoId)
+                ->where('solicitud_id', $solicitudId)
+                ->delete();
+
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -195,55 +199,55 @@ class SolicitudTecnicoController extends Controller
     {
         try {
             DB::beginTransaction();
-
+            
+            // Validar que el técnico existe
             $tecnico = Tecnico::findOrFail($tecnicoId);
+            
+            // Obtener y validar los IDs de solicitudes
             $solicitudIds = $request->input('solicitudes', []);
-
             if (empty($solicitudIds)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No se seleccionaron solicitudes para eliminar'
                 ], 400);
             }
-
+    
             // Verificar que todas las solicitudes existen y pertenecen al técnico
             $solicitudesPertenecientes = SolicitudTecnico::where('tecnico_id', $tecnicoId)
                 ->whereIn('solicitud_id', $solicitudIds)
-                ->pluck('solicitud_id')
-                ->toArray();
-
+                ->get();
+                
             if ($solicitudesPertenecientes->count() !== count($solicitudIds)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Algunas solicitudes no existen o ya fueron eliminadas'
                 ], 404);
             }
-
-            // Realizar la eliminación lógica en la tabla pivote
+    
+            // Realizar las eliminaciones y actualizaciones en batch
             SolicitudTecnico::where('tecnico_id', $tecnicoId)
                 ->whereIn('solicitud_id', $solicitudIds)
                 ->delete();
-
-            // Actualizar el estado a 'pendiente' (id 1) en la tabla estado_internos usando el modelo
+    
             EstadoInterno::whereIn('solicitud_id', $solicitudIds)
                 ->update(['estado_const_id' => 1]);
-
-
-            // // Actualizar estado a pendiente (1)
-            // DB::table('estado_internos')
-            //     ->whereIn('solicitud_id', $solicitudIds)
-            //     ->update(['estado_const_id' => 1]);
-
+    
+            Historial::where('tecnico_id', $tecnicoId)
+                ->whereIn('solicitud_id', $solicitudIds)
+                ->delete();
+    
             DB::commit();
-
+    
             return response()->json([
                 'success' => true,
                 'redirect' => route('employee.technicals.requests.index', $tecnicoId),
                 'message' => 'Las solicitudes han sido eliminadas exitosamente'
             ]);
+    
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error al eliminar solicitudes: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar las solicitudes'

@@ -23,7 +23,8 @@ class Tecnico extends Model
     public function solicitudes()
     {
         return $this->belongsToMany(Solicitud::class, 'solicitud_tecnico', 'tecnico_id', 'solicitud_id')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->whereNull('solicitud_tecnico.deleted_at');
     }
 
 }
