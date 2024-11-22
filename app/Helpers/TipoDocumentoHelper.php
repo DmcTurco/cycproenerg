@@ -46,10 +46,10 @@ class TipoDocumentoHelper
             ->firstWhere('id', $id)['name'] ?? 'N/A';
     }
 
-    public static function buildEstadosCase()
+    public static function buildEstadosCase($case)
     {
-        $nombreCase = "CASE ei.estado_const_id ";
-        $badgeCase = "CASE ei.estado_const_id ";
+        $nombreCase = "CASE ". $case; //"CASE ei.estado_const_id ";
+        $badgeCase = "CASE ". $case; //"CASE ei.estado_const_id ";
 
         foreach (Config::get('const.tipo_estado') as $estado) {
             $nombreCase .= " WHEN {$estado['id']} THEN '{$estado['name']}'";

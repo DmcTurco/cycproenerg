@@ -32,7 +32,7 @@ class SolicitudTecnicoController extends Controller
     {
         $tecnico = Tecnico::findOrFail($tecnicoId);
         $estados = $this->getEstados();
-        $estadosCase = TipoDocumentoHelper::buildEstadosCase();
+        $estadosCase = TipoDocumentoHelper::buildEstadosCase("ei.estado_const_id");
 
         // Query base que se reutiliza
         $baseQuery = DB::table('solicituds as s')
