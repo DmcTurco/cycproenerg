@@ -37,7 +37,7 @@ class HistorialController extends Controller
                 ->join('solicituds as s', 's.id', '=', 'h.solicitud_id')
                 // ->join('estado_internos as ei', 's.id', '=', 'ei.solicitud_id')
                 ->join('estado_portals as ep', 's.estado_portal_id', '=', 'ep.id')
-                ->join('employees as e', 'e.id', '=', 'h.employee_id')
+                ->leftJoin('employees as e', 'e.id', '=', 'h.employee_id')
                 ->orderBy('s.numero_solicitud', 'DESC')
                 ->where('h.tecnico_id', $tecnicoId)
                 ->whereNull('h.deleted_at');

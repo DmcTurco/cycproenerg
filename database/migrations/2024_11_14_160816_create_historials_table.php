@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('tecnico_id');
             $table->unsignedBigInteger('estado_const_id');
             $table->string('descripcion')->nullable();
-            $table->unsignedBigInteger('employee_id');
+            $table->unsignedBigInteger('employee_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

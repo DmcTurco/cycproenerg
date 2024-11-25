@@ -77,6 +77,9 @@
                                         <th
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Nombre</th>
+                                        <th
+                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Correo</th>
                                         <th style="width: 10%"
                                             class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Cargo</th>
@@ -112,6 +115,9 @@
                                                     <span class="text-xs font-weight-bold">{{ $tecnico->nombre }}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
+                                                    <span class="text-xs font-weight-bold">{{ $tecnico->email }}</span>
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
                                                     <span class="font-weight-bold badge bg-secondary">
                                                         {{ $tecnico->tipo_cargo_name }}
                                                     </span>
@@ -120,7 +126,8 @@
                                                 <td class="align-middle text-center">
                                                     <div class="d-flex align-items-center justify-content-center"
                                                         title="ver historial de solicitudes" style="height: 100%">
-                                                        <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}" class="btn btn-link text-secondary p-1">
+                                                        <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}"
+                                                            class="btn btn-link text-secondary p-1">
                                                             <i class="fas fa-history fa-lg"></i>
                                                         </a>
                                                     </div>

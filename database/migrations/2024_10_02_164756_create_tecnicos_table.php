@@ -18,6 +18,8 @@ return new class extends Migration
             $table->smallInteger('tipo_documento');
             $table->unsignedInteger('numero_documento_identificacion')->unique();
             $table->smallInteger('cargo');
+            $table->string('email')->unique();
+            $table->string('password');   
             $table->timestamps();
             $table->softDeletes();
         });

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\ApiSolicitudTecnico;
+use App\Http\Controllers\Api\ApiTecnicoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +15,17 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::post('login', [ApiTecnicoController::class, 'login']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::post('logout', [ApiTecnicoController::class, 'logout']);
+    Route::get('profile', [ApiTecnicoController::class, 'profile']);
+    Route::get('/solicitudes', [ApiSolicitudTecnico::class, 'getSolicitudTecnico']);
+    Route::put('/solicitudes/estado', [ApiSolicitudTecnico::class, 'updateEstado']);
+
+
 });

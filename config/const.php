@@ -28,21 +28,26 @@ return [
         ],
         [
             'id' => 3,
+            'name' => 'Iniciado',
+            'badge' => 'bg-gradient-warning '
+        ],
+        [
+            'id' => 4,
             'name' => 'finalizado',
             'badge' => 'bg-gradient-info'
         ],
         [
-            'id' => 4,
+            'id' => 5,
             'name' => 'reasignado',
             'badge' => 'bg-gradient-warning'
         ],
         [
-            'id' => 5,
+            'id' => 6,
             'name' => 'cancelado',
             'badge' => 'bg-gradient-danger'
         ],
         [
-            'id' => 6,
+            'id' => 7,
             'name' => 'expirado',
             'badge' => 'bg-gradient-secondary'
         ]
