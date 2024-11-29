@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('login', [ApiTecnicoController::class, 'login']);
+Route::get('/check-connection', function () {
+    return response()->json(['status' => 'ok']);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
