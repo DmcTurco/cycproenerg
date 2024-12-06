@@ -29,7 +29,7 @@ return [
         [
             'id' => 3,
             'name' => 'Iniciado',
-            'badge' => 'bg-gradient-warning '
+            'badge' => 'bg-gradient-warning'
         ],
         [
             'id' => 4,
