@@ -56,4 +56,5 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
     Route::get('/getDataIndex/{id}', [Employee\SolicitudTecnicoController::class, 'obtenerSolicitudesIndex'])->name('obtenerSolicitudesIndex');
     Route::post('/change', [Employee\ClientController::class, 'change'])->name('change');
     Route::get('/getFullSolicitudDetails/{id}',[Employee\SolicitudController::class, 'getFullSolicitudDetails'])->name('getFullSolicitudDetails');
+    Route::get('/check-progress/{fileId}', [Employee\ClientController::class, 'checkProgress'])->name('check-progress');
 });

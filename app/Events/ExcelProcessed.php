@@ -10,22 +10,18 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class RowProcessed implements ShouldBroadcast
+class ExcelProcessed implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $batchId;
-    public $rowIndex;
-    public $totalRows;
+    public $result;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($batchId, $rowIndex, $totalRows)
+    public function __construct($result)
     {
-        $this->batchId = $batchId;
-        $this->rowIndex = $rowIndex;
-        $this->totalRows = $totalRows;
+        $this->result = $result;
     }
 
     /**
@@ -35,9 +31,6 @@ class RowProcessed implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('excel-import');
-        // return [
-        //     new PrivateChannel('channel-name'),
-        // ];
+        return new Channel('excel-processing');
     }
 }

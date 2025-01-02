@@ -163,7 +163,7 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td class="align-middle text-center text-sm" colspan="6">
+                                            <td class="align-middle text-center text-sm" colspan="7">
                                                 <div class="d-flex flex-column align-items-center py-4">
                                                     <i class="fas fa-hard-hat fa-3x text-secondary mb-2"></i>
                                                     <p class="text-secondary mb-0">No existen técnicos registrados</p>

@@ -102,6 +102,7 @@
         const errorMessage = document.getElementById('error-message');
         const modal = document.getElementById('uploadModal');
         let uploadSuccessful = false;
+        let processingCheckInterval;
 
         uploadTrigger.addEventListener('click', function(event) {
             event.preventDefault(); // Prevenir el comportamiento por defecto del enlace
@@ -143,39 +144,47 @@
             return null;
         }
 
+        function updateProgress(percent) {
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = percent.toFixed(1) + '%';
+        }
+
+        function handleUploadSuccess(response) {
+            updateStatus('Procesando...', 'El archivo se está procesando en segundo plano');
+            updateProgress(90);
+        }
 
         function uploadExcel(file) {
             resetUI();
             updateStatus('Cargando...', 'Procesando el archivo...');
-
-            const xhr = new XMLHttpRequest();
             const formData = new FormData();
             formData.append('file', file);
+            const xhr = new XMLHttpRequest();
 
+            // Evento de progreso de subida
             xhr.upload.addEventListener('progress', (event) => {
                 if (event.lengthComputable) {
                     const percentComplete = (event.loaded / event.total) * 100;
-                    progressBar.style.width = percentComplete + '%';
-                    progressBar.textContent = percentComplete.toFixed(2) + '%';
+                    updateProgress(Math.min(percentComplete,
+                        90)); // Máximo 90% hasta que termine el procesamiento
                 }
             });
 
+            // Evento de respuesta del servidor
             xhr.addEventListener('load', () => {
                 try {
                     const response = JSON.parse(xhr.responseText);
                     if (xhr.status === 200 && response.success) {
-                        handleSuccess(response.message);
-                        uploadSuccessful = true;
+                        // Archivo subido exitosamente, comenzar a verificar el progreso
+                        handleUploadSuccess(response);
+                        startProgressChecking(response.file_id);
                     } else {
                         handleError(response.message || 'Error al procesar el archivo.');
-                        uploadSuccessful = false;
                     }
                 } catch (e) {
                     handleError('Error al procesar la respuesta del servidor.');
-                    uploadSuccessful = false;
                 }
             });
-
             xhr.addEventListener('error', () => {
                 handleError('Error de conexión al servidor.');
                 uploadSuccessful = false;
@@ -189,7 +198,53 @@
             xhr.send(formData);
         }
 
+        function startProgressChecking(fileId) {
+            // Verificar el progreso cada 2 segundos
+            processingCheckInterval = setInterval(() => {
+                checkProcessingProgress(fileId);
+            }, 2000);
+        }
+
+        function checkProcessingProgress(fileId) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `/employee/check-progress/${fileId}`);
+            xhr.setRequestHeader('X-CSRF-TOKEN', getCsrfToken());
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            xhr.addEventListener('load', () => {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+
+                    if (response.error === "No se encontró el proceso de carga") {
+                        // Si no se encuentra el proceso, asumimos que terminó exitosamente
+                        clearInterval(processingCheckInterval);
+                        handleSuccess("El archivo se procesó correctamente");
+                        uploadSuccessful = true;
+                    } else if (response.completed) {
+                        clearInterval(processingCheckInterval);
+                        handleSuccess(response.message);
+                        uploadSuccessful = true;
+                    } else if (response.error) {
+                        clearInterval(processingCheckInterval);
+                        handleError(response.error);
+                    } else {
+                        // Actualizar el progreso
+                        updateProgress(90 + (response.progress * 10)); // 90-100%
+                        updateStatus('Procesando...',
+                            `Procesadas ${response.processed} de ${response.total} filas`);
+                    }
+                } catch (e) {
+                    console.error('Error checking progress:', e);
+                }
+            });
+
+            xhr.send();
+        }
+
         function resetUI() {
+            if (processingCheckInterval) {
+                clearInterval(processingCheckInterval);
+            }
             progressBar.style.width = '0%';
             progressBar.textContent = '';
             progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated bg-secondary';
@@ -206,12 +261,17 @@
         function handleSuccess(message) {
             progressBar.classList.remove('bg-secondary');
             progressBar.classList.add('bg-success');
+            progressBar.style.width = '100%';
+            progressBar.textContent = '100%';
             resultIcon.innerHTML = '<i class="bi bi-check-circle-fill text-success result-icon"></i>';
             resultIcon.classList.remove('d-none');
             updateStatus('Datos Cargados', message);
         }
 
         function handleError(message) {
+            if (processingCheckInterval) {
+                clearInterval(processingCheckInterval);
+            }
             progressBar.classList.remove('bg-secondary');
             progressBar.classList.add('bg-danger');
             resultIcon.innerHTML = '<i class="bi bi-x-circle-fill text-danger result-icon"></i>';
@@ -223,7 +283,6 @@
 
 
         modal.addEventListener('hidden.bs.modal', function() {
-
             if (uploadSuccessful) {
                 location.reload();
             }
