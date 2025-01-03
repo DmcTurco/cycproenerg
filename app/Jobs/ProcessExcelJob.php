@@ -21,6 +21,7 @@ use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoInterno;
 use App\Models\EstadoPortal;
 use App\Models\Instalacion;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -29,7 +30,7 @@ class ProcessExcelJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $filePath;
-
+    public $processId;
 
     /**
      * Create a new job instance.
@@ -38,6 +39,7 @@ class ProcessExcelJob implements ShouldQueue
     public function __construct($filePath)
     {
         $this->filePath = $filePath;
+        $this->processId = uniqid('excel_');
     }
 
 
@@ -55,7 +57,26 @@ class ProcessExcelJob implements ShouldQueue
                 throw new \Exception("El archivo Excel está vacío o solo contiene encabezados.");
             }
 
+            // Inicializar el progreso
+            Cache::put("excel_progress_{$this->processId}", [
+                'progress' => 0,
+                'processed' => 0,
+                'total' => count($rows) - 1, // Excluir header
+                'created' => 0,
+                'updated' => 0
+            ], now()->addHours(1));
+
             $result = $this->processRows($rows);
+
+            // Marcar como completado
+            Cache::put("excel_progress_{$this->processId}", [
+                'progress' => 100,
+                'processed' => $result['total'],
+                'total' => $result['total'],
+                'created' => $result['created'],
+                'updated' => $result['updated'],
+                'completed' => true
+            ], now()->addHours(1));
 
             // Aquí podrías emitir un evento para notificar que el proceso terminó
             event(new ExcelProcessed($result));
@@ -64,12 +85,13 @@ class ProcessExcelJob implements ShouldQueue
             Storage::delete($this->filePath);
         } catch (\Exception $e) {
             Log::error('Error procesando el archivo Excel: ' . $e->getMessage());
-            // Aquí podrías emitir un evento de error
+
+            Cache::put("excel_progress_{$this->processId}", [
+                'error' => $e->getMessage()
+            ], now()->addHours(1));
+
             event(new ExcelProcessingFailed($e->getMessage()));
-
-            // Asegurarse de limpiar el archivo temporal incluso si hay error
             Storage::delete($this->filePath);
-
             throw $e;
         }
     }
@@ -82,6 +104,8 @@ class ProcessExcelJob implements ShouldQueue
     {
         $created = 0;
         $updated = 0;
+        $processed = 0;
+        $totalRows = count($rows) - 1; // Excluir header
 
         foreach ($rows as $index => $row) {
             if ($index == 1) continue; // Ignorar el header
@@ -99,6 +123,17 @@ class ProcessExcelJob implements ShouldQueue
             $instalacion = $this->processInstalacion($row, $solicitud);
 
             $solicitud->wasRecentlyCreated ? $created++ : $updated++;
+            $processed++;
+
+            // Actualizar progreso
+            $progress = ($processed / $totalRows) * 100;
+            Cache::put("excel_progress_{$this->processId}", [
+                'progress' => $progress,
+                'processed' => $processed,
+                'total' => $totalRows,
+                'created' => $created,
+                'updated' => $updated
+            ], now()->addHours(1));
         }
 
         return [

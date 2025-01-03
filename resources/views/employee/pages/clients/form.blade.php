@@ -102,11 +102,11 @@
         const errorMessage = document.getElementById('error-message');
         const modal = document.getElementById('uploadModal');
         let uploadSuccessful = false;
-        let processingCheckInterval;
+        let progressCheckInterval;
 
         uploadTrigger.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevenir el comportamiento por defecto del enlace
-            event.stopPropagation(); // Detener la propagación del evento
+            event.preventDefault();
+            event.stopPropagation();
             fileInput.click();
         });
 
@@ -115,135 +115,104 @@
             if (file) uploadExcel(file);
         });
 
-        function getCsrfToken() {
-            // Intenta obtener el token del meta tag
-            let token = document.querySelector('meta[name="csrf-token"]');
-            if (token) {
-                return token.getAttribute('content');
-            }
+        function uploadExcel(file) {
+            resetUI();
+            const formData = new FormData();
+            formData.append('file', file);
 
-            // Si no está en un meta tag, intenta obtenerlo de un input hidden
-            token = document.querySelector('input[name="_token"]');
-            if (token) {
-                return token.value;
-            }
+            fetch('/employee/change', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.success) {
+                        startProgressCheck(response.processId);
+                    } else {
+                        handleError(response.message);
+                    }
+                })
+                .catch(error => {
+                    handleError('Error al subir el archivo');
+                    console.error(error);
+                });
+        }
 
-            // Si aún no lo encuentra, busca en las cookies
-            const name = 'XSRF-TOKEN=';
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const cookieArray = decodedCookie.split(';');
-            for (let i = 0; i < cookieArray.length; i++) {
-                let cookie = cookieArray[i].trim();
-                if (cookie.indexOf(name) == 0) {
-                    return cookie.substring(name.length, cookie.length);
-                }
-            }
+        function startProgressCheck(processId) {
+            progressCheckInterval = setInterval(() => {
+                checkProgress(processId);
+            }, 1000);
+        }
 
-            // Si no se encuentra el token, lanza un error
-            console.error('No se pudo encontrar el token CSRF');
-            return null;
+        function checkProgress(processId) {
+            let checkAttempts = 0;
+            const maxAttempts = 60; // 1 minuto (con intervalo de 1 segundo)
+
+            fetch(`/employee/check-progress/${processId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.timeout) {
+                        clearInterval(progressCheckInterval);
+                        handleError(
+                            'El proceso ha excedido el tiempo de espera. Por favor, inténtelo de nuevo.'
+                        );
+                        return;
+                    }
+
+                    if (data.error) {
+                        checkAttempts++;
+                        if (checkAttempts >= maxAttempts) {
+                            clearInterval(progressCheckInterval);
+                            handleError('No se pudo procesar el archivo. Por favor, inténtelo de nuevo.');
+                        }
+                        return;
+                    }
+
+                    updateProgress(data.progress);
+                    updateStatus(
+                        'Procesando...',
+                        `Procesadas ${data.processed} de ${data.total} filas (${Math.round(data.progress)}%)`
+                    );
+
+                    if (data.completed) {
+                        clearInterval(progressCheckInterval);
+                        handleSuccess(
+                            `Proceso completado. Se procesaron ${data.total} filas. ` +
+                            `Se agregaron ${data.created} nuevos registros y ` +
+                            `se actualizaron ${data.updated} registros.`
+                        );
+                        uploadSuccessful = true;
+                    }
+
+                    // Verificar si el proceso está estancado
+                    const now = Date.now() / 1000;
+                    if (data.lastUpdate && (now - data.lastUpdate) > 300) { // 5 minutos
+                        clearInterval(progressCheckInterval);
+                        handleError('El proceso parece estar estancado. Por favor, inténtelo de nuevo.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking progress:', error);
+                    checkAttempts++;
+                    if (checkAttempts >= maxAttempts) {
+                        clearInterval(progressCheckInterval);
+                        handleError('Error al verificar el progreso. Por favor, inténtelo de nuevo.');
+                    }
+                });
         }
 
         function updateProgress(percent) {
-            progressBar.style.width = percent + '%';
-            progressBar.textContent = percent.toFixed(1) + '%';
-        }
-
-        function handleUploadSuccess(response) {
-            updateStatus('Procesando...', 'El archivo se está procesando en segundo plano');
-            updateProgress(90);
-        }
-
-        function uploadExcel(file) {
-            resetUI();
-            updateStatus('Cargando...', 'Procesando el archivo...');
-            const formData = new FormData();
-            formData.append('file', file);
-            const xhr = new XMLHttpRequest();
-
-            // Evento de progreso de subida
-            xhr.upload.addEventListener('progress', (event) => {
-                if (event.lengthComputable) {
-                    const percentComplete = (event.loaded / event.total) * 100;
-                    updateProgress(Math.min(percentComplete,
-                        90)); // Máximo 90% hasta que termine el procesamiento
-                }
-            });
-
-            // Evento de respuesta del servidor
-            xhr.addEventListener('load', () => {
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    if (xhr.status === 200 && response.success) {
-                        // Archivo subido exitosamente, comenzar a verificar el progreso
-                        handleUploadSuccess(response);
-                        startProgressChecking(response.file_id);
-                    } else {
-                        handleError(response.message || 'Error al procesar el archivo.');
-                    }
-                } catch (e) {
-                    handleError('Error al procesar la respuesta del servidor.');
-                }
-            });
-            xhr.addEventListener('error', () => {
-                handleError('Error de conexión al servidor.');
-                uploadSuccessful = false;
-            });
-            xhr.addEventListener('timeout', () => {
-                handleError('La solicitud ha excedido el tiempo de espera.');
-                uploadSuccessful = false;
-            });
-            xhr.open('POST', '/employee/change');
-            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
-            xhr.send(formData);
-        }
-
-        function startProgressChecking(fileId) {
-            // Verificar el progreso cada 2 segundos
-            processingCheckInterval = setInterval(() => {
-                checkProcessingProgress(fileId);
-            }, 2000);
-        }
-
-        function checkProcessingProgress(fileId) {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', `/employee/check-progress/${fileId}`);
-            xhr.setRequestHeader('X-CSRF-TOKEN', getCsrfToken());
-            xhr.setRequestHeader('Accept', 'application/json');
-
-            xhr.addEventListener('load', () => {
-                try {
-                    const response = JSON.parse(xhr.responseText);
-
-                    if (response.error === "No se encontró el proceso de carga") {
-                        // Si no se encuentra el proceso, asumimos que terminó exitosamente
-                        clearInterval(processingCheckInterval);
-                        handleSuccess("El archivo se procesó correctamente");
-                        uploadSuccessful = true;
-                    } else if (response.completed) {
-                        clearInterval(processingCheckInterval);
-                        handleSuccess(response.message);
-                        uploadSuccessful = true;
-                    } else if (response.error) {
-                        clearInterval(processingCheckInterval);
-                        handleError(response.error);
-                    } else {
-                        // Actualizar el progreso
-                        updateProgress(90 + (response.progress * 10)); // 90-100%
-                        updateStatus('Procesando...',
-                            `Procesadas ${response.processed} de ${response.total} filas`);
-                    }
-                } catch (e) {
-                    console.error('Error checking progress:', e);
-                }
-            });
-
-            xhr.send();
+            progressBar.style.width = `${percent}%`;
+            progressBar.textContent = `${Math.round(percent)}%`;
         }
 
         function resetUI() {
-            if (processingCheckInterval) {
-                clearInterval(processingCheckInterval);
+            if (progressCheckInterval) {
+                clearInterval(progressCheckInterval);
             }
             progressBar.style.width = '0%';
             progressBar.textContent = '';
@@ -261,26 +230,30 @@
         function handleSuccess(message) {
             progressBar.classList.remove('bg-secondary');
             progressBar.classList.add('bg-success');
-            progressBar.style.width = '100%';
-            progressBar.textContent = '100%';
             resultIcon.innerHTML = '<i class="bi bi-check-circle-fill text-success result-icon"></i>';
             resultIcon.classList.remove('d-none');
             updateStatus('Datos Cargados', message);
         }
 
         function handleError(message) {
-            if (processingCheckInterval) {
-                clearInterval(processingCheckInterval);
+            if (progressCheckInterval) {
+                clearInterval(progressCheckInterval);
             }
             progressBar.classList.remove('bg-secondary');
             progressBar.classList.add('bg-danger');
             resultIcon.innerHTML = '<i class="bi bi-x-circle-fill text-danger result-icon"></i>';
             resultIcon.classList.remove('d-none');
-            updateStatus('Error al Cargar Datos', 'Se ha producido un error');
+            updateStatus('Error en el Proceso', 'Se ha producido un error');
             errorMessage.textContent = message;
             errorMessage.classList.remove('d-none');
-        }
 
+            // Opcionalmente, mostrar un botón para reintentar
+            const retryButton = document.createElement('button');
+            retryButton.className = 'btn btn-primary mt-3';
+            retryButton.textContent = 'Reintentar';
+            retryButton.onclick = () => location.reload();
+            errorMessage.parentNode.appendChild(retryButton);
+        }
 
         modal.addEventListener('hidden.bs.modal', function() {
             if (uploadSuccessful) {
