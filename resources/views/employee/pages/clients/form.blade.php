@@ -89,8 +89,8 @@
         font-size: 48px;
     }
 </style>
-
-<script>
+<script src="/js/excel-uploader.js" defer></script>
+{{-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         const uploadTrigger = document.getElementById('upload-trigger');
         const fileInput = document.getElementById('file-input');
@@ -261,4 +261,4 @@
             }
         });
     });
-</script>
+</script> --}}
