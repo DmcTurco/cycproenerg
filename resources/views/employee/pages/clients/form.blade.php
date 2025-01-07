@@ -56,40 +56,8 @@
 </div>
 <input type="file" id="file-input" style="display: none;" accept=".xls,.xlsx" />
 
-<style>
-    .upload-icon {
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-
-    .upload-icon:hover {
-        transform: scale(1.1);
-    }
-
-    .modal-content {
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-header {
-        background-color: #f8f9fa;
-        border-bottom: none;
-    }
-
-    .modal-footer {
-        border-top: none;
-    }
-
-    .progress {
-        height: 25px;
-        border-radius: 5px;
-    }
-
-    .result-icon {
-        font-size: 48px;
-    }
-</style>
-<script src="/js/excel-uploader.js" defer></script>
+<link rel="stylesheet" href="/css/excel/excel-uploader.css">
+<script src="/js/excel/excel-uploader.js" defer></script>
 {{-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         const uploadTrigger = document.getElementById('upload-trigger');
