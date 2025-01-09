@@ -18,7 +18,7 @@
                             <div class="row">
                                 <div class="col-md-2">
                                     <div class="input-group input-group-outline">
-                                        <label class="form-label">Numero de Solicitud</label>
+                                        <label class="form-label">N. de Solicitud</label>
                                         <input type="text" name="numero_solicitud" class="form-control"
                                             value="{{ request('numero_solicitud') }}">
                                     </div>
@@ -45,7 +45,7 @@
                                 <!-- Número de Suministro -->
                                 <div class="col-md-2">
                                     <div class="input-group input-group-outline">
-                                        <label class="form-label">Numero De Suministro</label>
+                                        <label class="form-label">N. De Suministro</label>
                                         <input type="text" name="numero_suministro" class="form-control"
                                             value="{{ request('numero_suministro') }}">
                                     </div>
@@ -56,7 +56,7 @@
                                     <div class="input-group input-group-outline">
                                         {{-- <label class="form-label">Estado</label> --}}
                                         <select name="estado" class="form-control">
-                                            <option value="">Seleccione el estado</option>
+                                            <option value="">Seleccione Estado</option>
                                             @foreach ($estados_Portal as $estado)
                                                 <option value="{{ $estado->id }}"
                                                     {{ request('estado') == $estado->id ? 'selected' : '' }}>
