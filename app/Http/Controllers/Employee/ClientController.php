@@ -21,6 +21,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoPortal;
 use App\Models\EstadoInterno;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -32,7 +33,17 @@ class ClientController extends Controller
 
         $estados_Portal = EstadoPortal::orderBy('nombre', 'DESC')->get();
 
+        // Establecer fechas por defecto (últimos 6 meses)
+        $fechaFin = $request->fecha_fin ? Carbon::parse($request->fecha_fin) : Carbon::now();
+        $fechaInicio = $request->fecha_inicio
+            ? Carbon::parse($request->fecha_inicio)
+            : Carbon::now()->subMonths(6);
+
         $query = Solicitud::with('estadoPortal');
+
+        // Aplicar filtro de fechas
+        $query->whereBetween('created_at', [$fechaInicio->startOfDay(), $fechaFin->endOfDay()]);
+
 
         if ($request->filled('numero_solicitud')) {
             $query->where('numero_solicitud', 'like', '%' . $request->numero_solicitud . '%');
@@ -71,16 +82,14 @@ class ClientController extends Controller
             );
             return $solicitud;
         });
-        return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados_Portal', 'totalSolicitudes', 'totalSolicitudesFiltradas'));
+        // Pasar las fechas a la vista
+        $fechas = [
+            'fecha_inicio' => $fechaInicio->format('Y-m-d'),
+            'fecha_fin' => $fechaFin->format('Y-m-d'),
+        ];
+        return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados_Portal', 'totalSolicitudes', 'totalSolicitudesFiltradas','fechas'));
     }
 
-    // private function parseDate($date)
-    // {
-    //     if (empty($date)) {
-    //         return null;
-    //     }
-    //     return date('Y-m-d', strtotime($date));
-    // }
     public function checkProgress($processId)
     {
         $progress = Cache::get("excel_progress_{$processId}");

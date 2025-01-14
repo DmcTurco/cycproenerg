@@ -9,11 +9,32 @@
                     <div class="card-header pb-0">
                         @include('employee.pages.clients.form')
                         @include('employee.pages.clients.information')
-                        <a class="btn btn-info" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#uploadModal">Abrir Portal de Carga</a>
-                        <hr>
-
                         <form method="GET" action="{{ route('employee.client.index') }}">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <a class="btn btn-info" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#uploadModal">Abrir Portal de Carga</a>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="input-group input-group-outline">
+                                        <label for="fecha_inicio">Fecha Inicio</label>
+                                        <input type="date" class="input-group " id="fecha_inicio" name="fecha_inicio"
+                                            value="{{ request('fecha_inicio', $fechas['fecha_inicio']) }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group input-group-outline">
+                                        <label for="fecha_fin">Fecha Fin</label>
+                                        <input type="date" class="input-group " id="fecha_fin" name="fecha_fin"
+                                            value="{{ request('fecha_fin', $fechas['fecha_fin']) }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+
                             <!-- Número de Solicitud -->
                             <div class="row">
                                 <div class="col-md-2">
