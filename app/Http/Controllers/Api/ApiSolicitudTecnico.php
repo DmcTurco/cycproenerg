@@ -28,6 +28,7 @@ class ApiSolicitudTecnico extends Controller
             ->select([
                 's.*',
                 'ei.estado_const_id',
+                
                 'ep.abreviatura',
                 DB::raw($estadosCase['nombre']),
                 DB::raw($estadosCase['badge']),
@@ -38,7 +39,8 @@ class ApiSolicitudTecnico extends Controller
                 'u.provincia',
                 'u.distrito',
                 'u.ubicacion',
-                'p.categoria_proyecto'
+                'p.categoria_proyecto',
+                'st.created_at as fecha_asignacion',
             ])
             ->join('estado_internos as ei', 's.id', '=', 'ei.solicitud_id')
             ->join('estado_portals as ep', 's.estado_portal_id', '=', 'ep.id')
