@@ -16,22 +16,22 @@ class CompanySeeder extends Seeder
     {
         // Crear datos de ejemplo para la tabla companies
         Company::create([
-            'name' => 'My Company',
-            'email' => 'company@gmail.com',
-            'password' => Hash::make('0000'),
+            'name' => 'CYCproenerg',
+            'email' => 'admin@cycproenerg.com',
+            'password' => Hash::make('*d1xJ:-[OB32'),
         ]);
 
         Company::create([
-            'name' => 'Company 2',
-            'email' => 'company2@example.com',
-            'password' => Hash::make('0000'),
+            'name' => 'CLB-Ingenieria',
+            'email' => 'admin@clb-ingenieria.com',
+            'password' => Hash::make('KQ3+DAu7<P3@'),
         ]);
 
-        Company::create([
-            'name' => 'Company 3',
-            'email' => 'company3@example.com',
-            'password' => Hash::make('0000'),
-        ]);
+        // Company::create([
+        //     'name' => 'Company 3',
+        //     'email' => 'company3@example.com',
+        //     'password' => Hash::make('0000'),
+        // ]);
     
     }
 }
