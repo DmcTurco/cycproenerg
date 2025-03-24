@@ -96,3 +96,4 @@
     <script src="{{ asset('js/technician/delete-handler.js') }}"></script>
     <script src="{{ asset('js/technician/main.js') }}"></script>
 @endpush
+

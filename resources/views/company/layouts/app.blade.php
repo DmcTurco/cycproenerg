@@ -19,7 +19,7 @@
     <link href="{{ asset('assets') }}/css/nucleo-icons.css" rel="stylesheet" />
     <link href="{{ asset('assets') }}/css/nucleo-svg.css" rel="stylesheet" />
     <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    {{-- <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> --}}
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <!-- CSS Files -->
@@ -32,7 +32,6 @@
     <!--sweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{-- <i class="fa fa-life-ring" aria-hidden="true"></i> --}}
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCTuazTT4ftRrTOscHQYPabgJPLiBS9YXc&sensor=false&region=ES&callback=initialize"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     @stack('styles')
 </head>
@@ -57,6 +56,28 @@
     <!-- Stack para scripts adicionales -->
     @stack('scripts')
 
+    <script>
+        // Cargar Google Maps API programáticamente con loading=async
+        (function() {
+            const script = document.createElement('script');
+            script.src =
+                'https://maps.googleapis.com/maps/api/js?key=AIzaSyCTuazTT4ftRrTOscHQYPabgJPLiBS9YXc&region=ES&callback=initMap&loading=async';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        })();
+    </script>
+    <script>
+        // Función global que Google Maps llamará cuando se cargue
+        function initMap() {
+            console.log("Google Maps API cargada correctamente");
+            // Si tienes una función initMapHandler, llámala aquí
+            if (typeof initMapHandler === 'function') {
+                initMapHandler();
+            }
+        }
+    </script>
+
     <!-- Scripts específicos de la plantilla -->
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
@@ -72,4 +93,5 @@
     @stack('js')
     @stack('dashboard')
 </body>
+
 </html>

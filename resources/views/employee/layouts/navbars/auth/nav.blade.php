@@ -17,12 +17,12 @@
             </form>
             <ul class="navbar-nav  justify-content-end">
                 <li class="nav-item d-flex align-items-center">
-                    <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
+                    <a href="javascript:;" class="nav-link text-body font-weight-bold px-0" id="sign-logout">
                         <i class="fa fa-user me-sm-1"></i>
                         {{-- <span class="d-sm-inline d-none" id="sign-logut"
                             onclick="event.preventDefault();document.getElementById('logout-form').submit();">Sign
                             Out</span> --}}
-                        <span class="d-sm-inline d-none" id="sign-logut">Sign Out</span>
+                        <span class="d-sm-inline d-none" id="sign-logout">Sign Out</span>
                     </a>
                 </li>
                 <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
@@ -128,35 +128,40 @@
 </nav>
 
 <script>
-
-document.getElementById('sign-logut').addEventListener('click', function(event) {
-        event.preventDefault(); // Previene la acción predeterminada del enlace
-
-        Swal.fire({
-            position: 'center',
-            icon: 'warning',
-            title: '¿Quieres cerrar la seción?',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Aceptar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route('logout') }}';
-
-                const token = document.createElement('input');
-                token.type = 'hidden';
-                token.name = '_token';
-                token.value = '{{ csrf_token() }}';
-                form.appendChild(token);
-
-                document.body.appendChild(form);
-                form.submit();
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutButton = document.getElementById('sign-logout');
+        
+        if (logoutButton) {
+            // Función para manejar el logout
+            function handleLogout(event) {
+                event.preventDefault();
+                
+                Swal.fire({
+                    position: 'center',
+                    icon: 'warning',
+                    title: '¿Quieres cerrar la sesión?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Aceptar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('logout-form').submit();
+                    }
+                });
             }
-        });
+            
+            // Agregar evento de clic (desktop)
+            logoutButton.addEventListener('click', handleLogout);
+            
+            // Agregar evento táctil (móvil)
+            logoutButton.addEventListener('touchend', function(event) {
+                event.preventDefault();
+                handleLogout(event);
+            });
+        } else {
+            console.error('El elemento con ID "sign-logout" no se encontró en el DOM');
+        }
     });
-
 </script>

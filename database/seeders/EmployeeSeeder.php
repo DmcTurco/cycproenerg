@@ -16,8 +16,8 @@ class EmployeeSeeder extends Seeder
     {
         Employee::create([
             'name' => 'David Moises Mamani Chino',
-            'email' => 'David@cycproenerg.com',
-            'password' => Hash::make('\0j31[XBuIS='),
+            'email' => 'david_1993@cycproenerg.com',
+            'password' => Hash::make('0000'),
         ]);
     }
 }

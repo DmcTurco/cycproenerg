@@ -24,16 +24,16 @@ class SupervisorCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
-    {
-        while (true) {
-            if (DB::table('jobs')->count() > 0) {
-                $this->call('queue:work', [
-                    '--stop-when-empty' => true,
-                    '--quiet' => true
-                ]);
-            }
-            sleep(60);
-        }
-    }
+    // public function handle()
+    // {
+    //     while (true) {
+    //         if (DB::table('jobs')->count() > 0) {
+    //             $this->call('queue:work', [
+    //                 '--stop-when-empty' => true,
+    //                 '--quiet' => true
+    //             ]);
+    //         }
+    //         sleep(60);
+    //     }
+    // }
 }

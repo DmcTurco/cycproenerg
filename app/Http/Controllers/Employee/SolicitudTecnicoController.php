@@ -70,12 +70,18 @@ class SolicitudTecnicoController extends Controller
                 foreach ($searchWords as $word) {
                     $query->where(function ($subQuery) use ($word) {
                         $subQuery->where(function ($innerQuery) use ($word) {
-                            $innerQuery->where('s.numero_solicitud', 'ilike', '%' . $word . '%')
-                                ->orWhere('u.distrito', 'ilike', '%' . $word . '%')
-                                ->orWhere('p.categoria_proyecto', 'ilike', '%' . $word . '%')
-                                ->orWhere('sol.nombre', 'ilike', '%' . $word . '%')
-                                ->orWhere('u.departamento', 'ilike', '%' . $word . '%')
-                                ->orWhere('u.provincia', 'ilike', '%' . $word . '%');
+                            $innerQuery->whereRaw('LOWER(s.numero_solicitud) LIKE ?', ['%' . strtolower($word) . '%'])
+                                ->orWhereRaw('LOWER(u.distrito) LIKE ?', ['%' . strtolower($word) . '%'])
+                                ->orWhereRaw('LOWER(p.categoria_proyecto) LIKE ?', ['%' . strtolower($word) . '%'])
+                                ->orWhereRaw('LOWER(sol.nombre) LIKE ?', ['%' . strtolower($word) . '%'])
+                                ->orWhereRaw('LOWER(u.departamento) LIKE ?', ['%' . strtolower($word) . '%'])
+                                ->orWhereRaw('LOWER(u.provincia) LIKE ?', ['%' . strtolower($word) . '%']);
+                            // $innerQuery->where('s.numero_solicitud', 'ilike', '%' . $word . '%')
+                            //     ->orWhere('u.distrito', 'ilike', '%' . $word . '%')
+                            //     ->orWhere('p.categoria_proyecto', 'ilike', '%' . $word . '%')
+                            //     ->orWhere('sol.nombre', 'ilike', '%' . $word . '%')
+                            //     ->orWhere('u.departamento', 'ilike', '%' . $word . '%')
+                            //     ->orWhere('u.provincia', 'ilike', '%' . $word . '%');
                         });
                     });
                 }
@@ -205,7 +211,7 @@ class SolicitudTecnicoController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $solicitudIds = $request->input('solicitudes', []);
             if (empty($solicitudIds)) {
                 return response()->json([
@@ -213,48 +219,47 @@ class SolicitudTecnicoController extends Controller
                     'message' => 'No se seleccionaron solicitudes para eliminar'
                 ], 400);
             }
-    
+
             // Obtener solo las solicitudes en estado 2 (asignado)
             $solicitudesAsignadas = EstadoInterno::whereIn('solicitud_id', $solicitudIds)
                 ->where('estado_const_id', 2)
                 ->pluck('solicitud_id')
                 ->toArray();
-    
+
             if (empty($solicitudesAsignadas)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Ninguna de las solicitudes seleccionadas está en estado asignado'
                 ], 400);
             }
-    
+
             // Proceder con la eliminación solo de las solicitudes en estado asignado
             SolicitudTecnico::where('tecnico_id', $tecnicoId)
                 ->whereIn('solicitud_id', $solicitudesAsignadas)
                 ->delete();
-    
+
             EstadoInterno::whereIn('solicitud_id', $solicitudesAsignadas)
                 ->update(['estado_const_id' => 1]);
-    
+
             Historial::where('tecnico_id', $tecnicoId)
                 ->whereIn('solicitud_id', $solicitudesAsignadas)
                 ->delete();
-    
+
             DB::commit();
-            
+
             $eliminadas = count($solicitudesAsignadas);
             $noEliminadas = count($solicitudIds) - $eliminadas;
-            
+
             $mensaje = "Se eliminaron $eliminadas solicitudes.";
             if ($noEliminadas > 0) {
                 $mensaje .= " $noEliminadas solicitudes no se pudieron eliminar por no estar en estado asignado.";
             }
-    
+
             return response()->json([
                 'success' => true,
                 'redirect' => route('employee.technicals.requests.index', $tecnicoId),
                 'message' => $mensaje
             ]);
-    
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error al eliminar solicitudes: ' . $e->getMessage());

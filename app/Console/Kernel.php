@@ -15,11 +15,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('queue:supervisor')
-            ->everyMinute()
-            ->withoutOverlapping()
-            ->runInBackground()
-            ->storeOutput();
+        // Procesa las colas cada minuto si hay trabajos pendientes
+        $schedule->call(function () {
+            if (DB::table('jobs')->count() > 0) {
+                Artisan::call('queue:work', [
+                    '--stop-when-empty' => true,
+                    '--quiet' => true
+                ]);
+            }
+        })->everyMinute();
     
         $schedule->command('queue:prune-failed --hours=24')->hourly();
         $schedule->command('queue:restart')->everyFourHours();
