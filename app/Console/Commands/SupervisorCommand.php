@@ -3,37 +3,31 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class SupervisorCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'queue:supervisor';
+    protected $signature = 'queue:process';
+    protected $description = 'Procesa los trabajos pendientes en la cola';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Supervise and process queue jobs silently';
+    public function handle()
+    {
+        if (DB::table('jobs')->count() > 0) {
+            $this->info('Procesando trabajos pendientes...');
 
-    /**
-     * Execute the console command.
-     */
-    // public function handle()
-    // {
-    //     while (true) {
-    //         if (DB::table('jobs')->count() > 0) {
-    //             $this->call('queue:work', [
-    //                 '--stop-when-empty' => true,
-    //                 '--quiet' => true
-    //             ]);
-    //         }
-    //         sleep(60);
-    //     }
-    // }
+            Artisan::call('queue:work', [
+                '--stop-when-empty' => true,
+                '--memory' => '256',
+                '--timeout' => 300,
+                '--tries' => 3,
+                '--quiet' => true
+            ]);
+            $this->info('Proceso de cola iniciado en segundo plano.');
+        } else {
+            $this->info('No hay trabajos pendientes para procesar.');
+        }
+
+        return 0;
+    }
 }

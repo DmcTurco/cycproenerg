@@ -22,8 +22,12 @@ use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoPortal;
 use App\Models\EstadoInterno;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+use function Laravel\Prompts\table;
 
 class ClientController extends Controller
 {
@@ -87,7 +91,7 @@ class ClientController extends Controller
             'fecha_inicio' => $fechaInicio->format('Y-m-d'),
             'fecha_fin' => $fechaFin->format('Y-m-d'),
         ];
-        return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados_Portal', 'totalSolicitudes', 'totalSolicitudesFiltradas','fechas'));
+        return view('employee.pages.clients.index', compact('clientesConSolicitudes', 'estados_Portal', 'totalSolicitudes', 'totalSolicitudesFiltradas', 'fechas'));
     }
 
     public function checkProgress($processId)
@@ -144,14 +148,19 @@ class ClientController extends Controller
         }
 
         try {
-            // Guardar el archivo temporalmente
-            $filePath = $file->store('temp-excel');
+            // Verificamos si la cola está vacía antes de encolar el job
+            // $wasQueueEmpty = DB::table('jobs')->count() === 0;
 
-            // Despachar el job
-            $job = new ProcessExcelJob($filePath);
+            // Guardar el archivo temporalmente en storage/app/temp-excel
+            $filePath = $file->store('temp-excel', 'local');
 
-            Log::info('Creando nuevo proceso', ['processId' => $job->processId]);
-            $processId = $job->processId;
+            // Crear un ID único para el proceso
+            $processId = Str::uuid();
+
+            // Crear el Job con el processId
+            $job = new ProcessExcelJob($filePath, $processId);
+
+            Log::info('Creando nuevo proceso', ['processId' => $processId]);
 
             // Guardar tiempo de inicio
             Cache::put("excel_start_time_{$processId}", now(), now()->addHours(1));
@@ -168,13 +177,24 @@ class ClientController extends Controller
             ], now()->addHours(1));
             dispatch($job);
 
+            // Encolar el job
+            // ProcessExcelJob::dispatch($filePath,$processId);
+            // Artisan::call('queue:restart');
+            // Ejecuta inmediatamente la cola en segundo plano
+            // Artisan::call('queue:work', [
+            //     '--stop-when-empty' => true,
+            //     '--memory' => '256',
+            //     '--timeout' => 300,
+            //     '--tries' => 3,
+            //     '--quiet' => true
+            // ]);
+
             return response()->json([
                 'success' => true,
-                'message' => 'El archivo se está procesando',
+                'message' => 'El archivo se está procesando en segundo plano',
                 'processId' => $processId
             ]);
         } catch (\Exception $e) {
-
             Log::error('Error al iniciar el proceso: ' . $e->getMessage());
             return response()->json([
                 'success' => false,

@@ -32,14 +32,19 @@ class ProcessExcelJob implements ShouldQueue
     protected $filePath;
     public $processId;
 
+    // Añadir estas propiedades:
+    public $timeout = 1800;    // 30 minutos máximo para ejecutar el job
+    public $tries = 3;         // Número de intentos si falla
+    public $backoff = [60, 300, 600]; // Reintentar después de 1, 5 y 10 minutos
+
     /**
      * Create a new job instance.
      */
 
-    public function __construct($filePath)
+    public function __construct($filePath, $processId)
     {
         $this->filePath = $filePath;
-        $this->processId = uniqid('excel_');
+        $this->processId = $processId;
     }
 
 
@@ -80,6 +85,7 @@ class ProcessExcelJob implements ShouldQueue
 
             // Aquí podrías emitir un evento para notificar que el proceso terminó
             event(new ExcelProcessed($result));
+            // broadcast(new ExcelProcessed($result));
 
             // Limpieza: eliminar el archivo temporal
             Storage::delete($this->filePath);

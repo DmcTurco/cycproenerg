@@ -31,6 +31,15 @@ class ExcelProcessed implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('excel-processing');
+        return new PrivateChannel('excel-processing');
     }
+
+    public function broadcastWith()
+{
+    return [
+        'status' => 'success',
+        'result' => $this->result
+    ];
+}
+
 }
