@@ -148,24 +148,13 @@ class ClientController extends Controller
         }
 
         try {
-            // Verificamos si la cola está vacía antes de encolar el job
-            // $wasQueueEmpty = DB::table('jobs')->count() === 0;
 
-            // Guardar el archivo temporalmente en storage/app/temp-excel
             $filePath = $file->store('temp-excel', 'local');
-
-            // Crear un ID único para el proceso
             $processId = Str::uuid();
-
-            // Crear el Job con el processId
             $job = new ProcessExcelJob($filePath, $processId);
 
             Log::info('Creando nuevo proceso', ['processId' => $processId]);
-
-            // Guardar tiempo de inicio
             Cache::put("excel_start_time_{$processId}", now(), now()->addHours(1));
-
-            // Inicializar el progreso
             Cache::put("excel_progress_{$processId}", [
                 'progress' => 0,
                 'processed' => 0,
@@ -175,19 +164,8 @@ class ClientController extends Controller
                 'started' => true,
                 'lastUpdate' => now()->timestamp
             ], now()->addHours(1));
-            dispatch($job);
 
-            // Encolar el job
-            // ProcessExcelJob::dispatch($filePath,$processId);
-            // Artisan::call('queue:restart');
-            // Ejecuta inmediatamente la cola en segundo plano
-            // Artisan::call('queue:work', [
-            //     '--stop-when-empty' => true,
-            //     '--memory' => '256',
-            //     '--timeout' => 300,
-            //     '--tries' => 3,
-            //     '--quiet' => true
-            // ]);
+            dispatch($job);
 
             return response()->json([
                 'success' => true,

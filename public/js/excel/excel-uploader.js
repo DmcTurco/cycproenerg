@@ -80,7 +80,7 @@ class ExcelUploader {
     startProgressCheck(processId) {
         this.progressCheckInterval = setInterval(() => {
             this.checkProgress(processId);
-        }, 5000);
+        }, 4000);
     }
  
     checkProgress(processId) {
