@@ -154,31 +154,49 @@ class ProcessExcelJob implements ShouldQueue
         if (empty($date)) {
             return null;
         }
-        return date('Y-m-d', strtotime($date));
+
+        // Limpiar la fecha de posibles espacios u otros caracteres
+        $date = trim($date);
+
+        // Verificar si la fecha está en formato dd/mm/yyyy o d/m/yyyy
+        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $date, $matches)) {
+            // Convertir al formato yyyy-mm-dd para MySQL
+            return sprintf('%04d-%02d-%02d', $matches[3], $matches[2], $matches[1]);
+        }
+
+        // Intentar convertir con DateTime para manejar otros formatos
+        try {
+            $dateTime = new \DateTime($date);
+            return $dateTime->format('Y-m-d');
+        } catch (\Exception $e) {
+            // Si hay un error en la conversión, registrarlo y devolver null
+            Log::warning("No se pudo convertir la fecha: {$date}. Error: " . $e->getMessage());
+            return null;
+        }
     }
 
     private function processEmpresa($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AK']));
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AJ']));
 
         return Empresa::firstOrCreate(
-            ['numero_documento' => trim($row['AL'])],
+            ['numero_documento' => trim($row['AK'])],
             [
                 'tipo_documento' => $tipo_documento_id,
-                'nombre' => trim($row['AM']),
-                'registro_gas_natural' => trim($row['AN']),
+                'nombre' => trim($row['AL']),
+                'registro_gas_natural' => trim($row['AM']),
             ]
         );
     }
 
     private function processConcesionaria($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AO']));
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AN']));
         return Concesionaria::firstOrCreate(
-            ['numero_documento' => trim($row['AP'])],
+            ['numero_documento' => trim($row['AO'])],
             [
                 'tipo_documento' => $tipo_documento_id,
-                'nombre' => trim($row['AQ']),
+                'nombre' => trim($row['AP']),
             ]
         );
     }
@@ -195,7 +213,7 @@ class ProcessExcelJob implements ShouldQueue
                 'nombre' => trim($row['I']),
                 'celular' => trim($row['K']),
                 'correo_electronico' => trim($row['L']),
-                'usuario_fise' => trim($row['U']),
+                'usuario_fise' => trim($row['T']),
             ]
         );
     }
@@ -203,7 +221,7 @@ class ProcessExcelJob implements ShouldQueue
     private function processEstadoPortal($row)
     {
         // Procesar el estado
-        $estadoCompleto = trim($row['CO']);
+        $estadoCompleto = trim($row['CN']);
         $partes = explode('-', $estadoCompleto, 2);
         $codigo = $partes[0];
         $nombre = $partes[1] ?? '';
@@ -249,7 +267,7 @@ class ProcessExcelJob implements ShouldQueue
                 'numero_suministro' => trim($row['C']) ?: null,
                 'numero_contrato_suministro' => trim($row['D']) ?: null,
                 'fecha_aprobacion_contrato' => $this->parseDate(trim($row['F'])),
-                'fecha_registro_portal' => $this->parseDate(trim($row['X'])),
+                'fecha_registro_portal' => $this->parseDate(trim($row['W'])),
                 'estado_portal_id' => $estadoPortal->id,
             ]
         );
@@ -289,7 +307,7 @@ class ProcessExcelJob implements ShouldQueue
                 'departamento' => trim($row['N']),
                 'provincia' => trim($row['O']),
                 'distrito' => trim($row['P']),
-                'venta_zona_no_gasificada' => trim($row['W']),
+                'venta_zona_no_gasificada' => trim($row['V']),
 
             ]
         );
@@ -300,11 +318,11 @@ class ProcessExcelJob implements ShouldQueue
         return Proyecto::updateOrCreate(
             ['solicitud_id' => $solicitud->id],
             [
-                'tipo_proyecto' => trim($row['AE']) ?: null,
-                'codigo_proyecto' => trim($row['AF']) ?: null,
-                'categoria_proyecto' => trim($row['CL']) ?: null,
-                'sub_categoria_proyecto' => trim($row['CM']) ?: null,
-                'codigo_objeto_conexion' => trim($row['CN']) ?: null,
+                'tipo_proyecto' => trim($row['AD']) ?: null,
+                'codigo_proyecto' => trim($row['AE']) ?: null,
+                'categoria_proyecto' => trim($row['CK']) ?: null,
+                'sub_categoria_proyecto' => trim($row['CL']) ?: null,
+                'codigo_objeto_conexion' => trim($row['CM']) ?: null,
 
             ]
         );
@@ -315,13 +333,13 @@ class ProcessExcelJob implements ShouldQueue
         return Instalacion::updateOrCreate(
             ['solicitud_id' => $solicitud->id],
             [
-                'tipo_instalacion' => trim($row['AG']) ?: null,
-                'tipo_acometida' => trim($row['AH']) ?: null,
-                'numero_puntos_instalacion' => trim($row['AJ']) ?: null,
-                'fecha_finalizacion_instalacion_interna' => $this->parseDate(trim($row['AA'])) ?: null,
-                'fecha_finalizacion_instalacion_acometida' => $this->parseDate(trim($row['AB'])) ?: null,
-                'resultado_instalacion_tc' => trim($row['CQ']) ?: null,
-                'fecha_programacion_habilitacion' => $this->parseDate(trim($row['AC'])) ?: null,
+                'tipo_instalacion' => trim($row['AF']) ?: null,
+                'tipo_acometida' => trim($row['AG']) ?: null,
+                'numero_puntos_instalacion' => trim($row['AI']) ?: null,
+                'fecha_finalizacion_instalacion_interna' => $this->parseDate(trim($row['Z'])) ?: null,
+                'fecha_finalizacion_instalacion_acometida' => $this->parseDate(trim($row['AA'])) ?: null,
+                'resultado_instalacion_tc' => trim($row['CP']) ?: null,
+                'fecha_programacion_habilitacion' => $this->parseDate(trim($row['AB'])) ?: null,
             ]
         );
     }

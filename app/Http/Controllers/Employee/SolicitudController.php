@@ -13,9 +13,7 @@ class SolicitudController extends Controller
 
     public function getFullSolicitudDetails($id)
     {
-
         try {
-
             if (!is_numeric($id)) {
                 return response()->json([
                     'success' => false,
@@ -23,7 +21,7 @@ class SolicitudController extends Controller
                 ], 400);
             }
 
-            // Query SQL optimizado
+            // Query SQL con nombres de tablas corregidos (en minúscula)
             $solicitud = DB::select("
                 SELECT 
                     -- Datos de Solicitud
@@ -91,15 +89,15 @@ class SolicitudController extends Controller
                     a.telefono as asesor_telefono,
                     a.email as asesor_email,
                     a.direccion as asesor_direccion
-                FROM SOLICITUDS s
-                LEFT JOIN SOLICITANTES sol ON s.solicitante_id = sol.id
-                LEFT JOIN EMPRESAS e ON s.empresa_id = e.id
-                LEFT JOIN CONCESIONARIAS c ON s.concesionaria_id = c.id
-                LEFT JOIN INSTALACIONS i ON s.id = i.solicitud_id
-                LEFT JOIN PROYECTOS p ON s.id = p.solicitud_id
-                LEFT JOIN UBICACIONS u ON s.id = u.solicitud_id
-                LEFT JOIN ASESORES a ON s.asesor_id = a.id
-                LEFT JOIN ESTADO_PORTALS est ON CAST(s.estado_portal_id AS bigint) = est.id
+                FROM solicituds s
+                LEFT JOIN solicitantes sol ON s.solicitante_id = sol.id
+                LEFT JOIN empresas e ON s.empresa_id = e.id
+                LEFT JOIN concesionarias c ON s.concesionaria_id = c.id
+                LEFT JOIN instalacions i ON s.id = i.solicitud_id
+                LEFT JOIN proyectos p ON s.id = p.solicitud_id
+                LEFT JOIN ubicacions u ON s.id = u.solicitud_id
+                LEFT JOIN asesores a ON s.asesor_id = a.id
+                LEFT JOIN estado_portals est ON CAST(s.estado_portal_id AS SIGNED) = est.id
                 WHERE s.id = ?
             ", [$id]);
 
@@ -110,16 +108,49 @@ class SolicitudController extends Controller
                     'message' => 'Solicitud no encontrada'
                 ], 404);
             }
+
+            // Para solucionar el problema de UTF-8, limpiamos los datos antes del JSON
             $tiposDocumento = config('const.tipo_documeto');
             $tiposDocumentoMap = collect($tiposDocumento)->pluck('name', 'id')->toArray();
             $solicitudData = $solicitud[0];
-            $tipoDocumentoId = $solicitudData->solicitante_tipo_documento;
-            $solicitudData->solicitante_tipo_documento_nombre = $tiposDocumentoMap[$tipoDocumentoId] ?? 'No especificado';
 
-            // Retornar el resultado
+            // Limpiar datos para eliminar caracteres UTF-8 malformados
+            $solicitudData = json_decode(json_encode($solicitudData), true);
+            array_walk_recursive($solicitudData, function (&$item) {
+                if (is_string($item)) {
+                    $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+                }
+            });
+
+            $tipoDocumentoId = $solicitudData['solicitante_tipo_documento'];
+            $solicitudData['solicitante_tipo_documento_nombre'] = $tiposDocumentoMap[$tipoDocumentoId] ?? 'No especificado';
+
+            $fechasAFormatear = [
+                'fecha_aprobacion_contrato',
+                'fecha_registro_portal',
+                'fecha_finalizacion_instalacion_interna',
+                'fecha_finalizacion_instalacion_acometida',
+                'fecha_programacion_habilitacion'
+            ];
+
+            foreach ($fechasAFormatear as $campo) {
+                if (!empty($solicitudData[$campo])) {
+                    try {
+                        $fecha = date_create($solicitudData[$campo]);
+                        if ($fecha) {
+                            $solicitudData[$campo] = date_format($fecha, 'd/m/Y');
+                        }
+                    } catch (\Exception $ex) {
+                        // Si hay un error al formatear, dejamos la fecha original
+                        Log::warning("Error al formatear la fecha {$campo}: " . $ex->getMessage());
+                    }
+                }
+            }
+
+            // Retornar el resultado con los datos limpios
             return response()->json([
                 'success' => true,
-                'data' => $solicitud[0]
+                'data' => $solicitudData
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error al obtener solicitud: ' . $e->getMessage());

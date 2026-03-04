@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile', [ApiTecnicoController::class, 'profile']);
     Route::get('/solicitudes', [ApiSolicitudTecnico::class, 'getSolicitudTecnico']);
     Route::put('/solicitudes/estado', [ApiSolicitudTecnico::class, 'updateEstado']);
+    Route::get('/solicitudes/{id}', [ApiSolicitudTecnico::class, 'getSolicitudById']);
 
 
 });

@@ -335,9 +335,6 @@
                             $('#asesor_direccion').val(solicitud.asesor_direccion ||
                                 'No especificado');
 
-                            // Formatear fechas si es necesario
-                            formatDates();
-
                             // Inicializar las pestañas
                             initTabs();
 
@@ -364,27 +361,6 @@
                     }
                 });
             });
-
-            // Función para formatear fechas
-            function formatDates() {
-                const dateFields = [
-                    'fecha_aprobacion_contrato',
-                    'fecha_registro_portal',
-                    'fecha_finalizacion_instalacion_interna',
-                    'fecha_finalizacion_instalacion_acometida',
-                    'fecha_programacion_habilitacion'
-                ];
-
-                dateFields.forEach(field => {
-                    const value = $(`#${field}`).val();
-                    if (value && value !== 'No especificado') {
-                        const date = new Date(value);
-                        if (!isNaN(date)) {
-                            $(`#${field}`).val(date.toLocaleDateString('es-ES'));
-                        }
-                    }
-                });
-            }
 
             // Limpiar el modal cuando se cierre
             $('#myModalInformation').on('hidden.bs.modal', function() {
