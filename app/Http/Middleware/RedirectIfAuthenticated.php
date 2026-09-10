@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +9,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
 {
+    /**
+     * Ruta a la que se redirige a un usuario ya autenticado.
+     *
+     * Antes vivía en App\Providers\RouteServiceProvider::HOME (esa clase
+     * se eliminó al migrar a Laravel 12; el valor no cambió).
+     */
+    public const HOME = '/home';
+
     /**
      * Handle an incoming request.
      *
@@ -19,8 +26,10 @@ class RedirectIfAuthenticated
     {
         $guards = empty($guards) ? [null] : $guards;
 
-        if (Auth::guard(config('fortify.guard'))->check()) {
-            return redirect(config('fortify.home'));
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                return redirect(self::HOME);
+            }
         }
 
         return $next($request);
