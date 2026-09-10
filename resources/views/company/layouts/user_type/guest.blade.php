@@ -1,18 +1,11 @@
 @extends('company.layouts.app')
 
 @section('guest')
-    @if(\Request::is('login/forgot-password'))
-        @include('company.layouts.navbars.guest')
+    @include('company.layouts.navbars.guest.nav')
+
+    <div class="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
         @yield('content')
-    @else
-        <div class="container position-sticky z-index-sticky top-0">
-            <div class="row">
-                <div class="col-12">
-                    @include('company.layouts.navbars.guest.nav')
-                </div>
-            </div>
-        </div>
-        @yield('content')
-        @include('company.layouts.footers.guest.footer')
-    @endif
+    </div>
+
+    @include('company.layouts.footers.guest.footer')
 @endsection

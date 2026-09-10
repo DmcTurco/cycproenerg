@@ -41,8 +41,8 @@ Route::prefix(MyApp::COMPANIES_SUBDIR)->middleware('auth:company')->name('compan
 
 Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employee.')->group(function () {
     Route::get('/', function () {
-        return redirect()->route('client.home');
-    })->withoutMiddleware('auth:client');
+        return redirect()->route('employee.home');
+    })->withoutMiddleware('auth:employee');
     Route::get('/home', [Employee\EmployeeController::class, 'index'])->name('home');
     Route::resource('client', Employee\ClientController::class);
     Route::resource('technicals', Employee\TecnicoController::class);
