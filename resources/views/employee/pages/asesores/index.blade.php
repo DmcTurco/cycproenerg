@@ -1,117 +1,44 @@
 @extends('employee.layouts.user_type.auth')
 
 @section('content')
+    <div class="card">
+        <h2 class="mb-4 text-lg font-semibold text-gray-900">Asesores</h2>
 
-    <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
-                <div class="card">
-                    <div class="card-header pb-0">
-                        <a class="btn btn-info OpenModal py-2 px-3" data-toggle="modal" data-target="myModal">Registrar</a>
-                        <div class="row mt-3">
-                            <div class="col-lg-6 col-7">
-                                <h6>Asesores</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body px-0 pt-0">
-                        <div class="table-responsive">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead>
+                    <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3">Nombre</th>
+                        <th class="px-4 py-3">Tipo de documento</th>
+                        <th class="px-4 py-3">N° Documento</th>
+                        <th class="px-4 py-3">Cargo</th>
+                        <th class="px-4 py-3 text-center">Solicitudes</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse ($asesores as $asesor)
+                        <tr>
+                            <td class="px-4 py-3 font-medium text-gray-900">{{ $asesor->nombre }}</td>
+                            <td class="px-4 py-3 text-gray-600">{{ $asesor->tipo_documento }}</td>
+                            <td class="px-4 py-3 text-gray-600">{{ $asesor->numero_documento_identificacion }}</td>
+                            <td class="px-4 py-3 text-gray-600">{{ $asesor->cargo }}</td>
+                            <td class="px-4 py-3 text-center">
+                                <a href="{{ route('employee.technicals.requests.index', $asesor->id) }}" class="btn-icon" title="Ver solicitudes">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <x-empty-state colspan="5" message="No existen asesores registrados." />
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-                            <table class="table align-items-center mb-0">
-                                <thead>
-                                    <tr>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Nombre</th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Numero de solicitud</th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            N° Documento de indentidad</th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Cargo</th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Tipo de cliente
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (count($asesores ?? []) > 0)
-                                        @foreach ($asesores as $asesor)
-                                            <tr>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $asesor->nombre }}</span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $asesor->tipo_documento }}</span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $asesor->numero_documento_identificacion }}</span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $asesor->cargo }}</span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">
-                                                        {{-- {{ $asesor->numeroSolicitudes() }} --}}
-                                                        <a href="{{ route('employee.technicals.requests.index' , $asesor->id) }}">
-                                                            <i class="fas fa-plus-circle text-info" style="font-size: 15px"></i>
-                                                        </a>
-                                                    </span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <a class="mx-3 edit-form-data  OpenModal" data-toggle="modal"
-                                                        data-target="#myModal" data-head-id="{{ $asesor->id }}">
-                                                        <i class="fa fa-edit fa-lg text-info"></i>
-                                                    </a>
-                                                    <a class="delete-btn" data-head-id="{{ $asesor->id }}">
-                                                        <i class="far fa-trash-alt fa-lg text-danger"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <td class="align-middle text-center text-sm" colspan="6">
-                                            <div class="d-flex flex-column align-items-center py-4">
-                                                <i class="fas fa-user-tie fa-3x text-secondary mb-2"></i>
-                                                <p class="text-secondary mb-0">No existen Asesores registrados</p>
-                                            </div>
-                                        </td>
-                                    @endif
-                                </tbody>
-                            </table>
-                            <br>
-                            <div class="d-flex justify-content-center">
-                                {{ $asesores->links('pagination::bootstrap-4') }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="mt-4">
+            {{ $asesores->links('pagination::tailwind') }}
         </div>
     </div>
-        {{-- <form id="form-delete" action="{{ route('company.technicals.destroy', '') }}" method="POST" class="d-inline"
-            style="cursor:pointer">
-            @csrf
-            @method('DELETE')
-        </form> --}}
-
-
-        @if (session('message') || session('error'))
-            <script>
-                Swal.fire({
-                    position: "center",
-                    icon: "{{ session('error') ? 'error' : 'success' }}",
-                    title: "Información",
-                    text: "{{ session('error') ?? session('message') }}",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            </script>
-        @endif
-
-
-    @endsection
+@endsection

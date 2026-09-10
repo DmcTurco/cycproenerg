@@ -1,108 +1,56 @@
 @extends('employee.layouts.user_type.auth')
 
 @section('content')
-
-    <div class="container-fluid ">
-        <div class="d-flex justify-content-between" style="width:100%; margin:0 auto ">
-            <div class=""><span><strong>Tecnico:</strong> </span>{{ $tecnico->nombre }}</div>
-            <a href="{{ route('employee.technicals.index') }}" class="btn btn-info px-3 py-2">
-                ATRAS
-            </a>
+    <div class="mb-4 flex items-center justify-between">
+        <div class="text-sm text-gray-600">
+            <span class="font-semibold text-gray-900">Técnico:</span> {{ $tecnico->nombre }}
         </div>
-        <div class="row mb-4">
-            <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
-                <div class="card">
-                    <div class="card-header pb-0">
-                        <form action="{{ route('employee.technicals.record.index', $tecnico->id) }}" method="GET">
-                            <div class="row">
-                                <div class="col-md-6 ">
-                                    <h6>Historial</h6>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="input-group input-group-outline">
-                                        <input type="text" class="form-control" name="search"
-                                            value="{{ request('search') }}"
-                                            placeholder="Buscar por N° solicitud">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-info btn-sm">
-                                        <i class="fas fa-search" style="font-size: 12px;"></i>
-                                    </button>
-                                    <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}"
-                                        class="btn btn-outline-secondary btn-sm">
-                                        <i class="fa fa-trash" style="font-size: 12px;"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-body px-0 pt-0">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 5%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            N. solicitud
-                                        </th>
-                                        <th style="width: 5%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Estado
-                                        </th>
-                                        <th style="width: 30%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Descripcion
-                                        </th>
-                                        <th style="width: 30%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Registrado
-                                        </th>
-                                        <th style="width: 13%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Fecha
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="solicitudes-pendientes" class="drop-zone">
-                                    @if (count($historial) > 0)
-                                        @foreach ($historial as $item)
-                                            <tr>
-                                                <td style="width: 10%" class="align-middle text-center">
-                                                    <span class="text-xs font-weight-bold">{{ $item->numero_solicitud }}</span>
-                                                </td>
-                                                <td style="width: 10%" class="align-middle text-center">
-                                                    <span class="badge badge-sm {{ $item->estado_badge }} p-2">
-                                                        {{ $item->estado_nombre }}-{{ $item->abreviatura }}
-                                                    </span>
-                                                </td>
-                                                <td style="width: 30%" class="align-middle text-center">
-                                                    <span class="text-xs font-weight-bold">{{ $item->descripcion }}</span>
-                                                </td>
-                                                <td style="width: 30%" class="align-middle text-center">
-                                                    <span class="text-xs font-weight-bold">Registrado por: {{ $item->name }}</span>
-                                                </td>
-                                                <td style="width: 30%" class="align-middle text-center">
-                                                    <span class="text-xs font-weight-bold">{{ $item->created_at }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <tr class="empty-row">
-                                            <td colspan="6" class="text-center py-5" style="height: 500px;">
-                                                No existen solicitudes registradas
-                                            </td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                            <div class="d-flex justify-content-center">
-                                {{ $historial->links('pagination::bootstrap-4') }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <a href="{{ route('employee.technicals.index') }}" class="btn-secondary">Atrás</a>
+    </div>
+
+    <div class="card">
+        <form action="{{ route('employee.technicals.record.index', $tecnico->id) }}" method="GET" class="mb-4 flex items-center gap-3">
+            <h2 class="flex-1 text-lg font-semibold text-gray-900">Historial</h2>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por N° solicitud" class="form-input max-w-xs" />
+            <button type="submit" class="btn-secondary">Buscar</button>
+            <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}" class="btn-icon" title="Limpiar filtro">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </a>
+        </form>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead>
+                    <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <th class="px-4 py-3">N° Solicitud</th>
+                        <th class="px-4 py-3">Estado</th>
+                        <th class="px-4 py-3">Descripción</th>
+                        <th class="px-4 py-3">Registrado</th>
+                        <th class="px-4 py-3">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse ($historial as $item)
+                        <tr>
+                            <td class="px-4 py-3 font-medium text-gray-900">{{ $item->numero_solicitud }}</td>
+                            <td class="px-4 py-3">
+                                <span class="badge {{ $item->estado_badge }}">{{ $item->estado_nombre }} - {{ $item->abreviatura }}</span>
+                            </td>
+                            <td class="px-4 py-3 text-gray-600">{{ $item->descripcion }}</td>
+                            <td class="px-4 py-3 text-gray-600">Registrado por: {{ $item->name }}</td>
+                            <td class="px-4 py-3 text-gray-600">{{ $item->created_at }}</td>
+                        </tr>
+                    @empty
+                        <x-empty-state colspan="5" message="No existen solicitudes registradas." />
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $historial->links('pagination::tailwind') }}
         </div>
     </div>
 @endsection

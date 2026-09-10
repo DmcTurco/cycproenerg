@@ -1,244 +1,90 @@
 @extends('employee.layouts.user_type.auth')
 
 @section('content')
-    <style>
-        /* Efecto hover para los iconos */
-        .btn-link:hover {
-            transform: scale(1.1);
-            transition: transform 0.2s ease;
-        }
+    <div
+        x-data="crudModal({
+            baseUrl: '{{ route('employee.technicals.index') }}',
+            unwrap: 'tecnico',
+            defaults: { id: null, nombre: '', tipo_documento: '', numero_documento_identificacion: '', cargo: '', email: '', password: '' },
+        })"
+    >
+        <div class="card">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">Técnicos</h2>
+                <button type="button" @click="openCreate()" class="btn-brand">Registrar</button>
+            </div>
 
-        /* Colores específicos para cada tipo de acción */
-        .btn-link.text-secondary:hover {
-            color: #5a6268 !important;
-        }
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead>
+                        <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            <th class="px-4 py-3">N° Documento</th>
+                            <th class="px-4 py-3">Nombre</th>
+                            <th class="px-4 py-3">Correo</th>
+                            <th class="px-4 py-3">Cargo</th>
+                            <th class="px-4 py-3 text-center">Historial</th>
+                            <th class="px-4 py-3 text-center">Solicitudes</th>
+                            <th class="px-4 py-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse ($tecnicos as $tecnico)
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="badge bg-gray-100 text-gray-700">{{ $tecnico->tipo_documento_nombre }}</span>
+                                    <span class="ml-1 font-medium text-gray-700">{{ $tecnico->numero_documento_identificacion }}</span>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900">{{ $tecnico->nombre }}</td>
+                                <td class="px-4 py-3 text-gray-600">{{ $tecnico->email }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="badge bg-brand-100 text-brand-700">{{ $tecnico->tipo_cargo_name }}</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}"
+                                        class="btn-icon" title="Ver historial de solicitudes">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </a>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <a href="{{ route('employee.technicals.requests.index', $tecnico->id) }}"
+                                        class="btn-icon relative" title="Asignar solicitudes">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h6" />
+                                        </svg>
+                                        <span class="badge absolute -right-1 -top-1 bg-brand-600 text-white">{{ $tecnico->solicitudes_count }}</span>
+                                    </a>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button type="button" @click="openEdit({{ $tecnico->id }})" class="btn-icon" title="Editar técnico">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" @click="remove({{ $tecnico->id }})" class="btn-icon text-red-500 hover:bg-red-50" title="Eliminar técnico">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <x-empty-state colspan="7" message="No existen técnicos registrados." />
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-        .btn-link.text-info:hover {
-            color: #17a2b8 !important;
-        }
-
-        .btn-link.text-danger:hover {
-            color: #dc3545 !important;
-        }
-
-        /* Tooltip mejorado */
-        [title] {
-            position: relative;
-            cursor: pointer;
-        }
-
-        /* Asegurar que todas las celdas tengan la misma altura */
-        .table td {
-            height: 60px;
-            /* Ajusta este valor según necesites */
-            vertical-align: middle;
-        }
-
-        /* Estilo para los botones de acción */
-        .btn-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 40px;
-            /* Ajusta este valor según necesites */
-            width: 40px;
-            padding: 0;
-            margin: 0;
-            transition: transform 0.2s ease;
-        }
-
-        /* Tamaño consistente para los íconos */
-        .fa-lg {
-            font-size: 20px !important;
-        }
-    </style>
-    <div class="container-fluid ">
-        <div class="row mb-4">
-            <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
-                <div class="card">
-                    <div class="card-header pb-0">
-                        <a class="btn btn-info OpenModal py-2 px-3" data-bs-toggle="modal"
-                            data-bs-target="#myModal">Registrar</a>
-                        <div class="row mt-3">
-                            <div class="col-lg-6 col-7">
-                                <h6>Tecnicos</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body px-0 pt-0">
-                        <div class="table-responsive">
-
-                            <table class="table align-items-center mb-0">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 20%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            N° Documento de indentidad</th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Nombre</th>
-                                        <th
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Correo</th>
-                                        <th style="width: 10%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Cargo</th>
-                                        <th style="width: 10%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Historial</th>
-                                        <th style="width: 10%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Solicitudes
-                                        </th>
-                                        <th style="width: 10%"
-                                            class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Acciones
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (count($tecnicos ?? []) > 0)
-                                        @foreach ($tecnicos as $tecnico)
-                                            <tr>
-                                                <td class="align-middle text-center text-sm">
-                                                    <p class="text-sm mb-0">
-                                                        <span class="badge bg-light text-dark">
-                                                            {{ $tecnico->tipo_documento_nombre }}
-                                                        </span>
-                                                        -
-                                                        <span class="text-xs font-weight-bold">
-                                                            {{ $tecnico->numero_documento_identificacion }}
-                                                        </span>
-                                                    </p>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->nombre }}</span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="text-xs font-weight-bold">{{ $tecnico->email }}</span>
-                                                </td>
-                                                <td class="align-middle text-center text-sm">
-                                                    <span class="font-weight-bold badge bg-secondary">
-                                                        {{ $tecnico->tipo_cargo_name }}
-                                                    </span>
-                                                </td>
-                                                <!-- Para las columnas de historial, solicitudes y acciones -->
-                                                <td class="align-middle text-center">
-                                                    <div class="d-flex align-items-center justify-content-center"
-                                                        title="ver historial de solicitudes" style="height: 100%">
-                                                        <a href="{{ route('employee.technicals.record.index', $tecnico->id) }}"
-                                                            class="btn btn-link text-secondary p-1">
-                                                            <i class="fas fa-history fa-lg"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-
-                                                <td class="align-middle text-center">
-                                                    <div class="d-flex align-items-center justify-content-center"
-                                                        title="Asignar Solicitudes">
-                                                        <a href="{{ route('employee.technicals.requests.index', $tecnico->id) }}"
-                                                            class="btn btn-link text-info p-2">
-                                                            <i class="fas fa-clipboard-list fa-lg"></i>
-                                                            <span class="badge bg-light text-dark">
-                                                                {{ $tecnico->solicitudes_count }}
-                                                            </span>
-                                                        </a>
-                                                    </div>
-                                                </td>
-
-                                                <td class="align-middle text-center">
-                                                    <div class="d-flex align-items-center justify-content-center gap-2"
-                                                        title="Editar Tecnico" style="height: 100%">
-                                                        <a class="btn btn-link text-info p-1 OpenModal" data-toggle="modal"
-                                                            data-target="#myModal" data-head-id="{{ $tecnico->id }}">
-                                                            <i class="fas fa-pencil-alt fa-lg"></i>
-                                                        </a>
-                                                        <a class="btn btn-link text-danger p-1 delete-btn"
-                                                            title="Eliminar Tecnico" data-head-id="{{ $tecnico->id }}">
-                                                            <i class="fas fa-trash fa-lg"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <tr>
-                                            <td class="align-middle text-center text-sm" colspan="7">
-                                                <div class="d-flex flex-column align-items-center py-4">
-                                                    <i class="fas fa-hard-hat fa-3x text-secondary mb-2"></i>
-                                                    <p class="text-secondary mb-0">No existen técnicos registrados</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                            <br>
-                            <div class="d-flex justify-content-center">
-                                {{ $tecnicos->links('pagination::bootstrap-4') }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="mt-4">
+                {{ $tecnicos->links('pagination::tailwind') }}
             </div>
         </div>
 
-        <form id="form-delete" action="{{ route('employee.technicals.destroy', '') }}" method="POST" class="d-inline"
-            style="cursor:pointer">
-            @csrf
-            @method('DELETE')
-        </form>
+        <x-crud-modal>
+            @include('employee.pages.tecnicos.form')
+        </x-crud-modal>
     </div>
-    @include('employee.pages.tecnicos.form')
-
-
-    @if (session('message') || session('error'))
-        <script>
-            Swal.fire({
-                position: "center",
-                icon: "{{ session('error') ? 'error' : 'success' }}",
-                title: "Información",
-                text: "{{ session('error') ?? session('message') }}",
-                showConfirmButton: false,
-                timer: 1500
-            });
-        </script>
-    @endif
-
-    <script>
-        $(document).ready(function() {
-            initModal('.OpenModal', '/employee/technicals/', {
-                id: 'head-id',
-                titleEdit: "Editar",
-                titleCreate: "Registrar",
-                submitTextEdit: "Actualizar",
-                submitTextCreate: "Guardar",
-                modalID: '#myModal',
-                dataTransform: function(response) {
-                    return response.tecnico;
-                }
-            });
-
-            initFormSubmission('#myForm', '#myModal');
-
-            //Delete Tecnico
-            $('.delete-btn').on('click', function() {
-                var tecnicoId = $(this).data('head-id')
-                var action = $('#form-delete').attr('action') + '/' + tecnicoId;
-                console.log(action);
-                confirmDelete(function() {
-                    $('#form-delete').attr('action', action).submit();
-                });
-            });
-
-            //Edit Tecncio
-            $(document).ready(function() {
-                $('.edit-form-data').on('click', function() {
-                    var tecnicoId = $(this).data('head-id');
-                    $('#myModal input#tecnicoId').val(tecnicoId);
-                })
-            });
-        });
-    </script>
-
 @endsection
