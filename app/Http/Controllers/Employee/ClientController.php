@@ -49,28 +49,20 @@ class ClientController extends Controller
         $query->whereBetween('created_at', [$fechaInicio->startOfDay(), $fechaFin->endOfDay()]);
 
 
-        if ($request->filled('numero_solicitud')) {
-            $query->where('numero_solicitud', 'like', '%' . $request->numero_solicitud . '%');
-        }
-
         if ($request->filled('estado')) {
             $query->where('estado_portal_id', $request->estado);
         }
 
-        if ($request->filled('dni')) {
-            $query->whereHas('solicitante', function ($q) use ($request) {
-                $q->where('numero_documento', 'like', '%' . $request->dni . '%');
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('numero_solicitud', 'like', "%{$search}%")
+                    ->orWhere('numero_suministro', 'like', "%{$search}%")
+                    ->orWhereHas('solicitante', function ($sq) use ($search) {
+                        $sq->where('numero_documento', 'like', "%{$search}%")
+                            ->orWhere('nombre', 'like', "%{$search}%");
+                    });
             });
-        }
-
-        if ($request->filled('nombre')) {
-            $query->whereHas('solicitante', function ($q) use ($request) {
-                $q->where('nombre', 'like', '%' . $request->nombre . '%');
-            });
-        }
-
-        if ($request->filled('numero_suministro')) {
-            $query->where('numero_suministro', 'like', '%' . $request->numero_suministro . '%');
         }
 
         $clientesConSolicitudes = $query->paginate(10)->appends($request->except('page'));

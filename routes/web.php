@@ -44,6 +44,9 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         return redirect()->route('employee.home');
     })->withoutMiddleware('auth:employee');
     Route::get('/home', [Employee\EmployeeController::class, 'index'])->name('home');
+    Route::get('/client/carga-excel', function () {
+        return view('employee.pages.clients.excel');
+    })->name('client.excel');
     Route::resource('client', Employee\ClientController::class);
     Route::resource('technicals', Employee\TecnicoController::class);
     Route::resource('advisers', Employee\AsesorController::class);
@@ -56,5 +59,8 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
     Route::get('/getDataIndex/{id}', [Employee\SolicitudTecnicoController::class, 'obtenerSolicitudesIndex'])->name('obtenerSolicitudesIndex');
     Route::post('/change', [Employee\ClientController::class, 'change'])->name('change');
     Route::get('/getFullSolicitudDetails/{id}',[Employee\SolicitudController::class, 'getFullSolicitudDetails'])->name('getFullSolicitudDetails');
+    Route::get('/solicitudes/{id}/detalle', function ($id) {
+        return view('employee.pages.clients.detail', compact('id'));
+    })->name('solicitudes.detalle');
     Route::get('/check-progress/{fileId}', [Employee\ClientController::class, 'checkProgress'])->name('check-progress');
 });

@@ -97,7 +97,7 @@ class SolicitudController extends Controller
                 LEFT JOIN proyectos p ON s.id = p.solicitud_id
                 LEFT JOIN ubicacions u ON s.id = u.solicitud_id
                 LEFT JOIN asesores a ON s.asesor_id = a.id
-                LEFT JOIN estado_portals est ON CAST(s.estado_portal_id AS SIGNED) = est.id
+                LEFT JOIN estado_portals est ON CAST(s.estado_portal_id AS INTEGER) = est.id
                 WHERE s.id = ?
             ", [$id]);
 

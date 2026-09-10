@@ -1,9 +1,8 @@
 @props(['links' => [], 'brand' => 'CYC PROENERG'])
 
 <aside
-    x-cloak
-    :class="$store.sidebar.open ? 'translate-x-0' : '-translate-x-full'"
-    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-sidenav transition-transform duration-200 ease-in-out lg:translate-x-0"
+    :class="{ 'translate-x-0': $store.sidebar.open, '-translate-x-full': !$store.sidebar.open }"
+    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-sidenav -translate-x-full transition-transform duration-200 ease-in-out lg:translate-x-0"
 >
     <div class="flex h-16 items-center px-6">
         <span class="text-lg font-bold text-white">{{ $brand }}</span>

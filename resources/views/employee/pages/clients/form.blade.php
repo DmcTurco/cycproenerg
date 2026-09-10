@@ -1,60 +1,42 @@
-<div class="modal fade" id="uploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="uploadModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-inspinia text-info" id="uploadModalLabel">Portal de Carga de Excel</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center mb-4">
-                    <a href="#" id="upload-trigger">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
-                            <rect width="16" height="9" x="28" y="15" fill="#21a366" />
-                            <path fill="#185c37" d="M44,24H12v16c0,1.105,0.895,2,2,2h28c1.105,0,2-0.895,2-2V24z" />
-                            <rect width="16" height="9" x="28" y="24" fill="#107c42" />
-                            <rect width="16" height="9" x="12" y="15" fill="#3fa071" />
-                            <path fill="#33c481" d="M42,6H28v9h16V8C44,6.895,43.105,6,42,6z" />
-                            <path fill="#21a366" d="M14,6h14v9H12V8C12,6.895,12.895,6,14,6z" />
-                            <path
-                                d="M22.319,13H12v24h10.319C24.352,37,26,35.352,26,33.319V16.681C26,14.648,24.352,13,22.319,13z"
-                                opacity=".05" />
-                            <path
-                                d="M22.213,36H12V13.333h10.213c1.724,0,3.121,1.397,3.121,3.121v16.425	C25.333,34.603,23.936,36,22.213,36z"
-                                opacity=".07" />
-                            <path
-                                d="M22.106,35H12V13.667h10.106c1.414,0,2.56,1.146,2.56,2.56V32.44C24.667,33.854,23.52,35,22.106,35z"
-                                opacity=".09" />
-                            <linearGradient id="flEJnwg7q~uKUdkX0KCyBa" x1="4.725" x2="23.055" y1="14.725"
-                                y2="33.055" gradientUnits="userSpaceOnUse">
-                                <stop offset="0" stop-color="#18884f" />
-                                <stop offset="1" stop-color="#0b6731" />
-                            </linearGradient>
-                            <path fill="url(#flEJnwg7q~uKUdkX0KCyBa)"
-                                d="M22,34H6c-1.105,0-2-0.895-2-2V16c0-1.105,0.895-2,2-2h16c1.105,0,2,0.895,2,2v16	C24,33.105,23.105,34,22,34z" />
-                            <path fill="#fff"
-                                d="M9.807,19h2.386l1.936,3.754L16.175,19h2.229l-3.071,5l3.141,5h-2.351l-2.11-3.93L11.912,29H9.526	l3.193-5.018L9.807,19z" />
-                        </svg>
-                    </a>
-                    <h4 id="status-title" class="mt-3">Cargar Datos</h4>
-                    <p id="status-message" class="text-muted">Haga clic en el icono para seleccionar un archivo</p>
-                </div>
-                <div class="progress d-none" id="progress-container">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-secondary" role="progressbar"
-                        style="width: 0%;" id="progress-bar"></div>
-                </div>
-                <div id="result-icon" class="text-center mt-3 d-none">
-                    <!-- El icono de éxito/error se insertará aquí -->
-                </div>
-                <div id="error-message" class="text-danger mt-3 d-none"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+<div
+    x-data="excelUploader({
+        uploadUrl: '{{ route('employee.change') }}',
+        progressUrl: '{{ url('employee/check-progress/:id') }}',
+    })"
+>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-3">
+            <button type="button" @click="pickFile()" :disabled="status === 'uploading' || status === 'processing'"
+                class="btn-icon h-12 w-12 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </button>
+            <div>
+                <p class="text-sm font-semibold text-gray-900">
+                    <span x-show="status === 'idle'">Portal de carga de Excel</span>
+                    <span x-show="status === 'uploading' || status === 'processing'" x-cloak>Procesando archivo...</span>
+                    <span x-show="status === 'success'" x-cloak>Datos cargados</span>
+                    <span x-show="status === 'error'" x-cloak>Error en el proceso</span>
+                </p>
+                <p class="text-xs text-gray-500" x-show="status === 'idle'">Haz clic en el ícono para seleccionar un archivo (.xls, .xlsx)</p>
+                <p class="text-xs text-gray-500" x-show="status !== 'idle'" x-cloak x-text="message"></p>
             </div>
         </div>
-    </div>
-</div>
-<input type="file" id="file-input" style="display: none;" accept=".xls,.xlsx" />
 
-<link rel="stylesheet" href="/css/excel/excel-uploader.css">
-<script src="/js/excel/excel-uploader.js" defer></script>
+        <a href="{{ route('employee.client.index') }}" x-show="status === 'success'" x-cloak class="btn-secondary">
+            Ver clientes
+        </a>
+        <button type="button" x-show="status === 'error'" x-cloak @click="reset()" class="btn-secondary">
+            Reintentar
+        </button>
+    </div>
+
+    <div x-show="status === 'processing' || status === 'uploading'" x-cloak class="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+        <div class="h-full bg-brand-600 transition-all" :style="`width: ${progress}%`"></div>
+    </div>
+
+    <p x-show="status === 'error'" x-cloak x-text="errorMessage" class="mt-2 text-sm text-red-600"></p>
+
+    <input type="file" x-ref="fileInput" @change="onFileSelected($event)" accept=".xls,.xlsx" class="hidden" />
+</div>
