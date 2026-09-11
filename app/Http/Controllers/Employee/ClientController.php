@@ -22,7 +22,6 @@ use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoPortal;
 use App\Models\EstadoInterno;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -159,6 +158,14 @@ class ClientController extends Controller
 
             dispatch($job);
 
+            // Dispara el worker de la cola en un proceso del sistema operativo
+            // aparte (no dentro de esta misma petición), en vez de esperar a que
+            // el scheduler (cron) pase a recogerlo, que en algunos entornos (ej.
+            // este Windows local) puede no estar corriendo. Al ser un proceso
+            // realmente separado, no bloquea esta respuesta ni se ejecuta dos
+            // veces si el usuario reintenta la subida.
+            $this->runQueueWorkerInBackground();
+
             return response()->json([
                 'success' => true,
                 'message' => 'El archivo se está procesando en segundo plano',
@@ -170,6 +177,25 @@ class ClientController extends Controller
                 'success' => false,
                 'message' => 'Error al iniciar el proceso: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Lanza "php artisan queue:work --stop-when-empty" como un proceso del
+     * sistema operativo totalmente independiente (no bloquea esta petición ni
+     * depende de que un cron/scheduler externo esté corriendo). Funciona tanto
+     * en Windows (desarrollo local) como en Linux (producción).
+     */
+    private function runQueueWorkerInBackground(): void
+    {
+        $phpBinary = escapeshellarg(PHP_BINARY);
+        $artisan = escapeshellarg(base_path('artisan'));
+        $command = "{$phpBinary} {$artisan} queue:work --stop-when-empty --tries=3";
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            pclose(popen("start /B \"\" {$command}", 'r'));
+        } else {
+            exec("{$command} > /dev/null 2>&1 &");
         }
     }
 }

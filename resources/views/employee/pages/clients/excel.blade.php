@@ -17,4 +17,8 @@
             &copy; {{ date('Y') }} CYC PROENERG. Todos los derechos reservados.
         </div>
     </div>
+
+    @push('scripts')
+        @vite('resources/js/excel-uploader.js')
+    @endpush
 @endsection

@@ -22,6 +22,7 @@ use App\Models\EstadoInterno;
 use App\Models\EstadoPortal;
 use App\Models\Instalacion;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -36,6 +37,14 @@ class ProcessExcelJob implements ShouldQueue
     public $timeout = 1800;    // 30 minutos máximo para ejecutar el job
     public $tries = 3;         // Número de intentos si falla
     public $backoff = [60, 300, 600]; // Reintentar después de 1, 5 y 10 minutos
+
+    /**
+     * Mapa de "nombre de encabezado" => letra de columna, resuelto en tiempo de
+     * ejecución a partir de la fila 1 del Excel. Leer por nombre (en vez de por
+     * letra fija) hace que la carga sobreviva a que el portal de origen inserte,
+     * borre o reordene columnas — solo se rompe si cambia el TEXTO del encabezado.
+     */
+    protected array $columnMap = [];
 
     /**
      * Create a new job instance.
@@ -62,6 +71,8 @@ class ProcessExcelJob implements ShouldQueue
                 throw new \Exception("El archivo Excel está vacío o solo contiene encabezados.");
             }
 
+            $this->buildColumnMap($rows[1]);
+
             // Inicializar el progreso
             Cache::put("excel_progress_{$this->processId}", [
                 'progress' => 0,
@@ -80,6 +91,7 @@ class ProcessExcelJob implements ShouldQueue
                 'total' => $result['total'],
                 'created' => $result['created'],
                 'updated' => $result['updated'],
+                'failed' => $result['failed'],
                 'completed' => true
             ], now()->addHours(1));
 
@@ -101,15 +113,55 @@ class ProcessExcelJob implements ShouldQueue
             throw $e;
         }
     }
+
+    /**
+     * Construye el mapa encabezado => columna a partir de la fila 1 del Excel.
+     */
+    private function buildColumnMap(array $headerRow): void
+    {
+        $this->columnMap = [];
+
+        foreach ($headerRow as $letter => $header) {
+            $header = trim((string) $header);
+            // Si el encabezado está duplicado en el archivo (ej. "Tipo de
+            // instalación" vuelve a aparecer en la sección de Habilitación),
+            // nos quedamos con la primera aparición, no con la última.
+            if ($header !== '' && !isset($this->columnMap[$header])) {
+                $this->columnMap[$header] = $letter;
+            }
+        }
+    }
+
+    /**
+     * Lee una celda de la fila por el nombre de su encabezado (no por letra fija).
+     * Si el encabezado no existe en este archivo, devuelve null en vez de fallar.
+     */
+    private function col(array $row, string $headerName)
+    {
+        $letter = $this->columnMap[$headerName] ?? null;
+
+        if ($letter === null) {
+            Log::warning("Columna con encabezado \"{$headerName}\" no encontrada en el Excel.");
+            return null;
+        }
+
+        return $row[$letter] ?? null;
+    }
+
     private function validateRow($row)
     {
-        return !empty($row['A']) && !empty($row['H']) && !empty($row['G']) && is_numeric($row['H']);
+        $numeroSolicitud = $this->col($row, 'Número de Solicitud');
+        $tipoDocumento = $this->col($row, 'Tipo de documento de identificación del solicitante');
+        $numeroDocumento = $this->col($row, 'Número de documento de identificación del solicitante');
+
+        return !empty($numeroSolicitud) && !empty($numeroDocumento) && !empty($tipoDocumento) && is_numeric($numeroDocumento);
     }
 
     private function processRows($rows)
     {
         $created = 0;
         $updated = 0;
+        $failed = 0;
         $processed = 0;
         $totalRows = count($rows) - 1; // Excluir header
 
@@ -118,17 +170,30 @@ class ProcessExcelJob implements ShouldQueue
 
             if (!$this->validateRow($row)) continue;
 
-            $empresa = $this->processEmpresa($row);
-            $concesionaria = $this->processConcesionaria($row);
-            $solicitante = $this->processSolicitante($row);
-            $estadoPortal = $this->processEstadoPortal($row);
-            $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estadoPortal);
-            $this->processEstadoInterno($estadoPortal, $solicitud);
-            $ubicacion = $this->processUbicacion($row, $solicitud);
-            $proyecto = $this->processProyecto($row, $solicitud);
-            $instalacion = $this->processInstalacion($row, $solicitud);
+            try {
+                $wasCreated = DB::transaction(function () use ($row) {
+                    $empresa = $this->processEmpresa($row);
+                    $concesionaria = $this->processConcesionaria($row);
+                    $solicitante = $this->processSolicitante($row);
+                    $estadoPortal = $this->processEstadoPortal($row);
+                    $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estadoPortal);
+                    $this->processEstadoInterno($estadoPortal, $solicitud);
+                    $this->processUbicacion($row, $solicitud);
+                    $this->processProyecto($row, $solicitud);
+                    $this->processInstalacion($row, $solicitud);
 
-            $solicitud->wasRecentlyCreated ? $created++ : $updated++;
+                    return $solicitud->wasRecentlyCreated;
+                });
+
+                $wasCreated ? $created++ : $updated++;
+            } catch (\Throwable $e) {
+                // Una fila con datos inesperados no debe tirar abajo el resto del
+                // archivo: se revierte solo esta fila (transacción por fila) y se
+                // sigue con la siguiente.
+                $failed++;
+                Log::error("Fila {$index} del Excel omitida por error: " . $e->getMessage());
+            }
+
             $processed++;
 
             // Actualizar progreso
@@ -138,15 +203,37 @@ class ProcessExcelJob implements ShouldQueue
                 'processed' => $processed,
                 'total' => $totalRows,
                 'created' => $created,
-                'updated' => $updated
+                'updated' => $updated,
+                'failed' => $failed,
             ], now()->addHours(1));
         }
 
         return [
             'created' => $created,
             'updated' => $updated,
+            'failed' => $failed,
             'total' => $created + $updated
         ];
+    }
+
+    /**
+     * Igual que Model::firstOrCreate(), pero resistente a que dos cargas se
+     * pisen: si otro proceso crea el mismo registro entre nuestro SELECT y
+     * nuestro INSERT, en vez de fallar por la restricción de unicidad,
+     * simplemente volvemos a buscarlo y devolvemos el que ya quedó guardado.
+     */
+    private function firstOrCreateSafe(string $modelClass, array $attributes, array $values = [])
+    {
+        try {
+            return $modelClass::firstOrCreate($attributes, $values);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // 23505 = unique_violation (Postgres), 1062 = duplicate entry (MySQL)
+            if (!in_array($e->getCode(), ['23505', '1062'], true)) {
+                throw $e;
+            }
+
+            return $modelClass::where($attributes)->firstOrFail();
+        }
     }
 
     private function parseDate($date)
@@ -177,43 +264,43 @@ class ProcessExcelJob implements ShouldQueue
 
     private function processEmpresa($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AJ']));
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($this->col($row, 'Tipo de documento de identificación de la Empresa Instaladora Ejecutora')));
 
-        return Empresa::firstOrCreate(
-            ['numero_documento' => trim($row['AK'])],
+        return $this->firstOrCreateSafe(Empresa::class,
+            ['numero_documento' => trim($this->col($row, 'Número de documento de identificación de la Empresa Instaladora Ejecutora'))],
             [
                 'tipo_documento' => $tipo_documento_id,
-                'nombre' => trim($row['AL']),
-                'registro_gas_natural' => trim($row['AM']),
+                'nombre' => trim($this->col($row, 'Nombre de la Empresa Instaladora Ejecutora')),
+                'registro_gas_natural' => trim($this->col($row, 'Registro de Gas Natural de la de Empresa Instaladora Ejecutora')),
             ]
         );
     }
 
     private function processConcesionaria($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['AN']));
-        return Concesionaria::firstOrCreate(
-            ['numero_documento' => trim($row['AO'])],
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($this->col($row, 'Tipo de documento de identificación de la Empresa Concesionaria')));
+        return $this->firstOrCreateSafe(Concesionaria::class,
+            ['numero_documento' => trim($this->col($row, 'Número de documento de identificación de la Empresa Concesionaria'))],
             [
                 'tipo_documento' => $tipo_documento_id,
-                'nombre' => trim($row['AP']),
+                'nombre' => trim($this->col($row, 'Nombre de la Empresa Concesionaria')),
             ]
         );
     }
 
     private function processSolicitante($row)
     {
-        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($row['G']));
+        $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($this->col($row, 'Tipo de documento de identificación del solicitante')));
         return Solicitante::updateOrCreate(
             [
-                'numero_documento' => trim($row['H']),
+                'numero_documento' => trim($this->col($row, 'Número de documento de identificación del solicitante')),
                 'tipo_documento' => $tipo_documento_id,
             ],
             [
-                'nombre' => trim($row['I']),
-                'celular' => trim($row['K']),
-                'correo_electronico' => trim($row['L']),
-                'usuario_fise' => trim($row['T']),
+                'nombre' => trim($this->col($row, 'Nombre del solicitante')),
+                'celular' => trim($this->col($row, 'Celular')),
+                'correo_electronico' => trim($this->col($row, 'Correo electrónico')),
+                'usuario_fise' => trim($this->col($row, 'Usuario FISE')),
             ]
         );
     }
@@ -221,14 +308,14 @@ class ProcessExcelJob implements ShouldQueue
     private function processEstadoPortal($row)
     {
         // Procesar el estado
-        $estadoCompleto = trim($row['CN']);
+        $estadoCompleto = trim($this->col($row, 'Estado de Solicitud'));
         $partes = explode('-', $estadoCompleto, 2);
         $codigo = $partes[0];
         $nombre = $partes[1] ?? '';
         $abreviatura = $this->obtenerAbreviatura($nombre);
 
         // Crear el estado si no existe
-        return EstadoPortal::firstOrCreate(
+        return $this->firstOrCreateSafe(EstadoPortal::class,
             ['codigo' => $codigo],
             [
                 'nombre' => $nombre,
@@ -259,15 +346,15 @@ class ProcessExcelJob implements ShouldQueue
     private function processSolicitud($row, $solicitante, $empresa, $concesionaria, $estadoPortal)
     {
         return Solicitud::updateOrCreate(
-            ['numero_solicitud' => trim($row['A'])],
+            ['numero_solicitud' => trim($this->col($row, 'Número de Solicitud'))],
             [
                 'solicitante_id' => $solicitante->id,
                 'empresa_id' => $empresa->id,
                 'concesionaria_id' => $concesionaria->id,
-                'numero_suministro' => trim($row['C']) ?: null,
-                'numero_contrato_suministro' => trim($row['D']) ?: null,
-                'fecha_aprobacion_contrato' => $this->parseDate(trim($row['F'])),
-                'fecha_registro_portal' => $this->parseDate(trim($row['W'])),
+                'numero_suministro' => trim($this->col($row, 'Número de Suministro')) ?: null,
+                'numero_contrato_suministro' => trim($this->col($row, 'Número de Contrato de Suministro')) ?: null,
+                'fecha_aprobacion_contrato' => $this->parseDate(trim($this->col($row, 'Fecha de aprobación del contrato'))),
+                'fecha_registro_portal' => $this->parseDate(trim($this->col($row, 'Fecha de registro de la Solicitud en el Portal'))),
                 'estado_portal_id' => $estadoPortal->id,
             ]
         );
@@ -299,15 +386,15 @@ class ProcessExcelJob implements ShouldQueue
         return Ubicacion::updateOrCreate(
             ['solicitud_id' => $solicitud->id],
             [
-                'ubicacion' => trim($row['Q']) ?: null,
-                'codigo_manzana' => trim($row['R']) ?: null,
-                'codigo_identificacion_interna' => trim($row['B']) ?: null,
-                'nombre_malla' => trim($row['S']) ?: null,
-                'direccion' => trim($row['M']) ?: null,
-                'departamento' => trim($row['N']),
-                'provincia' => trim($row['O']),
-                'distrito' => trim($row['P']),
-                'venta_zona_no_gasificada' => trim($row['V']),
+                'ubicacion' => trim($this->col($row, 'Ubicación')) ?: null,
+                'codigo_manzana' => trim($this->col($row, 'Código de Manzana')) ?: null,
+                'codigo_identificacion_interna' => trim($this->col($row, 'Código de identificación interna del predio')) ?: null,
+                'nombre_malla' => trim($this->col($row, 'Nombre de Malla')) ?: null,
+                'direccion' => trim($this->col($row, 'Dirección')) ?: null,
+                'departamento' => trim($this->col($row, 'Departamento')),
+                'provincia' => trim($this->col($row, 'Provincia')),
+                'distrito' => trim($this->col($row, 'Distrito')),
+                'venta_zona_no_gasificada' => trim($this->col($row, 'Venta en zona no gasificada')),
 
             ]
         );
@@ -318,11 +405,11 @@ class ProcessExcelJob implements ShouldQueue
         return Proyecto::updateOrCreate(
             ['solicitud_id' => $solicitud->id],
             [
-                'tipo_proyecto' => trim($row['AD']) ?: null,
-                'codigo_proyecto' => trim($row['AE']) ?: null,
-                'categoria_proyecto' => trim($row['CK']) ?: null,
-                'sub_categoria_proyecto' => trim($row['CL']) ?: null,
-                'codigo_objeto_conexion' => trim($row['CM']) ?: null,
+                'tipo_proyecto' => trim($this->col($row, 'Tipo de proyecto')) ?: null,
+                'codigo_proyecto' => trim($this->col($row, 'Código de proyecto')) ?: null,
+                'categoria_proyecto' => trim($this->col($row, 'Categoría de proyecto')) ?: null,
+                'sub_categoria_proyecto' => trim($this->col($row, 'Sub Categoría de proyecto')) ?: null,
+                'codigo_objeto_conexion' => trim($this->col($row, 'Código de Objeto de conexión')) ?: null,
 
             ]
         );
@@ -333,13 +420,13 @@ class ProcessExcelJob implements ShouldQueue
         return Instalacion::updateOrCreate(
             ['solicitud_id' => $solicitud->id],
             [
-                'tipo_instalacion' => trim($row['AF']) ?: null,
-                'tipo_acometida' => trim($row['AG']) ?: null,
-                'numero_puntos_instalacion' => trim($row['AI']) ?: null,
-                'fecha_finalizacion_instalacion_interna' => $this->parseDate(trim($row['Z'])) ?: null,
-                'fecha_finalizacion_instalacion_acometida' => $this->parseDate(trim($row['AA'])) ?: null,
-                'resultado_instalacion_tc' => trim($row['CP']) ?: null,
-                'fecha_programacion_habilitacion' => $this->parseDate(trim($row['AB'])) ?: null,
+                'tipo_instalacion' => trim($this->col($row, 'Tipo de instalación')) ?: null,
+                'tipo_acometida' => trim($this->col($row, 'Tipo de acometida')) ?: null,
+                'numero_puntos_instalacion' => trim($this->col($row, 'Número de puntos de instalación proyectados')) ?: null,
+                'fecha_finalizacion_instalacion_interna' => $this->parseDate(trim($this->col($row, 'Fecha de finalización de la Instalación Interna'))) ?: null,
+                'fecha_finalizacion_instalacion_acometida' => $this->parseDate(trim($this->col($row, 'Fecha de finalización de la Instalación de Acometida'))) ?: null,
+                'resultado_instalacion_tc' => trim($this->col($row, 'Resultado de la Instalación de TC')) ?: null,
+                'fecha_programacion_habilitacion' => $this->parseDate(trim($this->col($row, 'Fecha de programación de Habilitación'))) ?: null,
             ]
         );
     }
