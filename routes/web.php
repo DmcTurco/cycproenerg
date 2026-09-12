@@ -50,13 +50,10 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
     Route::resource('client', Employee\ClientController::class);
     Route::resource('technicals', Employee\TecnicoController::class);
     Route::resource('advisers', Employee\AsesorController::class);
-    Route::get('technicals/{technical}/requests/search', [Employee\SolicitudTecnicoController::class, 'search'])->name('employee.technicals.requests.search');
-    Route::delete('technicals/{tecnico}/requests/bulk-delete', [Employee\SolicitudTecnicoController::class, 'destroyMultiple'])->name('employee.technicals.requests.bulk-delete');
-    
+    Route::delete('technicals/{tecnico}/requests/bulk-delete', [Employee\SolicitudTecnicoController::class, 'destroyMultiple'])->name('technicals.requests.bulk-delete');
+
     Route::resource('technicals.requests', Employee\SolicitudTecnicoController::class);
     Route::resource('technicals.record', Employee\HistorialController::class);
-    Route::any('technicals-getrecords-request', [Employee\SolicitudTecnicoController::class, 'obtenerRegistros'])->name('obtenerRegistros');
-    Route::get('/getDataIndex/{id}', [Employee\SolicitudTecnicoController::class, 'obtenerSolicitudesIndex'])->name('obtenerSolicitudesIndex');
     Route::post('/change', [Employee\ClientController::class, 'change'])->name('change');
     Route::get('/getFullSolicitudDetails/{id}',[Employee\SolicitudController::class, 'getFullSolicitudDetails'])->name('getFullSolicitudDetails');
     Route::get('/solicitudes/{id}/detalle', function ($id) {

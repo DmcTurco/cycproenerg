@@ -1,14 +1,15 @@
 @extends('employee.layouts.user_type.auth')
 
-@section('content')
-    <div class="mb-4 flex items-center justify-between">
-        <div class="text-sm text-gray-600">
-            <span class="font-semibold text-gray-900">Técnico:</span> {{ $tecnico->nombre }}
-        </div>
-        <a href="{{ route('employee.technicals.index') }}" class="btn-secondary">Atrás</a>
-    </div>
+@php($fullBleed = true)
 
-    <div class="card">
+@section('content')
+    <div class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
+        <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
+            <h2 class="text-base font-semibold text-white">Historial de {{ $tecnico->nombre }}</h2>
+            <a href="{{ route('employee.technicals.index') }}" class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Volver</a>
+        </div>
+
+        <div class="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
         <form action="{{ route('employee.technicals.record.index', $tecnico->id) }}" method="GET" class="mb-4 flex items-center gap-3">
             <h2 class="flex-1 text-lg font-semibold text-gray-900">Historial</h2>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar por N° solicitud" class="form-input max-w-xs" />
@@ -51,6 +52,11 @@
 
         <div class="mt-4">
             {{ $historial->links('pagination::tailwind') }}
+        </div>
+        </div>
+
+        <div class="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-400 sm:px-6">
+            &copy; {{ date('Y') }} CYC PROENERG. Todos los derechos reservados.
         </div>
     </div>
 @endsection

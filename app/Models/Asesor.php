@@ -13,6 +13,7 @@ class Asesor extends Model
     protected $table = 'asesores';
     
     protected $fillable = [
+        'company_id',
         'nombre',
         'tipo_documento',
         'numero_documento_identificacion',

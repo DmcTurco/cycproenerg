@@ -1,5 +1,7 @@
 @extends('employee.layouts.user_type.auth')
 
+@php($fullBleed = true)
+
 @section('content')
     <div
         x-data="crudModal({
@@ -7,13 +9,14 @@
             unwrap: 'tecnico',
             defaults: { id: null, nombre: '', tipo_documento: '', numero_documento_identificacion: '', cargo: '', email: '', password: '' },
         })"
+        class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200"
     >
-        <div class="card">
-            <div class="mb-4 flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900">Técnicos</h2>
-                <button type="button" @click="openCreate()" class="btn-brand">Registrar</button>
-            </div>
+        <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
+            <h2 class="text-base font-semibold text-white">Técnicos</h2>
+            <button type="button" @click="openCreate()" class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Registrar</button>
+        </div>
 
+        <div class="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead>
@@ -81,6 +84,10 @@
             <div class="mt-4">
                 {{ $tecnicos->links('pagination::tailwind') }}
             </div>
+        </div>
+
+        <div class="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-400 sm:px-6">
+            &copy; {{ date('Y') }} CYC PROENERG. Todos los derechos reservados.
         </div>
 
         <x-crud-modal>

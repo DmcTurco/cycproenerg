@@ -1,10 +1,86 @@
-<div
-    x-data="excelUploader({
-        uploadUrl: '{{ route('employee.change') }}',
-        progressUrl: '{{ url('employee/check-progress/:id') }}',
-    })"
-    class="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-3"
->
+<div class="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-3">
+    <template x-teleport="body">
+        <div x-show="showOverlay" x-cloak
+            class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-gray-900/85 px-4 backdrop-blur-sm">
+
+            <button type="button" x-show="status === 'success' || status === 'error'" x-cloak
+                @click="overlayDismissed = true"
+                class="absolute right-5 top-5 text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div x-show="status === 'uploading'" x-cloak
+                class="h-32 w-32 animate-spin rounded-full border-10 border-white/15 border-t-brand-400"></div>
+
+            <div x-show="status === 'processing'" x-cloak class="relative h-48 w-48">
+                <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="8" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round"
+                        stroke-dasharray="282.7"
+                        :stroke-dashoffset="282.7 * (1 - progress / 100)"
+                        class="transition-all duration-300 ease-linear" />
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center text-3xl font-bold text-white" x-text="`${Math.round(progress)}%`"></div>
+            </div>
+
+            <div x-show="status === 'success'" x-cloak class="relative h-48 w-48">
+                <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="8" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round" stroke-dasharray="282.7" stroke-dashoffset="0" />
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                </div>
+            </div>
+
+            <div x-show="status === 'error'" x-cloak class="relative h-48 w-48">
+                <svg class="h-full w-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="8" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#ef4444" stroke-width="8" stroke-linecap="round" stroke-dasharray="282.7" stroke-dashoffset="0" />
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <p class="text-base font-semibold text-white" x-text="message"></p>
+                <p x-show="status === 'uploading' || status === 'processing'" x-cloak class="mt-1 text-xs text-gray-400">No cierres ni recargues esta página, ni presiones "Volver"...</p>
+                <p x-show="status === 'error'" x-cloak x-text="errorMessage" class="mt-1 text-sm text-red-400"></p>
+            </div>
+
+            <div x-show="status === 'success'" x-cloak class="flex items-center gap-6 sm:gap-10">
+                <div class="text-center">
+                    <p class="text-4xl font-bold text-white" x-text="total"></p>
+                    <p class="mt-1 text-xs font-medium uppercase tracking-wide text-gray-400">Total</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl font-bold text-green-400" x-text="created"></p>
+                    <p class="mt-1 text-xs font-medium uppercase tracking-wide text-gray-400">Nuevos</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl font-bold text-brand-400" x-text="updated"></p>
+                    <p class="mt-1 text-xs font-medium uppercase tracking-wide text-gray-400">Actualizados</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-4xl font-bold" :class="failed > 0 ? 'text-red-400' : 'text-gray-500'" x-text="failed"></p>
+                    <p class="mt-1 text-xs font-medium uppercase tracking-wide text-gray-400">Omitidos</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="{{ route('employee.client.index') }}" x-show="status === 'success'" x-cloak class="btn-brand">Ver clientes</a>
+                <button type="button" x-show="status === 'error'" x-cloak @click="reset()" class="btn-brand">Reintentar</button>
+            </div>
+        </div>
+    </template>
+
     <div class="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white lg:col-span-2">
         <div class="flex flex-wrap items-center gap-3 border-b border-gray-100 px-4 py-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -81,11 +157,10 @@
                 </p>
             </div>
 
-            <div x-show="status === 'uploading' || status === 'processing' || status === 'success' || status === 'error'" x-cloak class="flex flex-1 flex-col justify-center">
+            <div x-show="status === 'success' || status === 'error'" x-cloak class="flex flex-1 flex-col justify-center">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p class="text-sm font-semibold text-gray-900">
-                            <span x-show="status === 'uploading' || status === 'processing'">Procesando archivo...</span>
                             <span x-show="status === 'success'" x-cloak>Datos cargados</span>
                             <span x-show="status === 'error'" x-cloak>Error en el proceso</span>
                         </p>
@@ -98,10 +173,6 @@
                     <button type="button" x-show="status === 'error'" x-cloak @click="reset()" class="btn-secondary">
                         Reintentar
                     </button>
-                </div>
-
-                <div x-show="status === 'processing' || status === 'uploading'" x-cloak class="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                    <div class="h-full bg-brand-600 transition-all" :style="`width: ${progress}%`"></div>
                 </div>
 
                 <p x-show="status === 'error'" x-cloak x-text="errorMessage" class="mt-2 text-sm text-red-600"></p>

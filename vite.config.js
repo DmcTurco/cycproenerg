@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/pages/chart-demo.js',
                 'resources/js/excel-uploader.js',
+                'resources/js/tecnico-solicitudes.js',
             ],
             refresh: true,
         }),

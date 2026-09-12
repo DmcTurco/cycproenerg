@@ -1,99 +1,64 @@
 @extends('employee.layouts.user_type.auth')
-@push('styles')
-    <link href="{{ asset('css/technician-requests.css') }}" rel="stylesheet">
-@endpush
+
+@php($fullBleed = true)
+
 @section('content')
-    <div class="d-flex justify-content-between" style="width:100%; margin:0 auto ">
-        <div class=""><span><strong>Tecnico Asignado:</strong> </span>{{ $tecnico->nombre }}</div>
-        <a href="{{ route('employee.technicals.index') }}" class="btn btn-info px-3 py-2">
-            ATRAS
-        </a>
-    </div>
-    <div class="row mb-4">
-        <!-- Solicitudes Asignadas -->
-        <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
-            <div class="card" style="min-height: 700px; height: 100%; padding: 0 20px">
-                <div class="card-header pb-0">
-                    <div class="d-flex justify-content-between">
-                        <div class="row">
-                            <div class="col-md-6 ">
-                                <h6>Solicitudes Asignadas</h6>
-                            </div>
-                            <div class="col-md-6 ">
-                                <div class="d-flex justify-content-end ">
-                                    <button type="button" id="eliminarMultiple" class="btn btn-danger btn-sm" disabled>
-                                        <i class="fas fa-trash" style="font-size: 12px;"></i> Eliminar seleccionados
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body px-0 pb-2 drop-zone" id="solicitudes-asignadas">
-                    @include('employee.pages.solicitudesTecnico.partials.tabla-asignadas')
-                </div>
+    <div
+        x-data="tecnicoSolicitudes({
+            assignUrl: '{{ route('employee.technicals.requests.store', $tecnico->id) }}',
+            destroyUrlBase: '{{ route('employee.technicals.requests.index', $tecnico->id) }}',
+            bulkDeleteUrl: '{{ route('employee.technicals.requests.bulk-delete', $tecnico->id) }}',
+            mapsKey: '{{ config('services.google_maps.key') }}',
+        })"
+        class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200"
+    >
+        <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
+            <h2 class="text-base font-semibold text-white">Asignar Solicitudes — {{ $tecnico->nombre }}</h2>
+            <a href="{{ route('employee.technicals.index') }}" class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Volver</a>
+        </div>
+
+        <div class="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
+            <div class="mb-4 flex items-center justify-between gap-3">
+                <h2 class="text-lg font-semibold text-gray-900">Solicitudes Asignadas</h2>
+                <button type="button" @click="deleteSelected()" :disabled="selectedAssigned.length === 0 || busyDeleteAll"
+                    class="btn-secondary text-red-600 hover:bg-red-50">
+                    <span x-show="!busyDeleteAll">Eliminar seleccionadas</span>
+                    <span x-show="busyDeleteAll" x-cloak>Eliminando...</span>
+                </button>
+            </div>
+
+            @include('employee.pages.solicitudesTecnico.partials.tabla-asignadas')
+
+            <div class="mt-8 border-t border-gray-100 pt-6">
+                <form action="{{ route('employee.technicals.requests.index', $tecnico->id) }}" method="GET"
+                    class="mb-4 flex flex-wrap items-center gap-3">
+                    <h2 class="flex-1 text-lg font-semibold text-gray-900">Solicitudes Disponibles</h2>
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Buscar por N° solicitud, distrito o categoría..." class="form-input max-w-xs" />
+                    <button type="submit" class="btn-secondary">Buscar</button>
+                    <a href="{{ route('employee.technicals.requests.index', $tecnico->id) }}" class="btn-icon" title="Limpiar filtro">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                    <button type="button" @click="assignSelected()" :disabled="selectedAvailable.length === 0 || busyAssignAll" class="btn-brand">
+                        <span x-show="!busyAssignAll">Asignar seleccionadas</span>
+                        <span x-show="busyAssignAll" x-cloak>Asignando...</span>
+                    </button>
+                </form>
+
+                @include('employee.pages.solicitudesTecnico.partials.tabla-disponibles')
             </div>
         </div>
 
-        <!-- Solicitudes en Espera -->
-        <div class="col-lg-6 col-md-6 mb-md-0 mb-4">
-            <div class="card" style="min-height: 700px; height: 100%; padding: 0 20px">
-                <div class="card-header pb-0">
-
-                    <form action="{{ route('employee.technicals.requests.index', $tecnico->id) }}" method="GET">
-                        <div class="row">
-                            <div class="col-md-4 ">
-                                <h6>Solicitudes Disponibles</h6>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="input-group input-group-outline">
-                                    <input type="text" class="form-control" name="search"
-                                        value="{{ request('search') }}"
-                                        placeholder="Buscar por N° solicitud, distrito o categoría...">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <button type="submit" class="btn btn-info btn-sm">
-                                    <i class="fas fa-search" style="font-size: 12px;"></i>
-                                </button>
-                                <a href="{{ route('employee.technicals.requests.index', $tecnico->id) }}"
-                                    class="btn btn-outline-secondary btn-sm">
-                                    <i class="fa fa-trash" style="font-size: 12px;"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="card-body px-0 pb-2">
-                    @include('employee.pages.solicitudesTecnico.partials.tabla-disponibles')
-                </div>
-            </div>
+        <div class="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-400 sm:px-6">
+            &copy; {{ date('Y') }} CYC PROENERG. Todos los derechos reservados.
         </div>
+
+        @include('employee.pages.solicitudesTecnico.ubicacion')
     </div>
-
-    @include('employee.pages.solicitudesTecnico.ubicacion')
-
-    @if (session('message') || session('error'))
-        <script>
-            Swal.fire({
-                position: "center",
-                icon: "{{ session('error') ? 'error' : 'success' }}",
-                title: "Información",
-                text: "{{ session('error') ?? session('message') }}",
-                showConfirmButton: false,
-                timer: 1500
-            });
-        </script>
-    @endif
 @endsection
-@push('scripts')
-    <script>
-        window.tecnicoId = "{{ $tecnico->id }}";
-    </script>
-    <script src="{{ asset('js/technician/multiple-selection.js') }}"></script>
-    <script src="{{ asset('js/technician/drag-and-drop.js') }}"></script>
-    <script src="{{ asset('js/technician/map-handler.js') }}"></script>
-    <script src="{{ asset('js/technician/delete-handler.js') }}"></script>
-    <script src="{{ asset('js/technician/main.js') }}"></script>
-@endpush
 
+@push('scripts')
+    @vite('resources/js/tecnico-solicitudes.js')
+@endpush

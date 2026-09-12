@@ -16,6 +16,22 @@ document.addEventListener('alpine:init', () => {
         created: 0,
         updated: 0,
         failed: 0,
+        overlayDismissed: false,
+
+        get showOverlay() {
+            if (this.status === 'uploading' || this.status === 'processing') return true;
+            if ((this.status === 'success' || this.status === 'error') && !this.overlayDismissed) return true;
+            return false;
+        },
+
+        init() {
+            window.addEventListener('beforeunload', (event) => {
+                if (this.status === 'uploading' || this.status === 'processing') {
+                    event.preventDefault();
+                    event.returnValue = '';
+                }
+            });
+        },
 
         pickFile() {
             if (this.status === 'uploading' || this.status === 'processing') return;
@@ -81,6 +97,7 @@ document.addEventListener('alpine:init', () => {
         reset() {
             clearInterval(this.pollTimer);
             this.status = 'idle';
+            this.overlayDismissed = false;
             this.progress = 0;
             this.message = '';
             this.errorMessage = '';
@@ -96,6 +113,7 @@ document.addEventListener('alpine:init', () => {
 
         async upload(file) {
             this.status = 'uploading';
+            this.overlayDismissed = false;
             this.message = 'Subiendo archivo...';
 
             const formData = new FormData();

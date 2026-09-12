@@ -1,78 +1,65 @@
-<div class="table-responsive">
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="text-center" style="width: 10%">
-                    <input type="checkbox" id="selectAll" class="form-check-input">
-                </th>
-                <th style="width: 12%"
-                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                    N. solicitud
-                </th>
-                <th style="width: 33%"
-                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                    Nombre
-                </th>
-                <th style="width: 15%" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                    Dep-Prov-Dist
-                </th>
-                <th style="width: 13%"
-                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                    Proyecto
-                </th>
-                <th style="width: 15%"
-                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                    Estado
-                </th>
-            </tr>
-        </thead>
-        <tbody id="solicitudes-pendientes" class="drop-zone">
-            @if (count($solicitudesDisponibles ?? []) > 0)
-                @foreach ($solicitudesDisponibles as $solicitud)
-                    <tr class="draggable" draggable="true" data-id="{{ $solicitud->id }}"
-                        data-solicitud="{{ json_encode($solicitud) }}">
-                        <td class="text-center">
-                            <input type="checkbox" class="form-check-input solicitud-checkbox"
-                                data-id="{{ $solicitud->id }}" data-solicitud="{{ json_encode($solicitud) }}">
+<div x-data="{ pageIds: @js($solicitudesDisponibles->pluck('id')->map(fn ($id) => (string) $id)->all()) }">
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead>
+                <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <th class="px-4 py-3">
+                        <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                            title="Seleccionar todos (página actual)"
+                            :checked="pageIds.length > 0 && pageIds.every((id) => selectedAvailable.includes(id))"
+                            @change="selectedAvailable = $event.target.checked
+                                ? [...new Set([...selectedAvailable, ...pageIds])]
+                                : selectedAvailable.filter((id) => !pageIds.includes(id))">
+                    </th>
+                    <th class="px-4 py-3">N° Solicitud</th>
+                    <th class="px-4 py-3">Solicitante</th>
+                    <th class="px-4 py-3">Categoría</th>
+                    <th class="px-4 py-3">Ubicación</th>
+                    <th class="px-4 py-3">Estado</th>
+                    <th class="px-4 py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse ($solicitudesDisponibles as $solicitud)
+                    <tr>
+                        <td class="px-4 py-3">
+                            <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                                value="{{ $solicitud->id }}" x-model="selectedAvailable">
                         </td>
-                        <td style="width: 20%" class="align-middle text-center">
-                            <span class="text-xs font-weight-bold">{{ $solicitud->numero_solicitud }}</span>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $solicitud->numero_solicitud }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $solicitud->solicitante_nombre }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $solicitud->categoria_proyecto }}</td>
+                        <td class="px-4 py-3">
+                            <button type="button" class="btn-icon" title="Ver ubicación"
+                                @disabled(empty($solicitud->ubicacion))
+                                @click="openUbicacion(@js($solicitud->ubicacion ?? ''), @js($solicitud->departamento), @js($solicitud->provincia), @js($solicitud->distrito))">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                            </button>
+                            <span class="text-xs text-gray-500">{{ $solicitud->departamento }} - {{ $solicitud->distrito }}</span>
                         </td>
-                        <td style="width: 30%" class="align-middle text-center">
-                            <span class="text-xs font-weight-bold">{{ $solicitud->solicitante_nombre }}</span>
+                        <td class="px-4 py-3">
+                            <span class="badge {{ $solicitud->estado_badge }}">{{ $solicitud->estado_nombre }}</span>
                         </td>
-                        <td style="width: 35%" class="align-middle text-info">
-                            <a href="#" class="ver-ubicacion" data-departamento="{{ $solicitud->departamento }}"
-                                data-provincia="{{ $solicitud->provincia }}" data-distrito="{{ $solicitud->distrito }}"
-                                data-ubicacion="{{ $solicitud->ubicacion }}">
-                                <p class="text-xs font-weight-bold mb-0 text-info">
-                                    {{ $solicitud->departamento }}-{{ $solicitud->provincia }}
-                                </p>
-                                <p class="text-xs text-secondary mb-0">
-                                    {{ $solicitud->distrito }}
-                                </p>
-                            </a>
-                        </td>
-                        <td class="align-middle text-center">
-                            <span class="text-xs font-weight-bold">{{ $solicitud->categoria_proyecto }}</span>
-                        </td>
-                        <td class="align-middle text-center text-sm">
-                            <span class="badge badge-sm {{ $solicitud->estado_badge }} p-2">
-                                {{ $solicitud->estado_nombre }}-{{ $solicitud->abreviatura }}
-                            </span>
+                        <td class="px-4 py-3 text-center">
+                            <button type="button" class="btn-secondary px-3 py-1.5 text-xs"
+                                :disabled="busyRowId === {{ $solicitud->id }}"
+                                @click="assignOne({{ $solicitud->id }})">
+                                <span x-show="busyRowId !== {{ $solicitud->id }}">Asignar</span>
+                                <span x-show="busyRowId === {{ $solicitud->id }}" x-cloak>Asignando...</span>
+                            </button>
                         </td>
                     </tr>
-                @endforeach
-            @else
-                <tr class="empty-row">
-                    <td colspan="6" class="text-center py-5" style="height: 500px;">
-                        No existen solicitudes registradas
-                    </td>
-                </tr>
-            @endif
-        </tbody>
-    </table>
-    <div class="d-flex justify-content-center mt-3">
-        {{ $solicitudesDisponibles->links('pagination::bootstrap-4') }}
+                @empty
+                    <x-empty-state colspan="7" message="No existen solicitudes registradas." />
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        {{ $solicitudesDisponibles->links('pagination::tailwind') }}
     </div>
 </div>
