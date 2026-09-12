@@ -1,6 +1,6 @@
-@props(['titlePage' => null])
+@props(['titlePage' => null, 'backUrl' => null])
 
-<header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 lg:pl-72">
+<header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 sm:px-6">
     <button
         type="button"
         @click="$store.sidebar.toggle()"
@@ -11,6 +11,16 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
     </button>
+
+    @if ($backUrl)
+        <a href="{{ $backUrl }}"
+            class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            <span>Volver</span>
+        </a>
+    @endif
 
     <h1 class="flex-1 text-base font-semibold text-gray-900">{{ $titlePage }}</h1>
 

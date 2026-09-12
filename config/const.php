@@ -51,6 +51,20 @@ return [
             'name' => 'expirado',
             'badge' => 'bg-gray-100 text-gray-700'
         ]
-    ]
+    ],
+
+    // Control Interno (migración de CONTROL INTERNAS - CYC CLB v5.4.xlsm).
+    // Mapeo de "Categoría de proyecto" del portal a su código corto
+    // (PARAM!B28:C31). Los plazos, feriados y el código CYC/CLB de cada
+    // empresa NO van aquí: viven en las tablas parametros_control_internos,
+    // feriados y empresas.codigo porque el negocio los ajusta seguido.
+    'control_interno' => [
+        'categorias' => [
+            'Residencial' => 'RES',
+            'Multifamiliar' => 'MULTI',
+            'Comercio' => 'COM',
+        ],
+        'categoria_por_defecto' => 'RES',
+    ],
 
 ];

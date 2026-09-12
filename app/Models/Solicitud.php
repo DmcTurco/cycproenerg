@@ -69,6 +69,16 @@ class Solicitud extends Model
         return $this->hasOne(EstadoInterno::class, 'solicitud_id');
     }
 
+    /**
+     * Fase de Control Interno (GENERAL / CONSTRUIDO / TC / PEND_ANULACION).
+     * Independiente de estadoSolicitud(), que es el estado de asignación a
+     * técnico de campo.
+     */
+    public function faseControlInterno()
+    {
+        return $this->hasOne(FaseControlInterno::class, 'solicitud_id');
+    }
+
 
     /**
      * Get the asesor associated with the Solicitud.

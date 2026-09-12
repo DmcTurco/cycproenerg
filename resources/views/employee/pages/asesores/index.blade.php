@@ -16,17 +16,17 @@
             <button type="button" @click="openCreate()" class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Registrar</button>
         </div>
 
-        <div class="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
-            <div class="overflow-x-auto">
+        <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">
+            <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead>
                         <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            <th class="px-4 py-3">Nombre</th>
-                            <th class="px-4 py-3">Documento</th>
-                            <th class="px-4 py-3">Contacto</th>
-                            <th class="px-4 py-3 text-center">Ventas</th>
-                            <th class="px-4 py-3">Estado</th>
-                            <th class="px-4 py-3 text-center">Acciones</th>
+                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Nombre</th>
+                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Documento</th>
+                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Contacto</th>
+                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Ventas</th>
+                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Estado</th>
+                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -73,7 +73,7 @@
                 </table>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-4 shrink-0">
                 {{ $asesores->links('pagination::tailwind') }}
             </div>
         </div>

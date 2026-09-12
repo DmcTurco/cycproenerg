@@ -60,4 +60,13 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         return view('employee.pages.clients.detail', compact('id'));
     })->name('solicitudes.detalle');
     Route::get('/check-progress/{fileId}', [Employee\ClientController::class, 'checkProgress'])->name('check-progress');
+
+    // Control Interno (migración de CONTROL INTERNAS - CYC CLB v5.4.xlsm).
+    Route::prefix('control-interno')->name('control-interno.')->group(function () {
+        Route::get('/parametros', [Employee\ParametroControlInternoController::class, 'edit'])->name('parametros.edit');
+        Route::put('/parametros', [Employee\ParametroControlInternoController::class, 'update'])->name('parametros.update');
+        Route::resource('feriados', Employee\FeriadoController::class)
+            ->only(['index', 'store', 'edit', 'destroy'])
+            ->names('feriados');
+    });
 });

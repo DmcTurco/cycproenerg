@@ -1,6 +1,7 @@
 @extends('employee.layouts.user_type.auth')
 
 @php($fullBleed = true)
+@php($backUrl = route('employee.client.index'))
 
 @section('content')
     <div
@@ -8,15 +9,12 @@
         x-init="load()"
         class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200"
     >
-        <div class="flex items-center justify-between gap-3 bg-brand-600 px-4 py-2.5 sm:px-6">
-            <div class="flex min-w-0 items-center gap-3">
-                <h2 class="text-base font-semibold text-white">Detalle de Solicitud</h2>
-                <span x-show="!loading && !loadError" x-cloak
-                    class="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium text-white">
-                    N° <span x-text="field('numero_solicitud')"></span>
-                </span>
-            </div>
-            <a href="{{ route('employee.client.index') }}" class="shrink-0 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Volver</a>
+        <div class="flex items-center gap-3 bg-brand-600 px-4 py-2.5 sm:px-6">
+            <h2 class="text-base font-semibold text-white">Detalle de Solicitud</h2>
+            <span x-show="!loading && !loadError" x-cloak
+                class="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium text-white">
+                N° <span x-text="field('numero_solicitud')"></span>
+            </span>
         </div>
 
         <div class="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">

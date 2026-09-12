@@ -1,9 +1,9 @@
-<div x-data="{ pageIds: @js($solicitudesAsignadas->pluck('id')->map(fn ($id) => (string) $id)->all()) }">
-    <div class="overflow-x-auto rounded-lg border border-gray-200">
+<div x-data="{ pageIds: @js($solicitudesAsignadas->pluck('id')->map(fn ($id) => (string) $id)->all()) }" class="flex flex-1 flex-col lg:min-h-0">
+    <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
                 <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    <th class="px-4 py-3">
+                    <th class="sticky top-0 z-10 bg-white px-4 py-3">
                         <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
                             title="Seleccionar todos (página actual)"
                             :checked="pageIds.length > 0 && pageIds.every((id) => selectedAssigned.includes(id))"
@@ -11,11 +11,11 @@
                                 ? [...new Set([...selectedAssigned, ...pageIds])]
                                 : selectedAssigned.filter((id) => !pageIds.includes(id))">
                     </th>
-                    <th class="px-4 py-3">N° Solicitud</th>
-                    <th class="px-4 py-3">Solicitante</th>
-                    <th class="px-4 py-3">Ubicación</th>
-                    <th class="px-4 py-3">Estado</th>
-                    <th class="px-4 py-3 text-center">Acciones</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-3">N° Soli.</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Solicitante</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Ubicación</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Estado</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -28,7 +28,12 @@
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $solicitud->numero_solicitud }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ $solicitud->solicitante_nombre }}</td>
                         <td class="px-4 py-3">
-                            <button type="button" class="btn-icon" title="Ver ubicación"
+                            <button type="button"
+                                @class([
+                                    'btn-icon',
+                                    'text-brand-600 hover:bg-brand-50 hover:text-brand-700' => !empty($solicitud->ubicacion),
+                                ])
+                                title="Ver ubicación"
                                 @disabled(empty($solicitud->ubicacion))
                                 @click="openUbicacion(@js($solicitud->ubicacion ?? ''), @js($solicitud->departamento), @js($solicitud->provincia), @js($solicitud->distrito))">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -60,7 +65,7 @@
         </table>
     </div>
 
-    <div class="mt-4">
+    <div class="mt-4 shrink-0">
         {{ $solicitudesAsignadas->links('pagination::tailwind') }}
     </div>
 </div>

@@ -20,6 +20,7 @@ use App\Events\RowProcessed;
 use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoInterno;
 use App\Models\EstadoPortal;
+use App\Models\FaseControlInterno;
 use App\Models\Instalacion;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -178,6 +179,7 @@ class ProcessExcelJob implements ShouldQueue
                     $estadoPortal = $this->processEstadoPortal($row);
                     $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estadoPortal);
                     $this->processEstadoInterno($estadoPortal, $solicitud);
+                    $this->processFaseControlInterno($solicitud);
                     $this->processUbicacion($row, $solicitud);
                     $this->processProyecto($row, $solicitud);
                     $this->processInstalacion($row, $solicitud);
@@ -378,6 +380,30 @@ class ProcessExcelJob implements ShouldQueue
             }
             // Si ya existe un estado interno, no hacemos nada para mantener el estado actual
             // (especialmente importante si ya está asignado a un técnico)
+        }
+    }
+
+    /**
+     * Enganche mínimo de Control Interno (CI-2): a toda solicitud que todavía
+     * no tenga fase le asigna GENERAL con fecha de ingreso hoy — igual que el
+     * Excel marca "NUEVO" con su F. INGRESO al entrar por primera vez.
+     *
+     * Ojo: esto NO es el motor de clasificación completo (mover a CONSTRUIDO
+     * cuando hay F. CONSTRUCCIÓN, a TC cuando el portal dice "Concluida", a
+     * PEND_ANULACION con la marca ANULAR o Rechazada/Anulada del portal).
+     * Esa lógica es CI-4 y todavía no está implementada; una solicitud que ya
+     * tiene fase asignada no se toca aquí.
+     */
+    private function processFaseControlInterno($solicitud)
+    {
+        $existeFase = FaseControlInterno::where('solicitud_id', $solicitud->id)->exists();
+
+        if (!$existeFase) {
+            FaseControlInterno::create([
+                'solicitud_id' => $solicitud->id,
+                'fase' => FaseControlInterno::GENERAL,
+                'fecha_ingreso_general' => now()->toDateString(),
+            ]);
         }
     }
 

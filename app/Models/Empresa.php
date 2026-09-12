@@ -16,6 +16,7 @@ class Empresa extends Model
     protected $fillable = [
         'tipo_documento',
         'numero_documento',
+        'codigo',
         'nombre',
         'registro_gas_natural',
     ];
