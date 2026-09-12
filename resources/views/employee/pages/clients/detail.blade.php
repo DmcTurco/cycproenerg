@@ -5,7 +5,9 @@
 
 @section('content')
     <div
-        x-data="solicitudDetail({ detailUrl: '{{ route('employee.getFullSolicitudDetails', $id) }}' })"
+        x-data="solicitudDetail({
+            detailUrl: '{{ route('employee.getFullSolicitudDetails', $id) }}',
+        })"
         x-init="load()"
         class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200"
     >
@@ -15,6 +17,10 @@
                 class="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium text-white">
                 N° <span x-text="field('numero_solicitud')"></span>
             </span>
+            <a href="{{ route('employee.solicitudes.control-interno', $id) }}"
+                class="ml-auto rounded-md bg-white/15 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/25">
+                Ver Control Interno
+            </a>
         </div>
 
         <div class="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
@@ -132,6 +138,7 @@
                         <x-detail-field label="Dirección" field="asesor_direccion" />
                     </div>
                 </div>
+
             </div>
         </div>
 

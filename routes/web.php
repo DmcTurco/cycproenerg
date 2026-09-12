@@ -59,14 +59,27 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
     Route::get('/solicitudes/{id}/detalle', function ($id) {
         return view('employee.pages.clients.detail', compact('id'));
     })->name('solicitudes.detalle');
+    // Vista propia de Control Interno por solicitud (separada del Detalle de
+    // Solicitud para que ese detalle siga siendo una vista rápida de solo
+    // lectura, sin pagar el costo de cargar/editar Control Interno).
+    Route::get('/solicitudes/{id}/control-interno', function ($id) {
+        return view('employee.pages.clients.control-interno', compact('id'));
+    })->name('solicitudes.control-interno');
     Route::get('/check-progress/{fileId}', [Employee\ClientController::class, 'checkProgress'])->name('check-progress');
 
     // Control Interno (migración de CONTROL INTERNAS - CYC CLB v5.4.xlsm).
     Route::prefix('control-interno')->name('control-interno.')->group(function () {
+        // CI-9: listado de solicitudes con su fase/semáforo de Control Interno.
+        Route::get('/', [Employee\ControlInternoController::class, 'index'])->name('index');
         Route::get('/parametros', [Employee\ParametroControlInternoController::class, 'edit'])->name('parametros.edit');
         Route::put('/parametros', [Employee\ParametroControlInternoController::class, 'update'])->name('parametros.update');
         Route::resource('feriados', Employee\FeriadoController::class)
             ->only(['index', 'store', 'edit', 'destroy'])
             ->names('feriados');
+
+        // CI-3: columnas manuales (F. CONSTRUCCIÓN control, OBSERVACIÓN, ANULAR)
+        // editables desde el detalle de la solicitud.
+        Route::get('/solicitudes/{solicitud}/manual', [Employee\ControlInternoManualController::class, 'show'])->name('solicitudes.manual.show');
+        Route::put('/solicitudes/{solicitud}/manual', [Employee\ControlInternoManualController::class, 'update'])->name('solicitudes.manual.update');
     });
 });

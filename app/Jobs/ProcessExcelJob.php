@@ -20,7 +20,6 @@ use App\Events\RowProcessed;
 use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoInterno;
 use App\Models\EstadoPortal;
-use App\Models\FaseControlInterno;
 use App\Models\Instalacion;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -179,10 +178,10 @@ class ProcessExcelJob implements ShouldQueue
                     $estadoPortal = $this->processEstadoPortal($row);
                     $solicitud = $this->processSolicitud($row, $solicitante, $empresa, $concesionaria, $estadoPortal);
                     $this->processEstadoInterno($estadoPortal, $solicitud);
-                    $this->processFaseControlInterno($solicitud);
                     $this->processUbicacion($row, $solicitud);
                     $this->processProyecto($row, $solicitud);
                     $this->processInstalacion($row, $solicitud);
+                    $this->processFaseControlInterno($row, $solicitud);
 
                     return $solicitud->wasRecentlyCreated;
                 });
@@ -355,7 +354,15 @@ class ProcessExcelJob implements ShouldQueue
                 'concesionaria_id' => $concesionaria->id,
                 'numero_suministro' => trim($this->col($row, 'Número de Suministro')) ?: null,
                 'numero_contrato_suministro' => trim($this->col($row, 'Número de Contrato de Suministro')) ?: null,
-                'fecha_aprobacion_contrato' => $this->parseDate(trim($this->col($row, 'Fecha de aprobación del contrato'))),
+                // OJO: el nombre de la columna del portal es "Fecha de suscripción
+                // de contrato" (confirmado con una descarga real del portal el
+                // 12/09/2026 al construir CI-5) — "Fecha de aprobación del
+                // contrato" no existe en el archivo y nunca se encontraba, así
+                // que este campo quedaba siempre null. Se mantiene el nombre de
+                // columna `fecha_aprobacion_contrato` en la base de datos (ya se
+                // usa en otras pantallas) para no tener que renombrarla; lo que
+                // cambia es solo el encabezado que se busca en el Excel.
+                'fecha_aprobacion_contrato' => $this->parseDate(trim($this->col($row, 'Fecha de suscripción de contrato'))),
                 'fecha_registro_portal' => $this->parseDate(trim($this->col($row, 'Fecha de registro de la Solicitud en el Portal'))),
                 'estado_portal_id' => $estadoPortal->id,
             ]
@@ -384,27 +391,28 @@ class ProcessExcelJob implements ShouldQueue
     }
 
     /**
-     * Enganche mínimo de Control Interno (CI-2): a toda solicitud que todavía
-     * no tenga fase le asigna GENERAL con fecha de ingreso hoy — igual que el
-     * Excel marca "NUEVO" con su F. INGRESO al entrar por primera vez.
+     * CI-4: motor de clasificación y movimientos entre fases.
      *
-     * Ojo: esto NO es el motor de clasificación completo (mover a CONSTRUIDO
-     * cuando hay F. CONSTRUCCIÓN, a TC cuando el portal dice "Concluida", a
-     * PEND_ANULACION con la marca ANULAR o Rechazada/Anulada del portal).
-     * Esa lógica es CI-4 y todavía no está implementada; una solicitud que ya
-     * tiene fase asignada no se toca aquí.
+     * Reversa-ingenierizado del VBA original (Modulo_Internas.bas, macro
+     * `Procesar` + funciones `EsTC`/`PortalAnulada`) para reproducir exactamente
+     * las mismas reglas del Excel — el detalle completo de las reglas vive en
+     * `ControlInternoClasificador::clasificar()`, que es el que de verdad las
+     * aplica; este método solo traduce la fila del Excel a los dos datos que
+     * ese servicio necesita. Se compartió como servicio porque
+     * `ControlInternoManualController` también lo usa (para reclasificar al
+     * toque cuando el staff edita F. CONSTRUCCIÓN/ANULAR a mano, sin esperar
+     * la próxima carga de Excel).
      */
-    private function processFaseControlInterno($solicitud)
+    private function processFaseControlInterno($row, $solicitud)
     {
-        $existeFase = FaseControlInterno::where('solicitud_id', $solicitud->id)->exists();
+        $tcConcluida = strtoupper(trim((string) $this->col($row, 'Resultado de la Instalación de TC'))) === 'CONCLUIDA';
+        // "F. TC (portal)" del Excel: la fecha que queda registrada al pasar a
+        // TC. CI-5 la usa para el indicador CICLO (suscripción -> TC).
+        $fechaTc = $tcConcluida
+            ? $this->parseDate(trim((string) $this->col($row, 'Fecha de Registro de resultado de TC')))
+            : null;
 
-        if (!$existeFase) {
-            FaseControlInterno::create([
-                'solicitud_id' => $solicitud->id,
-                'fase' => FaseControlInterno::GENERAL,
-                'fecha_ingreso_general' => now()->toDateString(),
-            ]);
-        }
+        \App\Services\ControlInternoClasificador::clasificar($solicitud, $tcConcluida, $fechaTc);
     }
 
     private function processUbicacion($row, $solicitud)

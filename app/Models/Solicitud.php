@@ -83,10 +83,10 @@ class Solicitud extends Model
     /**
      * Get the asesor associated with the Solicitud.
      */
-    // public function asesor()
-    // {
-    //     return $this->belongsTo(Asesor::class, 'asesor_id');
-    // }
+    public function asesor()
+    {
+        return $this->belongsTo(Asesor::class, 'asesor_id');
+    }
 
     public function tecnico()
     {
@@ -96,6 +96,11 @@ class Solicitud extends Model
     public function ubicacion()
     {
         return $this->hasOne(Ubicacion::class);
+    }
+
+    public function instalacion()
+    {
+        return $this->hasOne(Instalacion::class);
     }
 
     public function proyecto()

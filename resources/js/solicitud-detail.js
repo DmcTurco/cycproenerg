@@ -11,9 +11,7 @@ document.addEventListener('alpine:init', () => {
             this.loadError = false;
 
             try {
-                const response = await fetch(config.detailUrl, {
-                    headers: { Accept: 'application/json' },
-                });
+                const response = await fetch(config.detailUrl, { headers: { Accept: 'application/json' } });
                 const json = await response.json();
 
                 if (json.success) {

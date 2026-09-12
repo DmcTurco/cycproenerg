@@ -1,0 +1,562 @@
+<title>Avance Control Interno</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #f6f3ec;
+    --surface: #ffffff;
+    --surface-muted: #ece6d8;
+    --ink: #221c16;
+    --ink-soft: #6b6255;
+    --line: #ddd4c2;
+    --accent: #b5502a;
+    --accent-soft: #f0ddd0;
+    --done: #3d7a4f;
+    --done-soft: #dcead9;
+    --pending: #9c7a1f;
+    --pending-soft: #f3e6c4;
+    --shadow: 0 1px 2px rgba(34, 28, 22, 0.06), 0 8px 24px -12px rgba(34, 28, 22, 0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a1712;
+      --surface: #221d17;
+      --surface-muted: #2b251d;
+      --ink: #f1ebe0;
+      --ink-soft: #b6ab99;
+      --line: #3a3227;
+      --accent: #e2794c;
+      --accent-soft: #3a2419;
+      --done: #6fbb84;
+      --done-soft: #1f3527;
+      --pending: #d9b054;
+      --pending-soft: #3a2e13;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1a1712;
+    --surface: #221d17;
+    --surface-muted: #2b251d;
+    --ink: #f1ebe0;
+    --ink-soft: #b6ab99;
+    --line: #3a3227;
+    --accent: #e2794c;
+    --accent-soft: #3a2419;
+    --done: #6fbb84;
+    --done-soft: #1f3527;
+    --pending: #d9b054;
+    --pending-soft: #3a2e13;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    padding-inline: 20px;
+    padding-block: 40px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 860px;
+  }
+
+  h1, h2, .eyebrow, .code, .stat-num, .mono {
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, monospace;
+  }
+
+  h1 {
+    font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+
+  .subtitle {
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 14px 0 0;
+    line-height: 1.55;
+  }
+
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 28px;
+  }
+
+  .headline-block { flex: 1 1 380px; min-width: 0; }
+
+  .stat-card {
+    flex: 0 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 16px 22px;
+    text-align: right;
+    min-width: 168px;
+  }
+
+  .stat-num {
+    font-size: 2.4rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  .stat-num small {
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  .progress-track {
+    margin-top: 10px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--surface-muted);
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 50%;
+    background: var(--accent);
+    border-radius: 3px;
+  }
+
+  .banners {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 34px;
+  }
+
+  .banner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 14px 16px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .banner .glyph {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .banner.action .glyph { background: var(--pending-soft); color: var(--pending); }
+  .banner.finding .glyph { background: var(--accent-soft); color: var(--accent); }
+
+  .banner p {
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .banner p.lead { font-weight: 600; margin-bottom: 3px; font-family: 'Archivo', sans-serif; font-size: 0.9rem; }
+
+  .banner code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface-muted);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.86em;
+  }
+
+  .section-heading {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -0.005em;
+    margin: 0 0 4px;
+  }
+
+  .section-sub {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    margin: 0 0 22px;
+  }
+
+  .pipeline {
+    position: relative;
+    padding-left: 30px;
+  }
+
+  .pipeline::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .node {
+    position: relative;
+    padding-bottom: 26px;
+  }
+
+  .node:last-child { padding-bottom: 0; }
+
+  .node::before {
+    content: '';
+    position: absolute;
+    left: -30px;
+    top: 4px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--line);
+  }
+
+  .node.done::before {
+    border-color: var(--done);
+    background: var(--done);
+  }
+
+  .node.next::before {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+
+  .node-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 16px 18px;
+  }
+
+  .node.next .node-card {
+    border-color: var(--accent);
+  }
+
+  .node-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .code {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .node-title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 1.02rem;
+    margin: 0;
+    flex: 1 1 auto;
+    text-wrap: balance;
+  }
+
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .pill.done { background: var(--done-soft); color: var(--done); }
+  .pill.next { background: var(--accent-soft); color: var(--accent); }
+  .pill.pending { background: var(--surface-muted); color: var(--ink-soft); }
+
+  .node-desc {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    background: var(--surface-muted);
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .footnote-card {
+    margin-top: 26px;
+    padding: 14px 18px;
+    border: 1px dashed var(--line);
+    border-radius: 4px;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .footnote-card .code { color: var(--ink-soft); }
+
+  footer.page-footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 520px) {
+    header.top { flex-direction: column; align-items: stretch; }
+    .stat-card { text-align: left; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="top">
+    <div class="headline-block">
+      <p class="eyebrow">CYC · CLB — cycproenerg</p>
+      <h1>Migración de Control Interno</h1>
+      <p class="subtitle">De <span class="mono">CONTROL INTERNAS - CYC CLB v5.4.xlsm</span> (planilla + macros VBA) al sistema Laravel, submódulo por submódulo.</p>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">5<small>/10</small></div>
+      <div class="stat-label">Submódulos listos</div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+    </div>
+  </header>
+
+  <div class="banners">
+    <div class="banner action">
+      <span class="glyph">Acción pendiente</span>
+      <p>Los 5 submódulos de abajo están escritos pero no corren todavía: falta ejecutar <code>php artisan migrate</code> (y <code>db:seed --class=ControlInternoParametrosSeeder</code> para CI-1) en tu entorno, y <code>npm run build</code> porque el proyecto sirve el build de producción — no hay Vite en modo dev, así que los cambios de <code>resources/js/*</code> no se ven hasta reconstruir.</p>
+    </div>
+    <div class="banner finding">
+      <span class="glyph">Hallazgo — decidir antes de CI-6</span>
+      <p><span class="lead">"Anulada" = Sí en el 73% de las filas reales</span>En la descarga real del portal revisada (4761 filas), la columna "Anulada" viene en "Sí" en 3458. Aplicar tal cual la regla del VBA (borrar la fila) archivaría o eliminaría a la mayoría del sistema — por eso CI-4 no la automatizó. Falta confirmar qué significa ese "Sí" tan frecuente antes de construir CI-6.</p>
+    </div>
+  </div>
+
+  <section>
+    <p class="section-heading">Orden de implementación</p>
+    <p class="section-sub">No es el orden numérico del Excel (CI-1…CI-11) — es el orden en que conviene construirlos, cada uno sobre el anterior.</p>
+
+    <div class="pipeline">
+
+      <div class="node done">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-1</span>
+            <p class="node-title">Parámetros de Control Interno</p>
+            <span class="pill done">Hecho</span>
+          </div>
+          <p class="node-desc">Equivalente a la hoja PARAM: plazos, semáforo, meta IND2 y ámbito, configurables sin tocar código. Incluye pantalla de administración con alta/edición/baja de feriados.</p>
+          <div class="tags">
+            <span class="tag">parametros_control_internos</span>
+            <span class="tag">feriados</span>
+            <span class="tag">empresas.codigo</span>
+            <span class="tag">/control-interno/parametros</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="node done">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-2</span>
+            <p class="node-title">Fase de Control Interno</p>
+            <span class="pill done">Hecho</span>
+          </div>
+          <p class="node-desc">La máquina de estados GENERAL → CONSTRUIDO → TC → PEND_ANULACION, separada a propósito del estado de asignación a técnicos que ya existía.</p>
+          <div class="tags">
+            <span class="tag">fase_control_internos</span>
+            <span class="tag">FaseControlInterno</span>
+            <span class="tag">Solicitud::faseControlInterno()</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="node done">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-3</span>
+            <p class="node-title">Columnas de control manual</p>
+            <span class="pill done">Hecho</span>
+          </div>
+          <p class="node-desc">F. Construcción, Observación y Marcar para anular — las llena el staff a mano, la carga de Excel nunca las pisa. Vista propia como pestaña en el Detalle de Solicitud, en vez de esperar a CI-9.</p>
+          <div class="tags">
+            <span class="tag">fecha_construccion_control</span>
+            <span class="tag">marcado_para_anular</span>
+            <span class="tag">pestaña "Control Interno"</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="node done">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-4</span>
+            <p class="node-title">Motor de clasificación y movimientos</p>
+            <span class="pill done">Hecho</span>
+          </div>
+          <p class="node-desc">Decompilado del VBA original (módulo Modulo_Internas.bas) con oletools para tener la regla exacta. Mueve cada solicitud de fase sin pisar nunca las columnas manuales de CI-3.</p>
+          <div class="tags">
+            <span class="tag">ControlInternoClasificador</span>
+            <span class="tag">EsTC = "CONCLUIDA"</span>
+            <span class="tag">Rechazada/Anulada → CI-6</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="node done">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-5</span>
+            <p class="node-title">Indicadores calculados</p>
+            <span class="pill done">Hecho</span>
+          </div>
+          <p class="node-desc">DESFACE, SEMÁFORO, días hábiles, fuera de plazo, trimestre y semana — calculados al vuelo, nunca guardados. De paso se corrigió un bug preexistente: la fecha base venía siempre en null por un nombre de columna del portal mal escrito.</p>
+          <div class="tags">
+            <span class="tag">ControlInternoIndicadores</span>
+            <span class="tag">NETWORKDAYS propio</span>
+            <span class="tag">bug: fecha_aprobacion_contrato</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="node next">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-9</span>
+            <p class="node-title">Vistas por fase</p>
+            <span class="pill next">Siguiente</span>
+          </div>
+          <p class="node-desc">Los listados GENERAL / CONSTRUIDO / TC / PEND_ANULACION como pantallas, con filtros por empresa y categoría — el momento en que el sistema queda usable en el día a día, no solo solicitud por solicitud.</p>
+          <div class="tags">
+            <span class="tag">clona patrón de SolicitudTecnicoController</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="node">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-6</span>
+            <p class="node-title">Anulación / Rechazo</p>
+            <span class="pill pending">Pendiente</span>
+          </div>
+          <p class="node-desc">El lado "portal" de la anulación: capturar Rechazada, Anulada y Motivo, y decidir con Turco qué significa "eliminar" cuando Solicitud es una tabla compartida con Asignación a Técnicos.</p>
+          <div class="tags">
+            <span class="tag">bloqueado por decisión de producto</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="node">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-8</span>
+            <p class="node-title">Bitácora de cargas</p>
+            <span class="pill pending">Pendiente</span>
+          </div>
+          <p class="node-desc">Ampliar la tabla logs (ya existe) con los contadores propios de Control Interno: nuevas a GENERAL, movidas entre fases, eliminadas, ignoradas.</p>
+        </div>
+      </div>
+
+      <div class="node">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-7</span>
+            <p class="node-title">Indicador IND 2 (FISE) y Puntaje</p>
+            <span class="pill pending">Pendiente</span>
+          </div>
+          <p class="node-desc">% de instalaciones FISE construidas dentro de plazo, por empresa y mes — un reporte de solo lectura apoyado en CI-1 y CI-5.</p>
+        </div>
+      </div>
+
+      <div class="node">
+        <div class="node-card">
+          <div class="node-top">
+            <span class="code">CI-10</span>
+            <p class="node-title">Dashboard / Resumen ejecutivo</p>
+            <span class="pill pending">Pendiente</span>
+          </div>
+          <p class="node-desc">El bloque RESUMEN de la hoja INICIO: conteo por fase y empresa, fuera de plazo, IND 2 del trimestre. La última pieza — depende de todo lo anterior.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footnote-card">
+      <span class="code">CI-11</span> — Relación con Asignación a Técnicos. No es código: deja documentado que la fase de Control Interno y el estado de asignación a técnico son dos ejes independientes de la misma solicitud, para que nadie los fusione sin querer más adelante.
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    <span>Fuente: <code class="mono">docs/modulos/control-interno.md</code></span>
+    <span>Última actualización: 12 de septiembre de 2026</span>
+  </footer>
+
+</div>

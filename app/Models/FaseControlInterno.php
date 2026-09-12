@@ -35,10 +35,17 @@ class FaseControlInterno extends Model
         'solicitud_id',
         'fase',
         'fecha_ingreso_general',
+        'fecha_construccion_control',
+        'fecha_tc',
+        'observacion_control',
+        'marcado_para_anular',
     ];
 
     protected $casts = [
         'fecha_ingreso_general' => 'date',
+        'fecha_construccion_control' => 'date',
+        'fecha_tc' => 'date',
+        'marcado_para_anular' => 'boolean',
     ];
 
     public function solicitud()

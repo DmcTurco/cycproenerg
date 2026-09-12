@@ -14,7 +14,7 @@
                 href="{{ route($link['route']) }}"
                 @class([
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition hover:bg-sidenav-hover hover:text-white',
-                    'bg-brand-600 text-white hover:bg-brand-600' => request()->is($link['match']),
+                    'bg-brand-600 text-white hover:bg-brand-600' => request()->is(...(array) $link['match']),
                 ])
             >
                 <span class="h-1.5 w-1.5 rounded-full bg-current"></span>

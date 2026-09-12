@@ -1,6 +1,7 @@
 @extends('employee.layouts.user_type.auth')
 
 @php($fullBleed = true)
+@php($backUrl = route('employee.control-interno.index'))
 
 @section('content')
     <div class="flex flex-1 flex-col gap-4 lg:min-h-0 lg:overflow-hidden">
@@ -10,6 +11,8 @@
             <div class="flex min-w-0 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200 lg:min-h-0 lg:flex-1">
                 <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
                     <h2 class="text-base font-semibold text-white">Parámetros</h2>
+                    <a href="{{ route('employee.control-interno.index') }}"
+                        class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Salir</a>
                 </div>
 
                 <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:overflow-y-auto lg:p-4">
