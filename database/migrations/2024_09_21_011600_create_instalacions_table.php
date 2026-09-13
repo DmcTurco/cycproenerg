@@ -19,6 +19,22 @@ return new class extends Migration
             $table->date('fecha_finalizacion_instalacion_interna')->nullable();
             $table->date('fecha_finalizacion_instalacion_acometida')->nullable();
             $table->string('resultado_instalacion_tc')->nullable();
+
+            // CI-6 (parte segura): captura de "Rechazada"/"Anulada"/"Motivo de
+            // anulación" del portal. El VBA original elimina la fila cuando
+            // Rechazada o Anulada = "Sí", pero acá SOLO se capturan los datos
+            // — en una descarga real el ~73% de las filas tenía Anulada =
+            // "Sí", así que aplicar la regla del VBA tal cual borraría o
+            // archivaría la gran mayoría de las solicitudes del sistema.
+            // Falta decidir con Turco qué significa "eliminar" en este
+            // sistema antes de escribir esa regla (ver docs/modulos/control-interno.md, CI-6).
+            $table->boolean('rechazada')->default(false)
+                ->comment('Columna "Rechazada" del portal (Sí/No)');
+            $table->boolean('anulada')->default(false)
+                ->comment('Columna "Anulada" del portal (Sí/No) — ~73% "Sí" en una descarga real revisada el 12/09/2026');
+            $table->text('motivo_anulacion')->nullable()
+                ->comment('Columna "Motivo de anulación" del portal');
+
             $table->date('fecha_programacion_habilitacion')->nullable();
             $table->unsignedBigInteger('solicitud_id')->nullable();
             $table->timestamps();

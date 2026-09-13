@@ -135,6 +135,12 @@ class ProcessExcelJob implements ShouldQueue
                 'resumen_control_interno' => $this->ciCounters,
             ]);
 
+            // CI-10: ControlInternoDashboard::resumen() cachea 5 minutos (el
+            // desglose de GENERAL recorre cada solicitud para calcular su
+            // semáforo). Sin este forget, una carga de Excel recién terminada
+            // no se vería reflejada en el Resumen hasta que venciera ese caché.
+            Cache::forget('control_interno_dashboard_' . now()->year . '_' . (int) ceil(now()->month / 3));
+
             // Aquí podrías emitir un evento para notificar que el proceso terminó
             event(new ExcelProcessed($result));
             // broadcast(new ExcelProcessed($result));
@@ -324,15 +330,43 @@ class ProcessExcelJob implements ShouldQueue
     private function processEmpresa($row)
     {
         $tipo_documento_id = TipoDocumentoHelper::getTypeDocument(trim($this->col($row, 'Tipo de documento de identificación de la Empresa Instaladora Ejecutora')));
+        $numeroDocumento = trim($this->col($row, 'Número de documento de identificación de la Empresa Instaladora Ejecutora'));
 
-        return $this->firstOrCreateSafe(Empresa::class,
-            ['numero_documento' => trim($this->col($row, 'Número de documento de identificación de la Empresa Instaladora Ejecutora'))],
+        $empresa = $this->firstOrCreateSafe(Empresa::class,
+            ['numero_documento' => $numeroDocumento],
             [
                 'tipo_documento' => $tipo_documento_id,
                 'nombre' => trim($this->col($row, 'Nombre de la Empresa Instaladora Ejecutora')),
                 'registro_gas_natural' => trim($this->col($row, 'Registro de Gas Natural de la de Empresa Instaladora Ejecutora')),
             ]
         );
+
+        $this->asignarCodigoEmpresa($empresa, $numeroDocumento);
+
+        return $empresa;
+    }
+
+    /**
+     * CI-1/CI-10: código corto de empresa (CYC/CLB) para Control Interno.
+     * Se resuelve acá, por RUC, en cada carga de Excel — no en un seeder
+     * aparte — porque esta misma función ya identifica a la Empresa por RUC
+     * (`processEmpresa` de arriba); duplicar esa comparación en un seeder
+     * era redundante y además dependía de correr ese comando después de que
+     * la Empresa ya existiera (si no, el `update` no encontraba nada). Solo
+     * completa el código si todavía está vacío, para no pisar un código que
+     * se haya corregido a mano.
+     */
+    private function asignarCodigoEmpresa(Empresa $empresa, string $numeroDocumento): void
+    {
+        if ($empresa->codigo) {
+            return;
+        }
+
+        $codigo = config("const.control_interno.codigos_empresa_por_ruc.{$numeroDocumento}");
+
+        if ($codigo) {
+            $empresa->update(['codigo' => $codigo]);
+        }
     }
 
     private function processConcesionaria($row)
@@ -535,12 +569,38 @@ class ProcessExcelJob implements ShouldQueue
             [
                 'tipo_proyecto' => trim($this->col($row, 'Tipo de proyecto')) ?: null,
                 'codigo_proyecto' => trim($this->col($row, 'Código de proyecto')) ?: null,
-                'categoria_proyecto' => trim($this->col($row, 'Categoría de proyecto')) ?: null,
+                'categoria_proyecto' => $this->normalizarCategoria(trim((string) $this->col($row, 'Categoría de proyecto'))),
                 'sub_categoria_proyecto' => trim($this->col($row, 'Sub Categoría de proyecto')) ?: null,
                 'codigo_objeto_conexion' => trim($this->col($row, 'Código de Objeto de conexión')) ?: null,
 
             ]
         );
+    }
+
+    /**
+     * CI-1/CI-9/CI-7: el mapeo de categoría a su código corto (RES/MULTI/COM,
+     * `config('const.control_interno.categorias')`) compara el texto tal
+     * cual viene del portal contra "Residencial"/"Multifamiliar"/"Comercio"
+     * exactos — a pedido de Turco (13/09/2026), acá se normalizan mayúsculas/
+     * minúsculas y espacios antes de guardar, para que ese mapeo no falle
+     * silenciosamente solo porque el portal mandó "RESIDENCIAL" o
+     * " Residencial " en vez de "Residencial". Si el texto no coincide con
+     * ninguna categoría conocida, se guarda tal cual vino (no se inventa una
+     * categoría) — sigue mostrándose como texto libre en el listado.
+     */
+    private function normalizarCategoria(string $valor): ?string
+    {
+        if ($valor === '') {
+            return null;
+        }
+
+        foreach (array_keys(config('const.control_interno.categorias', [])) as $categoriaConocida) {
+            if (mb_strtoupper($valor, 'UTF-8') === mb_strtoupper($categoriaConocida, 'UTF-8')) {
+                return $categoriaConocida;
+            }
+        }
+
+        return $valor;
     }
 
     private function processInstalacion($row, $solicitud)

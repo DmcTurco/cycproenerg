@@ -25,6 +25,21 @@ return new class extends Migration
                 ->comment('GENERAL, CONSTRUIDO, TC o PEND_ANULACION');
             $table->date('fecha_ingreso_general')->nullable()
                 ->comment('Fecha en que la solicitud entró por primera vez al control (Z. F. INGRESO del Excel); no cambia al moverse de fase');
+
+            // CI-3: columnas "amarillas" del Excel — nunca las toca la carga
+            // del portal (ProcessExcelJob), solo el staff a mano.
+            $table->date('fecha_construccion_control')->nullable()
+                ->comment('F. CONSTRUCCIÓN (control) — la ingresa el staff a mano, no la carga del portal');
+            // CI-5: "F. TC (portal)" del Excel — fecha que queda registrada
+            // cuando la solicitud pasa a fase TC; CI-4 la completa al mover
+            // de fase, CI-5 la usa para el indicador CICLO.
+            $table->date('fecha_tc')->nullable()
+                ->comment('F. TC (portal) — fecha de "Fecha de Registro de resultado de TC" del portal, completada por CI-4 al pasar a fase TC');
+            $table->text('observacion_control')->nullable()
+                ->comment('OBSERVACIÓN del Excel — notas libres del staff');
+            $table->boolean('marcado_para_anular')->default(false)
+                ->comment('Equivalente a la "X" de ANULAR del Excel; CI-4 la usa para mover a PEND_ANULACION');
+
             $table->timestamps();
             $table->softDeletes();
         });

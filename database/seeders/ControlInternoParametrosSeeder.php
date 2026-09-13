@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Empresa;
 use App\Models\Feriado;
 use App\Models\ParametroControlInterno;
 use Illuminate\Database\Seeder;
@@ -11,8 +10,18 @@ class ControlInternoParametrosSeeder extends Seeder
 {
     /**
      * Carga los parámetros y feriados con los mismos valores que traía la
-     * hoja PARAM del Excel "CONTROL INTERNAS - CYC CLB v5.4.xlsm", y asigna
-     * el código CYC/CLB a las empresas que ya existan con esos RUC.
+     * hoja PARAM del Excel "CONTROL INTERNAS - CYC CLB v5.4.xlsm".
+     *
+     * OJO: el código CYC/CLB de cada empresa YA NO se asigna acá (hasta el
+     * 13/09/2026 este seeder hacía `Empresa::where('numero_documento',
+     * $ruc)->update(...)`, pero eso solo servía si la Empresa ya existía —
+     * si este seeder corría antes de la primera carga de Excel, como pasó en
+     * la práctica, no encontraba ninguna fila y no hacía nada). Turco hizo
+     * notar que era redundante tener esa misma comparación por RUC en un
+     * seeder aparte cuando la carga del Excel ya resuelve la Empresa por
+     * RUC: ahora se asigna solo, en cada carga, desde
+     * `ProcessExcelJob::asignarCodigoEmpresa()` (ver
+     * config/const.php → control_interno.codigos_empresa_por_ruc).
      */
     public function run(): void
     {
@@ -25,17 +34,6 @@ class ControlInternoParametrosSeeder extends Seeder
             'meta_ind2' => 0.95,
             'ambito_departamentos' => ['LIMA', 'CALLAO'],
         ]);
-
-        // RUC -> código corto (PARAM!B6:E7). No crea la Empresa si todavía
-        // no existe (eso lo hace la carga del portal); solo completa el
-        // código cuando la fila ya está en la base de datos.
-        $codigosPorRuc = [
-            '20604329397' => 'CYC', // C&C PROYECTOS INTEGRALES EN ENERGÍA S.A.C.
-            '20610320032' => 'CLB', // CLB INGENIERIA Y PROYECTOS EN ENERGIA SOSTENIBLE S.A.C.
-        ];
-        foreach ($codigosPorRuc as $ruc => $codigo) {
-            Empresa::where('numero_documento', $ruc)->update(['codigo' => $codigo]);
-        }
 
         // Feriados 2026 (PARAM!J17:J40 del Excel de origen).
         $feriados = [

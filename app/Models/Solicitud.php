@@ -114,6 +114,15 @@ class Solicitud extends Model
 
     public function proyecto()
     {
-        return $this->belongsTo(Proyecto::class);
+        // Bug preexistente encontrado el 13/09/2026 usando Control Interno
+        // (CI-9): estaba como belongsTo, pero la llave foránea real
+        // (solicitud_id) vive en `proyectos`, no en `solicituds` — igual que
+        // ubicacion()/instalacion() arriba. Con belongsTo, Laravel buscaba
+        // una columna `proyecto_id` en `solicituds` que nunca existió, así
+        // que $solicitud->proyecto daba siempre null (categoría vacía en el
+        // listado) aunque el dato estuviera bien guardado en `proyectos`. El
+        // módulo de Asignación a Técnicos nunca lo notó porque usa `DB::table`
+        // con join manual, no esta relación.
+        return $this->hasOne(Proyecto::class);
     }
 }
