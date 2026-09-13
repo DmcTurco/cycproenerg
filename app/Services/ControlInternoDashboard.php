@@ -74,29 +74,25 @@ class ControlInternoDashboard
 
     /**
      * GENERAL necesita, además del total, el desglose NUEVAS/SIN RED/ROJO
-     * (INICIO!C37:C39) — no hay forma de sacar eso en una sola consulta
-     * agregada porque el semáforo de CI-5 se calcula por solicitud (igual
-     * que la fórmula del Excel se evalúa celda por celda).
+     * (INICIO!C37:C39). Hasta el 13/09/2026 esto cargaba TODAS las
+     * solicitudes de la fase en PHP y llamaba a para() una por una porque el
+     * semáforo no vivía en ninguna columna; ahora que CI-5 lo cachea en
+     * fase_control_internos.ind_semaforo, se puede contar directo en SQL
+     * (4 COUNT en vez de traer miles de filas a PHP). "nuevas" tampoco
+     * necesita el caché: es simplemente fecha_ingreso_general = hoy.
      */
     private static function resumenGeneral(int $empresaId): array
     {
-        $solicitudes = Solicitud::where('empresa_id', $empresaId)
-            ->whereHas('faseControlInterno', fn ($q) => $q->where('fase', FaseControlInterno::GENERAL))
-            ->with(['faseControlInterno', 'instalacion'])
-            ->get();
+        $base = FaseControlInterno::query()
+            ->where('fase', FaseControlInterno::GENERAL)
+            ->whereHas('solicitud', fn ($q) => $q->where('empresa_id', $empresaId));
 
-        $nuevas = 0;
-        $sinRed = 0;
-        $rojo = 0;
-
-        foreach ($solicitudes as $solicitud) {
-            $ind = ControlInternoIndicadores::para($solicitud);
-            $ind['nuevo'] && $nuevas++;
-            $ind['semaforo'] === 'SIN RED' && $sinRed++;
-            $ind['semaforo'] === 'ROJO' && $rojo++;
-        }
-
-        return ['total' => $solicitudes->count(), 'nuevas' => $nuevas, 'sin_red' => $sinRed, 'rojo' => $rojo];
+        return [
+            'total' => (clone $base)->count(),
+            'nuevas' => (clone $base)->whereDate('fecha_ingreso_general', now()->toDateString())->count(),
+            'sin_red' => (clone $base)->where('ind_semaforo', 'SIN RED')->count(),
+            'rojo' => (clone $base)->where('ind_semaforo', 'ROJO')->count(),
+        ];
     }
 
     /**
@@ -143,6 +139,7 @@ class ControlInternoDashboard
             'filas_procesadas' => $log->filas_procesadas,
             'filas_con_error' => $log->filas_con_error,
             'nuevas_general' => $resumenCi['nuevas_general'] ?? null,
+            'actualizadas' => $resumenCi['actualizadas'] ?? null,
             'movidas_general_construido' => $resumenCi['movidas_general_construido'] ?? null,
             'movidas_general_tc' => $resumenCi['movidas_general_tc'] ?? null,
             'movidas_construido_tc' => $resumenCi['movidas_construido_tc'] ?? null,

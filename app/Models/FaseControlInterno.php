@@ -41,11 +41,17 @@ class FaseControlInterno extends Model
         'marcado_para_anular',
     ];
 
+    // Los campos ind_* (caché de ControlInternoIndicadores::para(), CI-5,
+    // 13/09/2026) a propósito NO están en $fillable: solo los debe escribir
+    // ControlInternoIndicadores::calcularYGuardar() vía forceFill(), nunca
+    // un update() con datos que vengan de un request (CI-3).
     protected $casts = [
         'fecha_ingreso_general' => 'date',
         'fecha_construccion_control' => 'date',
         'fecha_tc' => 'date',
         'marcado_para_anular' => 'boolean',
+        'ind_fuera_de_plazo' => 'boolean',
+        'ind_actualizado_en' => 'datetime',
     ];
 
     public function solicitud()

@@ -24,6 +24,7 @@ use App\Models\FaseControlInterno;
 use App\Models\Instalacion;
 use App\Models\Logs;
 use App\Services\ControlInternoClasificador;
+use App\Services\ControlInternoIndicadores;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -48,6 +49,7 @@ class ProcessExcelJob implements ShouldQueue
      */
     protected array $ciCounters = [
         'nuevas_general' => 0,
+        'actualizadas' => 0,
         'movidas_general_construido' => 0,
         'movidas_general_tc' => 0,
         'movidas_construido_tc' => 0,
@@ -247,10 +249,29 @@ class ProcessExcelJob implements ShouldQueue
                     $this->processInstalacion($row, $solicitud);
                     $this->processFaseControlInterno($row, $solicitud);
 
+                    // CI-5 (13/09/2026): recalcula y guarda el caché de
+                    // indicadores (semáforo, desface, días hábiles, fuera de
+                    // plazo) de esta solicitud ahora que ya quedaron
+                    // guardados fase/instalación/proyecto — así el listado y
+                    // el Resumen (que leen el caché, no calculan al vuelo)
+                    // ya muestran esta carga sin esperar al comando diario.
+                    ControlInternoIndicadores::calcularYGuardar($solicitud);
+
                     return $solicitud->wasRecentlyCreated;
                 });
 
-                $wasCreated ? $created++ : $updated++;
+                if ($wasCreated) {
+                    $created++;
+                } else {
+                    $updated++;
+                    // CI-8: "Actualizadas" de la bitácora del Excel — total de
+                    // solicitudes que ya existían y se volvieron a procesar en
+                    // esta carga (se movieran de fase o no). El Excel original
+                    // lo etiqueta "(GENERAL + CONSTRUIDO + PEND...)" pero no
+                    // se desglosa por fase acá: es el mismo total que ya se
+                    // usaba para la barra de progreso ($updated).
+                    $this->ciCounters['actualizadas']++;
+                }
             } catch (\Throwable $e) {
                 // Una fila con datos inesperados no debe tirar abajo el resto del
                 // archivo: se revierte solo esta fila (transacción por fila) y se

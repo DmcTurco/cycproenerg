@@ -28,7 +28,11 @@ class ControlInternoManualController extends Controller
             'fecha_construccion_control' => optional($fase?->fecha_construccion_control)->format('Y-m-d'),
             'observacion_control' => $fase->observacion_control ?? '',
             'marcado_para_anular' => (bool) ($fase->marcado_para_anular ?? false),
-            'indicadores' => ControlInternoIndicadores::para($solicitud),
+            // CI-5 (13/09/2026): calcularYGuardar() en vez de para() — este
+            // detalle siempre debe mostrar el dato fresco (nunca el caché de
+            // paraAlmacenado()), y de paso refresca el caché para el listado
+            // cada vez que el staff abre esta pantalla.
+            'indicadores' => ControlInternoIndicadores::calcularYGuardar($solicitud),
         ]);
     }
 
@@ -62,7 +66,10 @@ class ControlInternoManualController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Control Interno actualizado.',
-            'indicadores' => ControlInternoIndicadores::para($solicitud->fresh()),
+            // CI-5 (13/09/2026): calcularYGuardar() en vez de para() — guarda
+            // el caché ya con el cambio recién hecho, para que el listado
+            // (CI-9) no muestre datos viejos hasta el comando diario.
+            'indicadores' => ControlInternoIndicadores::calcularYGuardar($solicitud->fresh()),
         ]);
     }
 }

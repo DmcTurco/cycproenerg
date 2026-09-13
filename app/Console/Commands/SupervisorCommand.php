@@ -3,30 +3,26 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
+/**
+ * OBSOLETO (13/09/2026): renombrado a RevisarColaPendienteCommand.php
+ * (signature `queue:revisar-pendientes`) — "Supervisor" se confundía con la
+ * herramienta real de Linux del mismo nombre (que hace algo distinto:
+ * mantener un proceso corriendo para siempre). `routes/console.php` ya
+ * apunta al comando nuevo, así que este archivo ya no lo usa nada.
+ *
+ * No se pudo borrar este archivo desde la sesión de Claude (sin acceso para
+ * borrar archivos en esta máquina) — puedes borrarlo tú cuando quieras.
+ */
 class SupervisorCommand extends Command
 {
-    protected $signature = 'queue:process';
-    protected $description = 'Procesa los trabajos pendientes en la cola';
+    protected $signature = 'supervisor:obsoleto';
+    protected $description = 'OBSOLETO — ver RevisarColaPendienteCommand (queue:revisar-pendientes). Este archivo se puede borrar.';
 
-    public function handle()
+    public function handle(): int
     {
-        $this->info('Iniciando procesamiento de la cola...');
+        $this->warn('Este comando ya no se usa. Ver RevisarColaPendienteCommand (queue:revisar-pendientes).');
 
-        // Ejecutar en segundo plano
-        $output = [];
-        $returnCode = 0;
-        exec("php artisan queue:work --stop-when-empty --memory=256 --timeout=300 --tries=3 --quiet > /dev/null 2>&1 &", $output, $returnCode);
-
-        // Solo registrar si hay un error
-        if ($returnCode !== 0) {
-            Log::error('Error al procesar la cola', ['output' => $output]);
-            $this->error('Error al procesar la cola.');
-        }
-
-        return 0;
+        return self::SUCCESS;
     }
 }

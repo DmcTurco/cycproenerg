@@ -32,10 +32,10 @@ use Illuminate\Support\Carbon;
  *     de referencia aparte para comparar contra el IND2 obtenido, no un
  *     factor multiplicador.
  *
- * Sin tabla propia (reporte de solo lectura, como sugiere el roadmap):
- * calcula todo al vuelo reutilizando ControlInternoIndicadores::para() por
- * solicitud (mismo cálculo ya probado de DÍAS HÁBILES/FUERA DE PLAZO de
- * CI-5, en vez de duplicar el NETWORKDAYS).
+ * Sin tabla propia (reporte de solo lectura, como sugiere el roadmap): lee el
+ * FUERA DE PLAZO ya calculado y cacheado por CI-5
+ * (fase_control_internos.ind_fuera_de_plazo, ver ControlInternoIndicadores)
+ * en vez de recalcularlo aquí o duplicar el NETWORKDAYS.
  */
 class ControlInternoPuntaje
 {
@@ -75,7 +75,13 @@ class ControlInternoPuntaje
                     ->whereHas('faseControlInterno', fn ($q) => $q->whereIn('fase', self::FASES_QUE_CUENTAN))
                     ->whereHas('solicitante', fn ($q) => $q->where('usuario_fise', 'Sí'))
                     ->whereHas('instalacion', fn ($q) => $q->whereBetween('fecha_finalizacion_instalacion_interna', [$desde, $hasta]))
-                    ->with(['proyecto', 'instalacion'])
+                    // 13/09/2026: faltaba precargar faseControlInterno acá —
+                    // whereHas('faseControlInterno', ...) de arriba solo
+                    // filtra, no la deja cargada en el modelo, así que
+                    // ControlInternoIndicadores::para() (más abajo, dentro
+                    // del foreach) disparaba una consulta más POR CADA
+                    // solicitud para leerla sola (N+1).
+                    ->with(['proyecto', 'instalacion', 'faseControlInterno'])
                     ->get()
                     ->filter(function (Solicitud $solicitud) use ($categoriasMap) {
                         $categoria = $categoriasMap[$solicitud->proyecto?->categoria_proyecto ?? ''] ?? null;
@@ -93,7 +99,11 @@ class ControlInternoPuntaje
                     $categoria = $categoriasMap[$solicitud->proyecto?->categoria_proyecto] ?? null;
                     $categoria === 'COM' ? $comercio++ : $residencial++;
 
-                    if (ControlInternoIndicadores::para($solicitud)['fuera_de_plazo']) {
+                    // CI-5 (13/09/2026): se lee el caché ya cargado
+                    // (faseControlInterno viene con eager load arriba) en vez
+                    // de llamar a ControlInternoIndicadores::para() —
+                    // fuera_de_plazo ahora vive en fase_control_internos.ind_fuera_de_plazo.
+                    if ($solicitud->faseControlInterno?->ind_fuera_de_plazo) {
                         $fueraDePlazo++;
                     }
                 }

@@ -63,8 +63,12 @@ class ControlInternoController extends Controller
             ->paginate(20)
             ->appends($request->query());
 
+        // CI-5 (13/09/2026): paraAlmacenado() en vez de para() — este listado
+        // solo necesita el último caché guardado (se refresca solo con cada
+        // carga/edición y una vez al día), no recalcular en vivo fila por
+        // fila (ver docblock de ControlInternoIndicadores).
         $solicitudes->getCollection()->transform(function (Solicitud $solicitud) {
-            $solicitud->ci_indicadores = ControlInternoIndicadores::para($solicitud);
+            $solicitud->ci_indicadores = ControlInternoIndicadores::paraAlmacenado($solicitud);
 
             return $solicitud;
         });

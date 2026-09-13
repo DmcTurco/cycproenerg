@@ -117,6 +117,10 @@
                             <p class="font-medium text-gray-900">{{ $carga['nuevas_general'] ?? '—' }}</p>
                         </div>
                         <div>
+                            <p class="text-xs text-gray-400">Actualizadas</p>
+                            <p class="font-medium text-gray-900">{{ $carga['actualizadas'] ?? '—' }}</p>
+                        </div>
+                        <div>
                             <p class="text-xs text-gray-400">Movidas GENERAL → CONSTRUIDO</p>
                             <p class="font-medium text-gray-900">{{ $carga['movidas_general_construido'] ?? '—' }}</p>
                         </div>
@@ -138,7 +142,7 @@
                         </div>
                     </div>
                     <p class="mt-3 text-xs text-gray-400">
-                        "Eliminadas: anulación confirmada" e "Ignoradas: fuera de Lima/Callao" del Excel original no se muestran acá: la primera depende de una decisión de negocio todavía pendiente (CI-6) y la segunda de un filtro de ámbito que no está enganchado en la carga (CI-1).
+                        "Eliminadas: anulación confirmada", "Ignoradas: fuera de Lima/Callao" e "Ignoradas: sin empresa / no aprobadas" del Excel original no se muestran acá todavía: la primera depende de una decisión de negocio pendiente (CI-6); la segunda, de enganchar el filtro de ámbito de CI-1 en la carga; la tercera, de definir con Turco el mismo criterio que usaba el Excel para esa fila (no es lo mismo que "Omitidas por validación mínima", que es un chequeo propio de este sistema).
                     </p>
                 @endif
             </div>

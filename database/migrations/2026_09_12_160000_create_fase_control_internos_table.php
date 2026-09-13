@@ -40,6 +40,33 @@ return new class extends Migration
             $table->boolean('marcado_para_anular')->default(false)
                 ->comment('Equivalente a la "X" de ANULAR del Excel; CI-4 la usa para mover a PEND_ANULACION');
 
+            // CI-5 (13/09/2026): caché de ControlInternoIndicadores::para().
+            // Antes todo se calculaba 100% al vuelo (nunca se guardaba, para
+            // no desactualizarse); se decidió cachear estos 4 campos porque
+            // Resumen (CI-10) y Puntaje (CI-7) necesitaban recorrer TODAS las
+            // solicitudes de una fase en cada request en PHP (para sumar
+            // semáforos uno por uno) en vez de poder usar COUNT/GROUP BY en
+            // SQL directamente sobre esta tabla. Se recalculan y se guardan
+            // solos cada vez que la solicitud cambia (ProcessExcelJob,
+            // ControlInternoManualController::calcularYGuardar) y, además,
+            // una vez al día vía el comando
+            // `control-interno:recalcular-indicadores` (routes/console.php),
+            // porque DESFACE/SEMÁFORO de GENERAL y CONSTRUIDO comparan contra
+            // "hoy" y se desactualizan solos aunque nada cambie en la
+            // solicitud. La vista de detalle (CI-3) nunca lee estos campos
+            // guardados: siempre pide el cálculo en vivo (para()), que de
+            // paso los refresca.
+            $table->string('ind_semaforo', 20)->nullable()
+                ->comment('Caché de para()["semaforo"] — ver comentario arriba');
+            $table->integer('ind_desface_dias')->nullable()
+                ->comment('Caché de para()["desface_dias"]');
+            $table->integer('ind_dias_habiles')->nullable()
+                ->comment('Caché de para()["dias_habiles"]');
+            $table->boolean('ind_fuera_de_plazo')->nullable()
+                ->comment('Caché de para()["fuera_de_plazo"]');
+            $table->timestamp('ind_actualizado_en')->nullable()
+                ->comment('Cuándo se calculó por última vez este caché (calcularYGuardar)');
+
             $table->timestamps();
             $table->softDeletes();
         });
