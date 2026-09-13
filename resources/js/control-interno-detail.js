@@ -1,4 +1,9 @@
 document.addEventListener('alpine:init', () => {
+    // CI-3/CI-5: pantalla dedicada de Control Interno de una solicitud
+    // (`employee/solicitudes/{id}/control-interno`), separada del Detalle de
+    // Solicitud general (`solicitudDetail`, en solicitud-detail.js). Muestra
+    // fase + indicadores calculados (CI-5) y permite editar las 3 columnas
+    // manuales (CI-3): F. CONSTRUCCIÓN control, OBSERVACIÓN, ANULAR.
     Alpine.data('controlInternoDetail', (config) => ({
         loading: true,
         loadError: false,
@@ -21,13 +26,15 @@ document.addEventListener('alpine:init', () => {
 
             try {
                 const response = await fetch(config.controlInternoUrl, { headers: { Accept: 'application/json' } });
+
                 if (!response.ok) {
                     throw new Error('load failed');
                 }
+
                 this.ci = { ...this.ci, ...(await response.json()) };
             } catch (e) {
                 this.loadError = true;
-                this.errorMessage = 'No se pudo cargar Control Interno de esta solicitud.';
+                this.errorMessage = 'Error al cargar Control Interno. Verifica tu conexión.';
             } finally {
                 this.loading = false;
             }
@@ -71,8 +78,9 @@ document.addEventListener('alpine:init', () => {
                 const data = await response.json();
                 if (data.indicadores) {
                     // El guardado puede haber reclasificado la fase (CI-4) al
-                    // toque: reflejamos fase + indicadores actualizados sin
-                    // tener que recargar toda la pantalla.
+                    // toque — igual que el botón "Aplicar movimientos" del
+                    // VBA, pero automático al guardar. Reflejamos fase +
+                    // indicadores actualizados sin recargar toda la pantalla.
                     this.ci.indicadores = data.indicadores;
                     this.ci.fase = data.indicadores.fase;
                 }

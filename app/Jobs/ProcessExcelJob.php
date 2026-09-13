@@ -20,7 +20,10 @@ use App\Events\RowProcessed;
 use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoInterno;
 use App\Models\EstadoPortal;
+use App\Models\FaseControlInterno;
 use App\Models\Instalacion;
+use App\Models\Logs;
+use App\Services\ControlInternoClasificador;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -32,6 +35,25 @@ class ProcessExcelJob implements ShouldQueue
 
     protected $filePath;
     public $processId;
+
+    // CI-8: id de la fila en `logs` (bitácora persistente) creada por
+    // ClientController::change() antes de despachar el job. Nullable por si
+    // algún día se dispara este job sin pasar por esa acción (ej. un comando
+    // artisan de carga manual) — en ese caso simplemente no se escribe bitácora.
+    protected $logId;
+
+    /**
+     * CI-8: contadores de Control Interno de esta carga, para la bitácora
+     * (equivalente al resumen de la hoja INICIO del Excel original).
+     */
+    protected array $ciCounters = [
+        'nuevas_general' => 0,
+        'movidas_general_construido' => 0,
+        'movidas_general_tc' => 0,
+        'movidas_construido_tc' => 0,
+        'movidas_a_pend_anulacion' => 0,
+        'filas_omitidas_validacion' => 0,
+    ];
 
     // Añadir estas propiedades:
     public $timeout = 1800;    // 30 minutos máximo para ejecutar el job
@@ -50,10 +72,11 @@ class ProcessExcelJob implements ShouldQueue
      * Create a new job instance.
      */
 
-    public function __construct($filePath, $processId)
+    public function __construct($filePath, $processId, $logId = null)
     {
         $this->filePath = $filePath;
         $this->processId = $processId;
+        $this->logId = $logId;
     }
 
 
@@ -73,14 +96,21 @@ class ProcessExcelJob implements ShouldQueue
 
             $this->buildColumnMap($rows[1]);
 
+            $totalFilas = count($rows) - 1; // Excluir header
+
             // Inicializar el progreso
             Cache::put("excel_progress_{$this->processId}", [
                 'progress' => 0,
                 'processed' => 0,
-                'total' => count($rows) - 1, // Excluir header
+                'total' => $totalFilas,
                 'created' => 0,
                 'updated' => 0
             ], now()->addHours(1));
+
+            // CI-8: la bitácora ya se creó en ClientController::change() con
+            // total_filas=0 (todavía no se había leído el archivo); acá se
+            // completa apenas se sabe cuántas filas trae.
+            $this->log()?->update(['total_filas' => $totalFilas]);
 
             $result = $this->processRows($rows);
 
@@ -95,6 +125,16 @@ class ProcessExcelJob implements ShouldQueue
                 'completed' => true
             ], now()->addHours(1));
 
+            // CI-8: bitácora final — contadores de filas + resumen de
+            // Control Interno de esta carga (nuevas a GENERAL, movidas entre
+            // fases, filas omitidas por no pasar la validación mínima).
+            $this->log()?->update([
+                'filas_procesadas' => $result['total'],
+                'filas_con_error' => $result['failed'],
+                'estado' => 'completado',
+                'resumen_control_interno' => $this->ciCounters,
+            ]);
+
             // Aquí podrías emitir un evento para notificar que el proceso terminó
             event(new ExcelProcessed($result));
             // broadcast(new ExcelProcessed($result));
@@ -108,10 +148,25 @@ class ProcessExcelJob implements ShouldQueue
                 'error' => $e->getMessage()
             ], now()->addHours(1));
 
+            $this->log()?->update([
+                'estado' => 'error',
+                'errores' => $e->getMessage(),
+                'resumen_control_interno' => $this->ciCounters,
+            ]);
+
             event(new ExcelProcessingFailed($e->getMessage()));
             Storage::delete($this->filePath);
             throw $e;
         }
+    }
+
+    /**
+     * CI-8: la fila de bitácora (`logs`) de esta carga, si se pasó un
+     * `$logId` al construir el job (ver ClientController::change()).
+     */
+    private function log(): ?Logs
+    {
+        return $this->logId ? Logs::find($this->logId) : null;
     }
 
     /**
@@ -168,7 +223,10 @@ class ProcessExcelJob implements ShouldQueue
         foreach ($rows as $index => $row) {
             if ($index == 1) continue; // Ignorar el header
 
-            if (!$this->validateRow($row)) continue;
+            if (!$this->validateRow($row)) {
+                $this->ciCounters['filas_omitidas_validacion']++;
+                continue;
+            }
 
             try {
                 $wasCreated = DB::transaction(function () use ($row) {
@@ -412,7 +470,43 @@ class ProcessExcelJob implements ShouldQueue
             ? $this->parseDate(trim((string) $this->col($row, 'Fecha de Registro de resultado de TC')))
             : null;
 
-        \App\Services\ControlInternoClasificador::clasificar($solicitud, $tcConcluida, $fechaTc);
+        // CI-8: se lee la fase ANTES de clasificar (una sola consulta extra)
+        // para poder contar en la bitácora si la solicitud es nueva en
+        // Control Interno o si esta carga la movió de fase. `null` significa
+        // que todavía no tenía fila en fase_control_internos (es nueva).
+        $faseAntes = FaseControlInterno::where('solicitud_id', $solicitud->id)->value('fase');
+
+        $fase = ControlInternoClasificador::clasificar($solicitud, $tcConcluida, $fechaTc);
+
+        $this->registrarMovimientoControlInterno($faseAntes, $fase->fase);
+    }
+
+    /**
+     * CI-8: acumula en $ciCounters el tipo de movimiento de fase que produjo
+     * esta fila, para el resumen de Control Interno de la bitácora.
+     */
+    private function registrarMovimientoControlInterno(?string $antes, string $despues): void
+    {
+        if ($antes === null) {
+            $this->ciCounters['nuevas_general']++;
+            return;
+        }
+
+        if ($antes === $despues) {
+            return;
+        }
+
+        $clave = match (true) {
+            $antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::CONSTRUIDO => 'movidas_general_construido',
+            $antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::TC => 'movidas_general_tc',
+            $antes === FaseControlInterno::CONSTRUIDO && $despues === FaseControlInterno::TC => 'movidas_construido_tc',
+            $despues === FaseControlInterno::PEND_ANULACION => 'movidas_a_pend_anulacion',
+            default => null,
+        };
+
+        if ($clave !== null) {
+            $this->ciCounters[$clave]++;
+        }
     }
 
     private function processUbicacion($row, $solicitud)
@@ -461,7 +555,27 @@ class ProcessExcelJob implements ShouldQueue
                 'fecha_finalizacion_instalacion_acometida' => $this->parseDate(trim($this->col($row, 'Fecha de finalización de la Instalación de Acometida'))) ?: null,
                 'resultado_instalacion_tc' => trim($this->col($row, 'Resultado de la Instalación de TC')) ?: null,
                 'fecha_programacion_habilitacion' => $this->parseDate(trim($this->col($row, 'Fecha de programación de Habilitación'))) ?: null,
+                // CI-6 (parte segura): se capturan tal cual del portal, pero
+                // a propósito NO disparan ninguna regla de eliminación o
+                // archivado de la Solicitud — ver la nota de la migración
+                // add_anulacion_columns_to_instalacions_table y
+                // docs/modulos/control-interno.md (CI-6).
+                'rechazada' => $this->esSi($this->col($row, 'Rechazada')),
+                'anulada' => $this->esSi($this->col($row, 'Anulada')),
+                'motivo_anulacion' => trim((string) $this->col($row, 'Motivo de anulación')) ?: null,
             ]
         );
+    }
+
+    /**
+     * El portal marca sus columnas booleanas (Rechazada, Anulada, ...) con el
+     * texto literal "Sí"/"No", igual que compara el VBA original
+     * (`Trim(CStr(...)) = "Sí"` en PortalAnulada, Modulo_Internas.bas).
+     */
+    private function esSi($value): bool
+    {
+        $texto = strtoupper(trim((string) $value));
+
+        return $texto === 'SÍ' || $texto === 'SI';
     }
 }

@@ -90,7 +90,16 @@ class Solicitud extends Model
 
     public function tecnico()
     {
-        return $this->belongsToMany(Tecnico::class, 'solicitud_tecnico', 'solicitud_id', 'tecnico_id')->withPivot('categoria')->withTimestamps();
+        // Nota: no usar withPivot('categoria') — esa columna nunca existió en
+        // la tabla solicitud_tecnico (bug preexistente encontrado el 13/09/2026
+        // al usar esta relación por primera vez desde Control Interno; el
+        // módulo de Asignación a Técnicos nunca pasaba por acá, siempre usaba
+        // Tecnico::solicitudes() o el modelo SolicitudTecnico directamente).
+        // Se excluyen asignaciones eliminadas (soft delete), igual que hace
+        // Tecnico::solicitudes(), para que ambos lados de la relación coincidan.
+        return $this->belongsToMany(Tecnico::class, 'solicitud_tecnico', 'solicitud_id', 'tecnico_id')
+            ->withTimestamps()
+            ->whereNull('solicitud_tecnico.deleted_at');
     }
 
     public function ubicacion()

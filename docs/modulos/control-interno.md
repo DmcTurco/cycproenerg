@@ -87,41 +87,59 @@ En el Excel son fórmulas que se regeneran en cada carga. En Laravel no se guard
 - **Hallazgo importante para CI-6** (no es un bug, es un dato real a tener en cuenta): en la descarga real revisada, la columna "Anulada" del portal viene en **"Sí" para ~73% de las filas** (3458 de 4761). Confirma que la decisión de CI-4 de NO auto-eliminar/archivar por esta columna fue la correcta — aplicar esa regla tal cual del VBA borraría o archivaría la gran mayoría de las solicitudes del sistema. Antes de construir CI-6 hay que confirmar con Turco qué significa realmente ese "Sí" tan frecuente (¿son solicitudes viejas ya cerradas del ciclo de vida del portal, y no "anuladas" en el sentido de Control Interno?).
 - **Pendiente para que corra:** `php artisan migrate` (por `fecha_tc`); `npm run build` (el proyecto sirve el build de producción, no hay servidor Vite en modo dev — cualquier cambio en `resources/js/*` necesita este paso para reflejarse en el navegador).
 
-### CI-6. Anulación / Rechazo (PEND_ANULACION)
-La regla "`marcado_para_anular` = true → `PEND_ANULACION`" ya la aplica CI-4 (es la columna manual de CI-3). Lo que queda acá es específicamente el lado **portal**: Rechazada/Anulada.
+### CI-6. Anulación / Rechazo (PEND_ANULACION) — parte segura ✅ implementada (12/09/2026), regla de negocio pendiente
+La regla "`marcado_para_anular` = true → `PEND_ANULACION`" ya la aplica CI-4 (es la columna manual de CI-3). Lo que quedaba acá era específicamente el lado **portal**: Rechazada/Anulada.
 
-- **Ya existe:** nada — el portal trae "Rechazada" y "Anulada" pero `ProcessExcelJob` no las captura hoy en `Instalacion`. Ya se confirmó (al decompilar el VBA para CI-4) que son exactamente esas dos columnas del portal (valores "Sí"/"No"), más "Motivo de anulación".
-- **Falta:** capturar esos 3 campos del portal; y decidir la regla de "portal confirma Anulada/Rechazada = Sí" — el VBA elimina la fila del libro, pero en Laravel `Solicitud` es una tabla **compartida** con el módulo de Asignación a Técnicos (preexistente, no forma parte de Control Interno), así que hay que decidir con Turco si "eliminar" significa `soft delete` de la `Solicitud` completa (la saca de TODO el sistema, no solo de Control Interno) o algún archivado más acotado del lado de Control Interno únicamente. Esta es la razón por la que CI-4 la dejó explícitamente afuera en vez de implementarla de encargado.
-- **Sugerido:** agregar esos 3 campos a `Instalacion` (o a una tabla nueva si se prefiere no ensuciar esa tabla); la regla de transición, una vez decidida, se agrega al mismo método `ProcessExcelJob::processFaseControlInterno()` de CI-4.
+**Estado:** se capturan los 3 campos del portal (parte segura, sin efectos colaterales); la regla de qué hacer con una solicitud marcada así sigue **sin implementar a propósito** — es una decisión de producto que le corresponde a Turco, no algo para decidir de encargado.
 
-### CI-7. Indicador IND 2 (FISE) y Puntaje trimestral
+- Migración `add_anulacion_columns_to_instalacions_table`: agrega `rechazada` (boolean, default false), `anulada` (boolean, default false) y `motivo_anulacion` (text, nullable) a `instalacions` — confirmadas como columnas 55/56/57 del portal ("Rechazada", "Anulada", "Motivo de anulación") con la descarga real usada en CI-5.
+- `Instalacion::$fillable`/`$casts` actualizados.
+- `ProcessExcelJob::processInstalacion()` ahora captura los 3 campos en cada carga (nuevo helper `esSi()`, igual al `Trim(CStr(...)) = "Sí"` del VBA original). **No dispara ninguna regla de eliminación, archivado ni cambio de fase** — solo guarda el dato, exactamente igual que cualquier otro campo de `Instalacion`.
+- **Deliberadamente sin implementar:** la regla del VBA que borra la fila del libro cuando `Rechazada`/`Anulada` = "Sí". En Laravel, `Solicitud` es una tabla **compartida** con el módulo de Asignación a Técnicos (preexistente, no forma parte de Control Interno) — hay que decidir con Turco si "eliminar" significa `soft delete` de la `Solicitud` completa (la saca de TODO el sistema) o algún archivado acotado solo del lado de Control Interno. Con la columna `anulada` ya capturada y visible, Turco puede revisar cuántas/cuáles solicitudes reales caen en ese ~73% antes de decidir la regla — el dato ya no es una incógnita, solo falta la decisión.
+- **Pendiente para que corra:** `php artisan migrate`.
+- **Pendiente de decisión de Turco (bloqueante para cerrar CI-6 del todo):** qué hacer exactamente con una `Solicitud` cuando el portal confirma `Rechazada`/`Anulada` = "Sí".
+
+### CI-7. Indicador IND 2 (FISE) y Puntaje trimestral — ✅ implementado (12/09/2026)
 Equivalente a la hoja `PUNTAJE`: % de instalaciones FISE construidas dentro de plazo, por empresa y por mes, acumulado del trimestre, excluyendo multifamiliares y NO FISE.
 
-- **Ya existe:** el dato fuente `Solicitante.usuario_fise` y `Proyecto.categoria_proyecto` ya están capturados.
-- **Falta:** todo el reporte — es un query agregado (no una tabla), se apoya en CI-5 (días hábiles y fuera de plazo) y CI-1 (plazo FISE = 20 días hábiles, meta 95%).
-- **Sugerido:** un `Report`/`Service` de solo lectura, sin tabla propia; se puede cachear por trimestre si el cálculo es pesado.
+**Estado:** servicio de solo lectura listo (`App\Services\ControlInternoPuntaje::trimestre($anio, $trimestre)`); sin vista propia todavía — la consumirá CI-10 (dashboard).
 
-### CI-8. Bitácora de cargas
-- **Ya existe:** la tabla `logs` (nombre_archivo, total_filas, filas_procesadas, filas_con_error, errores, estado, employee_id) es prácticamente igual a la bitácora de la hoja INICIO. Hay que confirmar si `ProcessExcelJob` ya escribe ahí (no lo vi en el job — revisar `ClientController`, que es quien probablemente crea el registro `Logs` antes de despachar el job).
-- **Falta:** los contadores específicos de Control Interno (nuevas a GENERAL, movidas GENERAL→CONSTRUIDO, CONSTRUIDO→TC, →PEND_ANULACION, eliminadas por anulación confirmada, ignoradas por fuera de ámbito / sin empresa / sin contrato). Se pueden guardar como columnas nuevas en `logs` o como JSON en un campo `detalle`.
-- **Sugerido:** ampliar `logs` en vez de crear una tabla paralela, ya que conceptualmente es la misma bitácora de "una carga de Excel".
+- A diferencia de CI-4/CI-6, la hoja `PUNTAJE` no tiene lógica en VBA — es 100% fórmulas de hoja de cálculo. Se leyeron directamente del archivo original (filas 8-25) en vez de adivinar la definición de IND 2. Fórmula real, por empresa (CYC/CLB) y por cada uno de los 3 meses del trimestre: cuenta solicitudes con Usuario FISE = "Sí", que ya llegaron a fase CONSTRUIDO o TC (el Excel las suma desde las hojas CONSTRUIDO + TC — antes de CONSTRUIDO no cuentan), categoría Residencial o Comercio (Multifamiliares excluidas, "FP: 5" del Excel), con "Fecha de finalización de la Instalación Interna" dentro de ese mes. FUERA DE PLAZO = las de ese grupo cuyo indicador FUERA DE PLAZO de CI-5 es "SÍ". IND 2 = en plazo / total FISE construidas. **PUNTAJE = IND2 × 5** (máximo 5 puntos, fórmula literal `PUNTAJE!G8/G9`) — el `meta_ind2` de CI-1 (95%) NO es parte de esta fórmula, es solo un valor de referencia para comparar contra el IND2 obtenido.
+- `ControlInternoPuntaje::trimestre()` reutiliza `ControlInternoIndicadores::para()` por solicitud (mismo cálculo ya probado de días hábiles/fuera de plazo de CI-5) en vez de duplicar el NETWORKDAYS — sin tabla propia, se calcula al vuelo (tal como sugería el roadmap).
+
+### CI-8. Bitácora de cargas — ✅ implementado (12/09/2026)
+**Estado:** confirmado (revisando `ClientController` y `ProcessExcelJob`) que la tabla `logs` existía desde antes pero **nada escribía ahí** — el progreso de una carga solo vivía en caché (`excel_progress_*`, efímera, para la barra de progreso), así que la bitácora persistente de la hoja INICIO del Excel nunca se había implementado de verdad. Corregido de raíz, no solo agregados los contadores de Control Interno.
+
+- Migración `add_control_interno_columns_to_logs_table`: agrega `resumen_control_interno` (json, nullable) a `logs`.
+- **Bug preexistente encontrado y corregido de paso:** `Logs::$fillable` tenía `tamano_archivo` (sin ñ), pero la columna real de la migración original es `tamaño_archivo` (con ñ) — nunca se había notado porque nada creaba filas en `logs` todavía. Se corrigió el fillable para usar el nombre real de columna.
+- `ClientController::change()` ahora crea la fila de `Logs` (nombre_archivo, tamaño_archivo, estado='en_proceso', employee_id vía `Auth::id()`) antes de despachar `ProcessExcelJob`, pasándole su id.
+- `ProcessExcelJob` recibe ese `$logId` (tercer parámetro del constructor) y actualiza la bitácora: `total_filas` apenas lee el archivo, y al terminar (`filas_procesadas`, `filas_con_error`, `estado`, `resumen_control_interno`) o si falla (`estado='error'`, `errores`).
+- `resumen_control_interno` trae los contadores específicos de Control Interno: `nuevas_general`, `movidas_general_construido`, `movidas_general_tc`, `movidas_construido_tc`, `movidas_a_pend_anulacion`, `filas_omitidas_validacion` (filas que no pasan `validateRow`, antes se saltaban en silencio sin contarse en ningún lado). Se calculan comparando la fase ANTES y DESPUÉS de `ControlInternoClasificador::clasificar()` en cada fila (una consulta extra por fila).
+- **No incluido a propósito:** "eliminadas por anulación confirmada" — no aplica todavía porque CI-6 no implementa ninguna eliminación (ver CI-6). "Ignoradas por fuera de ámbito / sin empresa / sin contrato" tampoco aplica: el filtro de ámbito de CI-1 (departamentos) no está enganchado en ningún punto del `ProcessExcelJob` actual — es una limitación preexistente, no algo que CI-8 debía resolver.
+- **Pendiente para que corra:** `php artisan migrate`.
 
 ### CI-9. Vistas de Control Interno (listados por fase) — ✅ implementado (12/09/2026)
 Equivalente a las hojas GENERAL / CONSTRUIDO / TC / PEND_ANULACION como pantallas, con filtros por empresa (CYC/CLB) y categoría (RES/MULTI/COM) — como los botones `FiltrarCYC`, `FiltrarRES`, etc. del VBA.
 
-**Estado:** implementado el listado con filtro por fase y búsqueda por número de solicitud; quedan pendientes los filtros por empresa/categoría del VBA original.
+**Estado:** completo — listado con pestañas por fase (con contador), filtros de empresa/categoría/búsqueda, y columnas ASESOR/CUADRILLA/SEMÁFORO/DESFACE/FUERA DE PLAZO.
 
-- Nuevo `App\Http\Controllers\Employee\ControlInternoController::index` (`GET employee/control-interno`, vista `employee.pages.control-interno.index`): pagina `Solicitud` (20 por página), con filtro `?fase=` (GENERAL/CONSTRUIDO/TC/PEND_ANULACION) y `?search=` (número de solicitud), y calcula `ControlInternoIndicadores::para()` por fila para mostrar fase, semáforo y desface — igual que el detalle individual (CI-3/CI-5), pero de un vistazo para muchas solicitudes a la vez.
-- El sidebar del empleado ("Control Interno") ahora apunta a este listado en vez de ir directo a Parámetros; el listado tiene un botón "Parámetros" en la cabecera para no perder ese acceso.
-- Cada fila enlaza a la pantalla individual de CI-3 (`employee/solicitudes/{id}/control-interno`) para ver el detalle completo y editar las columnas manuales.
-- **Decisión de diseño (12/09/2026):** originalmente Control Interno era una pestaña dentro del Detalle de Solicitud; se separó primero en una pantalla individual por solicitud (ver nota en CI-3) y ahora en este listado, porque lo que Turco pedía desde el principio era justamente esto — un índice por número de solicitud con sus fases/semáforos, no un dato más dentro del detalle de una solicitud puntual.
-- **Falta:** filtros por empresa (CYC/CLB) y categoría (RES/MULTI/COM); columnas ASESOR/CUADRILLA del Excel original (fáciles de agregar reusando `Solicitud::asesor()`/`Solicitud::tecnico()` si se necesitan más adelante).
+- `App\Http\Controllers\Employee\ControlInternoController::index` (`GET employee/control-interno`, vista `employee.pages.control-interno.index`): pagina `Solicitud` (20 por página) con pestañas por fase (Todas/GENERAL/CONSTRUIDO/TC/PEND_ANULACION, cada una con su contador — respetando los filtros activos), `?empresa=` (código CYC/CLB, vía `Empresa.codigo` de CI-1), `?categoria=` (RES/MULTI/COM, resuelto contra `Proyecto.categoria_proyecto` usando el mapeo de `config('const.control_interno.categorias')`) y `?search=` (número de solicitud). Calcula `ControlInternoIndicadores::para()` por fila para mostrar fase, semáforo, desface y fuera de plazo — igual que la pantalla individual (CI-3/CI-5), pero de un vistazo para muchas solicitudes a la vez. Columnas ASESOR y CUADRILLA reutilizan `Solicitud::asesor()`/`Solicitud::tecnico()`, sin relaciones nuevas.
+- El sidebar del empleado ("Control Interno") apunta a este listado; el listado tiene un botón "Parámetros y feriados" en la cabecera para no perder ese acceso, y la pantalla de Parámetros tiene su botón "Salir" de vuelta al listado.
+- Cada fila enlaza directo a la pantalla individual de Control Interno de esa solicitud (`employee/solicitudes/{id}/control-interno`, CI-3/CI-5) y, aparte, al Detalle de Solicitud general si se necesita ver el resto de los datos.
+- **Decisión de diseño (12/09/2026):** originalmente Control Interno era una pestaña dentro del Detalle de Solicitud; se separó en una pantalla individual por solicitud (CI-3) y ahora en este listado, porque lo que Turco pedía desde el principio era justamente esto — un índice por número de solicitud con sus fases/semáforos, no un dato más dentro del detalle de una solicitud puntual.
+- **Bug encontrado y corregido de paso:** la pantalla individual `employee/solicitudes/{id}/control-interno` (vista `clients/control-interno.blade.php`) ya usaba el componente Alpine `controlInternoDetail` y `resources/js/app.js` ya lo importaba, pero el archivo `resources/js/control-interno-detail.js` nunca se había creado — la pantalla se habría roto (Alpine sin poder resolver `controlInternoDetail`) en cuanto alguien la abriera. Creado con la misma lógica de `load()`/`save()`/`semaforoClase()` que tenía la versión anterior (cuando Control Interno todavía era una pestaña de `solicitud-detail.js`).
+- **Pendiente para que corra:** `npm run build` (nuevo archivo JS).
 
-### CI-10. Dashboard / Resumen ejecutivo
-Equivalente al bloque "RESUMEN" de la hoja INICIO: conteo por fase y por empresa, nuevas de la última carga, fuera de plazo, IND 2 del trimestre y puntaje.
+### CI-10. Dashboard / Resumen ejecutivo — ✅ implementado (12/09/2026)
+Equivalente al bloque "RESUMEN" + "BITÁCORA DE LA ÚLTIMA CARGA" de la hoja INICIO: conteo por fase y por empresa, nuevas de la última carga, fuera de plazo, IND 2 del trimestre y puntaje.
 
-- **Ya existe:** nada como pantalla; los datos fuente estarán disponibles una vez estén CI-2, CI-5 y CI-7.
-- **Falta:** todo — es la última pieza porque depende de las anteriores.
+**Estado:** completo — última pieza del roadmap con entregable de código.
+
+- Igual que con PUNTAJE (CI-7), el bloque RESUMEN de INICIO (`B34:D45`) es 100% fórmulas de hoja — se leyó directo del archivo original en vez de adivinar qué contaba cada indicador: GENERAL (total + NUEVAS + SIN RED + ROJO por empresa), CONSTRUIDO (total + cuántas no tienen fecha de fin de instalación interna todavía, "no cuentan en IND2"), TC (total), PENDIENTES DE ANULACIÓN (total), IND2 del trimestre y PUNTAJE (tomados de CI-7).
+- Nuevo `App\Services\ControlInternoDashboard::resumen($anio, $trimestre)`: arma todo lo anterior por empresa, más la bitácora de la última carga (bloque `B5:B15` de INICIO, tomada de la última fila de `logs` de CI-8). Los dos conceptos del Excel sin equivalente todavía ("Eliminadas: anulación confirmada", "Ignoradas: fuera de Lima/Callao") se muestran como no disponibles en vez de inventar un número — dependen de la decisión de negocio pendiente de CI-6 y de un filtro de ámbito que CI-1 dejó como parámetro pero que `ProcessExcelJob` todavía no aplica.
+- Se cachea 5 minutos (`Cache::remember`) porque el desglose de GENERAL recorre cada solicitud para calcular su semáforo (días hábiles) — igual que el propio roadmap sugería para CI-7.
+- Pantalla nueva `GET employee/control-interno/resumen` (`ControlInternoDashboardController`, vista `employee.pages.control-interno.resumen`), con selector de año/trimestre. El listado de CI-9 ganó un botón "Resumen" en la cabecera (junto a "Parámetros y feriados") para llegar ahí, y el resumen tiene su "Ver listado" de vuelta.
+- Con esto quedan implementados los 11 submódulos del roadmap. Lo único que sigue abierto es la decisión de negocio de CI-6 (qué significa "eliminar" una `Solicitud` cuando el portal confirma Rechazada/Anulada), que se dejó a propósito para que la tome Turco.
 
 ### CI-11. Relación con el módulo de Asignación a Técnicos
 No es una construcción nueva, es una decisión de diseño a dejar explícita: la fase de Control Interno (CI-2) y el estado de asignación a técnico (`estado_internos` ya existente) son dos ejes independientes de la misma `Solicitud` — una solicitud puede estar en fase CONSTRUIDO y a la vez "Iniciado" para el técnico. Documentar esto evita que a futuro alguien intente fusionar ambas tablas.
@@ -130,16 +148,27 @@ No es una construcción nueva, es una decisión de diseño a dejar explícita: l
 
 1. ~~**CI-1** Parámetros~~ — hecho el 12/09/2026, con pantalla de administración incluida (falta correr `migrate` + `db:seed`).
 2. ~~**CI-2** Fase de Control Interno~~ — hecho el 12/09/2026 (tabla `fase_control_internos`, modelo, enganche mínimo en la carga; falta `migrate` y el motor completo de CI-4).
-3. ~~**CI-3** Columnas de control manual~~ — hecho el 12/09/2026 (esquema en `fase_control_internos`, `Solicitud::asesor()` activada, cuadrilla reutiliza `Solicitud::tecnico()`, vista de edición en la pestaña "Control Interno" del Detalle de Solicitud; falta `migrate`).
+3. ~~**CI-3** Columnas de control manual~~ — hecho el 12/09/2026 (esquema en `fase_control_internos`, `Solicitud::asesor()` activada, cuadrilla reutiliza `Solicitud::tecnico()`, pantalla propia `employee/solicitudes/{id}/control-interno`; falta `migrate`).
 4. ~~**CI-4** Motor de clasificación~~ — hecho el 12/09/2026 (`App\Services\ControlInternoClasificador::clasificar()`, usado por `ProcessExcelJob` y por el guardado manual de CI-3, mueve GENERAL→CONSTRUIDO→TC y aplica PEND_ANULACION por marca manual, según las reglas exactas del VBA original; falta `migrate` para que corra sin errores. Rechazada/Anulada del portal queda para CI-6 a propósito).
-5. ~~**CI-5** Indicadores calculados~~ — hecho el 12/09/2026 (`App\Services\ControlInternoIndicadores`, visibles en la pestaña Control Interno de Detalle de Solicitud; de paso se corrigió un bug preexistente en la fecha base — ver la sección de CI-5. Falta `migrate` + `npm run build`).
-6. ~~**CI-9** Vistas por fase~~ — hecho el 12/09/2026 (listado en `employee/control-interno`, filtro por fase y búsqueda por número; ya se puede usar el sistema en el día a día).
-7. **CI-6** Anulación/Rechazo completo.
-8. **CI-8** Bitácora ampliada.
-9. **CI-7** IND 2 / Puntaje.
-10. **CI-10** Dashboard resumen.
+5. ~~**CI-5** Indicadores calculados~~ — hecho el 12/09/2026 (`App\Services\ControlInternoIndicadores`, visibles en la pantalla de Control Interno por solicitud y en el listado de CI-9; de paso se corrigió un bug preexistente en la fecha base — ver la sección de CI-5. Falta `migrate` + `npm run build`).
+6. ~~**CI-9** Vistas por fase~~ — hecho el 12/09/2026 (listado en `employee/control-interno` con pestañas por fase, filtros de empresa/categoría/búsqueda y columnas ASESOR/CUADRILLA/SEMÁFORO/DESFACE; ya se puede usar el sistema en el día a día. De paso se encontró y corrigió un bug: faltaba crear `resources/js/control-interno-detail.js`, que la pantalla individual de CI-3 ya necesitaba. Falta `npm run build`).
+7. ~~**CI-6** Anulación/Rechazo — parte segura~~ — hecho el 12/09/2026 (captura de Rechazada/Anulada/Motivo de anulación en `Instalacion`, sin ninguna regla de eliminación/archivado; falta `migrate`). **La regla de negocio en sí sigue pendiente de que Turco decida** qué significa "eliminar" para una `Solicitud` compartida con Asignación a Técnicos.
+8. ~~**CI-8** Bitácora ampliada~~ — hecho el 12/09/2026 (se encontró que `logs` nunca se escribía y se implementó de raíz, no solo los contadores nuevos; falta `migrate`).
+9. ~~**CI-7** IND 2 / Puntaje~~ — hecho el 12/09/2026 (`App\Services\ControlInternoPuntaje::trimestre()`, fórmulas reales tomadas de la hoja PUNTAJE del Excel original; sin vista propia, la usará CI-10).
+10. ~~**CI-10** Dashboard resumen~~ — hecho el 12/09/2026 (`ControlInternoDashboard::resumen()`, pantalla `employee/control-interno/resumen`; falta `migrate`+`npm run build` acumulados de los pasos anteriores). **Con esto quedan los 11 submódulos implementados** — solo falta que Turco decida la regla de negocio de CI-6 (ver esa sección) y corra `migrate`/`db:seed`/`npm run build` en su entorno.
 
 (CI-11 es solo documentación, no tiene entregable de código.)
+
+## 4. Para que todo esto corra en tu entorno
+
+Esta sesión no pudo ejecutar comandos en tu máquina (falla de montaje de carpeta reportada por Windows desde el 8-sep-2026), así que falta correr, en orden, en la carpeta del proyecto:
+
+1. `php artisan migrate` — aplica TODAS las migraciones nuevas de CI-1 a CI-6 (parámetros, feriados, código de empresa, fase de control interno, columnas manuales, F. TC, Rechazada/Anulada/Motivo de anulación, resumen_control_interno de logs).
+2. `php artisan db:seed --class=ControlInternoParametrosSeeder` — carga los valores por defecto (plazos, feriados 2026, código CYC/CLB por RUC). Sin esto, `ParametroControlInterno::actual()` y `Empresa::codigo` igual funcionan (tienen valores por defecto/`firstOrCreate`), pero es mejor correrlo para tener los datos reales del Excel desde el día uno.
+3. `npm run build` — el proyecto sirve el build de producción (no hay servidor Vite en modo dev), así que los cambios de `resources/js/*` (más recientemente `control-interno-detail.js`) no se van a ver en el navegador hasta correr esto.
+4. Un hard-refresh del navegador después del build.
+
+**Pendiente de decisión (no es un comando, es tuyo):** qué debe pasar con una `Solicitud` cuando el portal confirma `Rechazada`/`Anulada` = "Sí" (CI-6) — el dato ya se captura, solo falta la regla. Con `migrate` corrido, puedes revisar en el listado de CI-9 o directamente en la base de datos cuántas/cuáles solicitudes reales caen ahí antes de decidir.
 
 ---
 *Generado a partir del análisis de `CONTROL INTERNAS - CYC CLB v5.4.xlsm` (hojas INICIO, GENERAL, CONSTRUIDO, TC, PEND_ANULACION, PUNTAJE, PARAM, INSTRUCTIVO y macros VBA) y del código actual de `cycproenerg` (modelos, controllers, migrations y rutas revisados el 12/09/2026).*

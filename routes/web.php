@@ -71,6 +71,8 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
     Route::prefix('control-interno')->name('control-interno.')->group(function () {
         // CI-9: listado de solicitudes con su fase/semáforo de Control Interno.
         Route::get('/', [Employee\ControlInternoController::class, 'index'])->name('index');
+        // CI-10: dashboard / resumen ejecutivo (conteo por fase/empresa, bitácora de la última carga, IND2/puntaje de CI-7).
+        Route::get('/resumen', [Employee\ControlInternoDashboardController::class, 'index'])->name('resumen');
         Route::get('/parametros', [Employee\ParametroControlInternoController::class, 'edit'])->name('parametros.edit');
         Route::put('/parametros', [Employee\ParametroControlInternoController::class, 'update'])->name('parametros.update');
         Route::resource('feriados', Employee\FeriadoController::class)

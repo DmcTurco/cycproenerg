@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Jobs\ProcessExcelJob;
 use App\Models\Concesionaria;
 use App\Models\Empresa;
+use App\Models\Logs;
 use App\Models\Proyecto;
 use App\Models\Prueba;
 use App\Models\Solicitante;
@@ -22,6 +23,7 @@ use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoPortal;
 use App\Models\EstadoInterno;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -138,13 +140,29 @@ class ClientController extends Controller
             ], 422);
         }
 
+        $log = null;
+
         try {
 
             $filePath = $file->store('temp-excel', 'local');
             $processId = Str::uuid();
-            $job = new ProcessExcelJob($filePath, $processId);
 
-            Log::info('Creando nuevo proceso', ['processId' => $processId]);
+            // CI-8: bitácora persistente de la carga (tabla `logs`, hoja
+            // INICIO del Excel original). Antes de este cambio ni esta acción
+            // ni ProcessExcelJob escribían ahí — el progreso solo vivía en
+            // caché (`excel_progress_*`), que es efímera. `total_filas` se
+            // completa recién en el job (ahí es donde se lee el archivo).
+            $log = Logs::create([
+                'nombre_archivo' => $file->getClientOriginalName(),
+                'total_filas' => 0,
+                'tamaño_archivo' => round($file->getSize() / (1024 * 1024), 2),
+                'estado' => 'en_proceso',
+                'employee_id' => Auth::id(),
+            ]);
+
+            $job = new ProcessExcelJob($filePath, $processId, $log->id);
+
+            Log::info('Creando nuevo proceso', ['processId' => $processId, 'logId' => $log->id]);
             Cache::put("excel_start_time_{$processId}", now(), now()->addHours(1));
             Cache::put("excel_progress_{$processId}", [
                 'progress' => 0,
@@ -173,6 +191,7 @@ class ClientController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error al iniciar el proceso: ' . $e->getMessage());
+            $log?->update(['estado' => 'error', 'errores' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Error al iniciar el proceso: ' . $e->getMessage()
