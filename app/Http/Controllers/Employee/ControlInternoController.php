@@ -54,6 +54,16 @@ class ControlInternoController extends Controller
             ->groupBy('fci.fase')
             ->pluck('total', 'fase');
 
+        // CI-6 (18/09/2026, a pedido de Turco): la anulación sigue siendo
+        // manual, pero necesita una ALERTA visible de lo que el portal ya
+        // reporta como Rechazada/Anulada y todavía no pasó a PEND_ANULACION
+        // (el staff no lo marcó a mano todavía) — respeta los mismos
+        // filtros de empresa/categoría/búsqueda que el resto del listado.
+        $alertasPortal = (clone $baseQuery)
+            ->whereHas('instalacion', fn ($q) => $q->where('rechazada', true)->orWhere('anulada', true))
+            ->whereDoesntHave('faseControlInterno', fn ($q) => $q->where('fase', FaseControlInterno::PEND_ANULACION))
+            ->count();
+
         $solicitudes = (clone $baseQuery)
             ->with(['faseControlInterno', 'instalacion', 'empresa', 'proyecto', 'asesor', 'tecnico'])
             ->when($fase, function ($query) use ($fase) {
@@ -82,6 +92,7 @@ class ControlInternoController extends Controller
             'categorias' => $categoriasMap,
             'empresaActual' => $empresaCodigo,
             'categoriaActual' => $categoriaCodigo,
+            'alertasPortal' => $alertasPortal,
         ]);
     }
 }

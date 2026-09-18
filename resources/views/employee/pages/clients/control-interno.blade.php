@@ -80,6 +80,21 @@
                     </div>
                 </div>
 
+                <div x-show="ci.portal_alerta?.rechazada || ci.portal_alerta?.anulada" x-cloak
+                    class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-semibold text-amber-800">
+                            El portal reporta esta solicitud como
+                            <span x-show="ci.portal_alerta?.anulada">Anulada</span><span x-show="ci.portal_alerta?.anulada && ci.portal_alerta?.rechazada"> / </span><span x-show="ci.portal_alerta?.rechazada">Rechazada</span>
+                        </p>
+                        <p class="mt-1 text-xs text-amber-700" x-show="ci.portal_alerta?.motivo" x-text="'Motivo: ' + ci.portal_alerta?.motivo"></p>
+                        <p class="mt-1 text-xs text-amber-600">Esto es solo informativo — la anulación sigue siendo manual. Si corresponde, marcá &quot;Marcar para anular&quot; abajo.</p>
+                    </div>
+                </div>
+
                 <div>
                     <p class="mb-3 text-sm font-semibold text-gray-700">Columnas manuales</p>
                     <p class="mb-4 text-xs text-gray-400">Estas 3 las llena el staff a mano — la carga de Excel del portal nunca las sobrescribe.</p>

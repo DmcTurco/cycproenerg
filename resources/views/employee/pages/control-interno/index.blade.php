@@ -57,6 +57,15 @@
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">
 
+            @if ($alertasPortal > 0)
+                <div class="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    <span><strong>{{ $alertasPortal }}</strong> {{ Str::plural('solicitud', $alertasPortal) }} que el portal reporta como Rechazada/Anulada y todavía no {{ $alertasPortal === 1 ? 'está marcada' : 'están marcadas' }} para anular (⚠ en la columna Fase).</span>
+                </div>
+            @endif
+
             {{-- Pestañas por fase, equivalentes a las hojas GENERAL / CONSTRUIDO / TC / PEND_ANULACION del Excel --}}
             @php($queryBase = request()->except(['fase', 'page']))
             <div class="mb-3 flex flex-wrap gap-2">
@@ -156,6 +165,12 @@
                                     </span>
                                     @if ($ind['nuevo'])
                                         <span class="badge bg-brand-100 text-brand-700">NUEVO</span>
+                                    @endif
+                                    @if (($solicitud->instalacion?->rechazada || $solicitud->instalacion?->anulada) && $ind['fase'] !== 'PEND_ANULACION')
+                                        <span class="badge bg-amber-100 text-amber-700"
+                                            title="El portal reporta esta solicitud como {{ $solicitud->instalacion?->anulada ? 'Anulada' : '' }}{{ $solicitud->instalacion?->anulada && $solicitud->instalacion?->rechazada ? ' / ' : '' }}{{ $solicitud->instalacion?->rechazada ? 'Rechazada' : '' }}{{ $solicitud->instalacion?->motivo_anulacion ? ' — ' . $solicitud->instalacion->motivo_anulacion : '' }}. No se anuló sola: revisar y marcar a mano si corresponde.">
+                                            ⚠ Portal
+                                        </span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-600">

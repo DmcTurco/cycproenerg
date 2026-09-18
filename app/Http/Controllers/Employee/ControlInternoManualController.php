@@ -21,6 +21,7 @@ class ControlInternoManualController extends Controller
     public function show(Solicitud $solicitud)
     {
         $fase = $solicitud->faseControlInterno;
+        $instalacion = $solicitud->instalacion;
 
         return response()->json([
             'fase' => $fase->fase ?? FaseControlInterno::GENERAL,
@@ -28,6 +29,16 @@ class ControlInternoManualController extends Controller
             'fecha_construccion_control' => optional($fase?->fecha_construccion_control)->format('Y-m-d'),
             'observacion_control' => $fase->observacion_control ?? '',
             'marcado_para_anular' => (bool) ($fase->marcado_para_anular ?? false),
+            // CI-6 (18/09/2026, a pedido de Turco): la anulación sigue
+            // siendo 100% manual (marcado_para_anular arriba) — esto es solo
+            // una ALERTA informativa de lo que reporta el portal en la
+            // última carga, para que el staff la vea y decida. Nunca mueve
+            // de fase ni se guarda por su cuenta.
+            'portal_alerta' => [
+                'rechazada' => (bool) ($instalacion?->rechazada ?? false),
+                'anulada' => (bool) ($instalacion?->anulada ?? false),
+                'motivo' => $instalacion?->motivo_anulacion,
+            ],
             // CI-5 (13/09/2026): calcularYGuardar() en vez de para() — este
             // detalle siempre debe mostrar el dato fresco (nunca el caché de
             // paraAlmacenado()), y de paso refresca el caché para el listado

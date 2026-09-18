@@ -4,4 +4,5 @@
     ['route' => 'employee.technicals.index', 'label' => 'Gestión de Técnicos', 'match' => 'employee/technicals*'],
     ['route' => 'employee.advisers.index', 'label' => 'Asesores', 'match' => 'employee/advisers*'],
     ['route' => 'employee.control-interno.index', 'label' => 'Control Interno', 'match' => ['employee/control-interno*', 'employee/solicitudes/*/control-interno']],
+    ['route' => 'employee.materiales.index', 'label' => 'Materiales', 'match' => 'employee/materiales*'],
 ]" />

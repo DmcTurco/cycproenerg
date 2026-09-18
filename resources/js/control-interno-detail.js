@@ -18,6 +18,7 @@ document.addEventListener('alpine:init', () => {
             observacion_control: '',
             marcado_para_anular: false,
             indicadores: {},
+            portal_alerta: { rechazada: false, anulada: false, motivo: null },
         },
 
         async load() {

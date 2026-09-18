@@ -84,4 +84,51 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         Route::get('/solicitudes/{solicitud}/manual', [Employee\ControlInternoManualController::class, 'show'])->name('solicitudes.manual.show');
         Route::put('/solicitudes/{solicitud}/manual', [Employee\ControlInternoManualController::class, 'update'])->name('solicitudes.manual.update');
     });
+
+    // Control de Materiales (migración de CONTROL_MATERIALES_CC_08-2026 rev 02.xlsm).
+    // Módulo nuevo e independiente de Control Interno (ver docs/modulos/control-materiales.md).
+    Route::prefix('materiales')->name('materiales.')->group(function () {
+        // CM-1: pantalla de Catálogo (pestañas Materiales / Herramientas).
+        Route::get('/', [Employee\CatalogoController::class, 'index'])->name('index');
+        Route::get('/parametros', [Employee\ParametroControlMaterialController::class, 'edit'])->name('parametros.edit');
+        Route::put('/parametros', [Employee\ParametroControlMaterialController::class, 'update'])->name('parametros.update');
+        // Rutas explícitas (en vez de Route::resource) para no depender de
+        // que Str::singular() adivine bien el nombre del parámetro en
+        // español ("items" -> {item} es correcto, pero no vale la pena
+        // arriesgarse con "herramientas" -> {herramienta}).
+        Route::get('items', [Employee\MaterialController::class, 'index'])->name('items.index');
+        Route::post('items', [Employee\MaterialController::class, 'store'])->name('items.store');
+        Route::get('items/{item}/edit', [Employee\MaterialController::class, 'edit'])->name('items.edit');
+        Route::delete('items/{item}', [Employee\MaterialController::class, 'destroy'])->name('items.destroy');
+
+        Route::get('herramientas', [Employee\HerramientaController::class, 'index'])->name('herramientas.index');
+        Route::post('herramientas', [Employee\HerramientaController::class, 'store'])->name('herramientas.store');
+        Route::get('herramientas/{herramienta}/edit', [Employee\HerramientaController::class, 'edit'])->name('herramientas.edit');
+        Route::delete('herramientas/{herramienta}', [Employee\HerramientaController::class, 'destroy'])->name('herramientas.destroy');
+
+        // CM-2: registro de cuadrillas (personas que retiran materiales).
+        Route::get('cuadrillas', [Employee\CuadrillaController::class, 'index'])->name('cuadrillas.index');
+        Route::post('cuadrillas', [Employee\CuadrillaController::class, 'store'])->name('cuadrillas.store');
+        Route::get('cuadrillas/{cuadrilla}/edit', [Employee\CuadrillaController::class, 'edit'])->name('cuadrillas.edit');
+        Route::delete('cuadrillas/{cuadrilla}', [Employee\CuadrillaController::class, 'destroy'])->name('cuadrillas.destroy');
+
+        // CM-3: ingresos (kardex de entradas de materiales al almacén).
+        Route::get('ingresos', [Employee\IngresoController::class, 'index'])->name('ingresos.index');
+        Route::post('ingresos', [Employee\IngresoController::class, 'store'])->name('ingresos.store');
+        Route::get('ingresos/{ingreso}/edit', [Employee\IngresoController::class, 'edit'])->name('ingresos.edit');
+        Route::delete('ingresos/{ingreso}', [Employee\IngresoController::class, 'destroy'])->name('ingresos.destroy');
+
+        // CM-4/CM-5: cotización (contratistas) / vale de entrega (personal
+        // directo) + su registro. Formulario de página completa (no
+        // crudModal): tiene una lista dinámica de ítems, a diferencia de
+        // los CRUDs simples de arriba.
+        Route::get('cotizaciones', [Employee\CotizacionController::class, 'index'])->name('cotizaciones.index');
+        Route::get('cotizaciones/crear', [Employee\CotizacionController::class, 'create'])->name('cotizaciones.create');
+        Route::post('cotizaciones', [Employee\CotizacionController::class, 'store'])->name('cotizaciones.store');
+        Route::get('cotizaciones/{cotizacion}/editar', [Employee\CotizacionController::class, 'edit'])->name('cotizaciones.edit');
+        Route::put('cotizaciones/{cotizacion}', [Employee\CotizacionController::class, 'update'])->name('cotizaciones.update');
+        Route::get('cotizaciones/{cotizacion}/pdf', [Employee\CotizacionController::class, 'pdf'])->name('cotizaciones.pdf');
+        Route::post('cotizaciones/{cotizacion}/descontar', [Employee\CotizacionController::class, 'marcarDescontado'])->name('cotizaciones.descontar');
+        Route::delete('cotizaciones/{cotizacion}', [Employee\CotizacionController::class, 'destroy'])->name('cotizaciones.destroy');
+    });
 });
