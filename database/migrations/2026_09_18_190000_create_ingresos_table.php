@@ -23,7 +23,7 @@ return new class extends Migration
     {
         Schema::create('ingresos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('material_id')->constrained('materiales')->cascadeOnDelete();
+            $table->unsignedBigInteger('material_id');
             $table->date('fecha');
             $table->decimal('cantidad', 12, 2);
             $table->string('proveedor')->nullable();

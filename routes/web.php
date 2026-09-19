@@ -130,5 +130,18 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         Route::get('cotizaciones/{cotizacion}/pdf', [Employee\CotizacionController::class, 'pdf'])->name('cotizaciones.pdf');
         Route::post('cotizaciones/{cotizacion}/descontar', [Employee\CotizacionController::class, 'marcarDescontado'])->name('cotizaciones.descontar');
         Route::delete('cotizaciones/{cotizacion}', [Employee\CotizacionController::class, 'destroy'])->name('cotizaciones.destroy');
+
+        // CM-6: registro rápido + ejecutado (solo personal directo).
+        Route::get('ejecutados', [Employee\EjecutadoController::class, 'index'])->name('ejecutados.index');
+        Route::get('ejecutados/crear', [Employee\EjecutadoController::class, 'create'])->name('ejecutados.create');
+        Route::post('ejecutados', [Employee\EjecutadoController::class, 'store'])->name('ejecutados.store');
+        Route::delete('ejecutados/{ejecutado}', [Employee\EjecutadoController::class, 'destroy'])->name('ejecutados.destroy');
+
+        // CM-7: entregas de herramientas (ENTREGA/DEVOLUCION). Sin macro
+        // dedicada en el Excel -> CRUD simple (crudModal), como CM-1/2/3.
+        Route::get('entregas', [Employee\EntregaController::class, 'index'])->name('entregas.index');
+        Route::post('entregas', [Employee\EntregaController::class, 'store'])->name('entregas.store');
+        Route::get('entregas/{entrega}/edit', [Employee\EntregaController::class, 'edit'])->name('entregas.edit');
+        Route::delete('entregas/{entrega}', [Employee\EntregaController::class, 'destroy'])->name('entregas.destroy');
     });
 });

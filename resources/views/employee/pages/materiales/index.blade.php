@@ -20,9 +20,17 @@
         <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
             <h2 class="text-base font-semibold text-white">Catálogo</h2>
             <div class="flex items-center gap-2">
+                <a href="{{ route('employee.materiales.ejecutados.index') }}"
+                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
+                    Ejecutado
+                </a>
                 <a href="{{ route('employee.materiales.cotizaciones.index') }}"
                     class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
                     Cotizaciones
+                </a>
+                <a href="{{ route('employee.materiales.entregas.index') }}"
+                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
+                    Entregas
                 </a>
                 <a href="{{ route('employee.materiales.ingresos.index') }}"
                     class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">

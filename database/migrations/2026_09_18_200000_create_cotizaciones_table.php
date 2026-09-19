@@ -23,7 +23,7 @@ return new class extends Migration
             // / "VALE-260716-01" — ver Cotizacion::siguienteNumero().
             $table->string('numero', 30)->unique();
             $table->date('fecha');
-            $table->foreignId('cuadrilla_id')->constrained()->restrictOnDelete();
+            $table->unsignedBigInteger('cuadrilla_id');
             // true = VALE (PERSONAL DIRECTO, a costo, sin IGV, no descuenta
             // stock al emitir); false = COTIZACION (CONTRATISTA, con IGV,
             // descuenta stock al emitir).

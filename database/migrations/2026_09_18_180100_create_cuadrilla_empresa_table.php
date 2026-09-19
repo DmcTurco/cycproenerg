@@ -20,8 +20,8 @@ return new class extends Migration
     {
         Schema::create('cuadrilla_empresa', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cuadrilla_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('empresa_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('cuadrilla_id');
+            $table->unsignedBigInteger('empresa_id');
             $table->unique(['cuadrilla_id', 'empresa_id']);
             $table->timestamps();
         });

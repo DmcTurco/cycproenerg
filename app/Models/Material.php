@@ -79,10 +79,21 @@ class Material extends Model
     }
 
     /**
+     * Relación con lo EJECUTADO por personal directo (CM-6).
+     */
+    public function ejecutados(): HasMany
+    {
+        return $this->hasMany(Ejecutado::class);
+    }
+
+    /**
      * CATALOGO!K — total de salidas:
      *   - CONTRATISTA (cotización): descuenta ya, al emitir (CM-4) — ✅.
-     *   - PERSONAL DIRECTO (vale): NO descuenta al emitir, recién cuando
-     *     se reporta lo EJECUTADO (CM-6, todavía no existe) — sigue en 0.
+     *   - PERSONAL DIRECTO (vale): descuenta recién cuando se reporta lo
+     *     EJECUTADO (CM-6) — ✅. EJECUTADO se reporta en METROS para
+     *     tuberías; se divide por factor_metros_por_unidad para volver a
+     *     la unidad de stock (rollos), igual que CATALOGO!K del Excel.
+     *     Una DEVOLUCION resta (vuelve al stock).
      */
     public function salidas(): float
     {
@@ -90,9 +101,10 @@ class Material extends Model
             ->whereHas('cotizacion', fn ($query) => $query->where('es_vale', false))
             ->sum('cantidad');
 
-        // TODO CM-6: sumar lo ejecutado por personal directo (dividido por
-        // factor_metros_por_unidad para tuberías), ver EJECUTADO en el Excel.
-        $salidasPersonalDirecto = 0.0;
+        $factor = max(1.0, (float) $this->factor_metros_por_unidad);
+        $salidaEjecutada = (float) $this->ejecutados()->where('movimiento', Ejecutado::MOVIMIENTO_SALIDA)->sum('cantidad');
+        $devueltoEjecutado = (float) $this->ejecutados()->where('movimiento', Ejecutado::MOVIMIENTO_DEVOLUCION)->sum('cantidad');
+        $salidasPersonalDirecto = ($salidaEjecutada - $devueltoEjecutado) / $factor;
 
         return $salidasContratistas + $salidasPersonalDirecto;
     }

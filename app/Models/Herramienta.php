@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * CM-1: catálogo de herramientas (hoja CATALOGO, bloque de herramientas,
  * filas 164+ del Excel). El código HER-### se autogenera (nunca lo llena
- * el staff); responsable actual y ubicación son fórmulas en el Excel que
- * dependen de `entregas` (CM-7, todavía no existe) — hasta entonces se
- * asume que toda herramienta está en ALMACEN (nadie se la llevó todavía).
+ * el staff); responsable actual y ubicación se calculan desde `entregas`
+ * (CM-7).
  */
 class Herramienta extends Model
 {
@@ -50,14 +50,35 @@ class Herramienta extends Model
         return 'HER-' . str_pad((int) $ultimo + 1, 3, '0', STR_PAD_LEFT);
     }
 
+    public function entregas(): HasMany
+    {
+        return $this->hasMany(Entrega::class);
+    }
+
     /**
-     * CATALOGO!I164+ — RESPONSABLE ACTUAL. Se calcula desde `entregas`
-     * (CM-7, todavía no existe): mientras tanto, ninguna herramienta tiene
-     * responsable (todas están en almacén).
+     * CATALOGO!I164+ — RESPONSABLE ACTUAL:
+     *   =IFERROR(IF(LOOKUP(2,1/(ENTREGAS!$B$5:$B$304=$B165),ENTREGAS!$C$5:$C$304)="DEVOLUCION",
+     *       "ALMACEN",
+     *       LOOKUP(2,1/(ENTREGAS!$B$5:$B$304=$B165),ENTREGAS!$D$5:$D$304)),
+     *       "ALMACEN")
+     * Es decir: se busca el ÚLTIMO movimiento (por fecha, luego id) de esta
+     * herramienta en `entregas`; si ese último movimiento es DEVOLUCION,
+     * vuelve a estar en ALMACEN; si es ENTREGA, el responsable es la
+     * cuadrilla de esa fila; si nunca tuvo movimientos, ALMACEN.
      */
     public function responsableActual(): ?string
     {
-        return null;
+        $ultima = $this->entregas()
+            ->with('cuadrilla')
+            ->orderByDesc('fecha')
+            ->orderByDesc('id')
+            ->first();
+
+        if (!$ultima || $ultima->tipo === Entrega::TIPO_DEVOLUCION) {
+            return null;
+        }
+
+        return $ultima->cuadrilla->nombre ?? null;
     }
 
     /**

@@ -17,10 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('solicitud_id');
             $table->timestamps();
             $table->softDeletes();
-            // Foráneas
-            $table->foreign('tecnico_id')->references('id')->on('tecnicos');
-            $table->foreign('solicitud_id')->references('id')->on('solicituds');
-
         });
     }
 

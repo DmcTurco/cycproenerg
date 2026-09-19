@@ -77,11 +77,25 @@ Tabla automática de lo emitido en CM-4: fecha, número, cuadrilla, monto, IGV, 
 
 - No es una pantalla aparte: es el mismo listado `employee/materiales/cotizaciones` de CM-4 (la tabla `cotizaciones` ES el registro), con la acción "marcar descontado en valorización" (pide N° de valorización, solo disponible para CONTRATISTA + PENDIENTE).
 
-### CM-6. Registro rápido + Ejecutado (solo personal directo)
-Formulario de campo (REGISTRO RÁPIDO): técnico, fecha, tipo de trabajo, N° de suministro, movimiento (SALIDA/DEVOLUCIÓN) y cantidades sobre el catálogo — muestra cuánto tiene "en su poder" (por vales) antes de reportar. Al guardar, pasa cada línea a EJECUTADO (base de datos de lo realmente usado y lo devuelto, valorizado a costo). Los contratistas nunca pasan por acá.
+### CM-6. Registro rápido + Ejecutado (solo personal directo) — ✅ implementado (19/09/2026)
+Formulario de campo (REGISTRO RÁPIDO): cuadrilla (personal directo), fecha, tipo de trabajo, N° de suministro, movimiento (SALIDA/DEVOLUCIÓN) y cantidades sobre el catálogo — muestra cuánto tiene "en su poder" (por vales) antes de reportar. Al guardar, pasa cada línea a EJECUTADO (base de datos de lo realmente usado y lo devuelto, valorizado a costo). Los contratistas nunca pasan por acá.
 
-### CM-7. Entregas de herramientas
+- **Valorización EN VIVO, no una foto:** a diferencia de `cotizacion_detalles` (que sí guarda el precio del momento porque es un documento emitido), `Ejecutado::precioCosto()`/`total()` recalculan siempre con el precio vigente ACTUAL del material — igual que las columnas J/K de EJECUTADO en el Excel, que son fórmulas, no valores fijos.
+- **"En su poder"** (`Cuadrilla::saldosEnPoder()`): vale recibido (convertido a la unidad reportada con `factor_metros_por_unidad`) menos TODO lo ejecutado, sea SALIDA o DEVOLUCIÓN — las dos reducen el saldo, por motivos distintos (una lo consume, la otra lo devuelve). Se calcula en bloque para todos los materiales de una cuadrilla con 2 consultas agregadas, no una por fila.
+- Con esto se completó el último placeholder de CM-1: `Material::salidas()` ahora suma también el lado PERSONAL DIRECTO — `(SALIDA − DEVOLUCION) / factor_metros_por_unidad`, igual que CATALOGO!K del Excel. `Material::salidas()` queda 100% real, sin partes pendientes.
+- No hay "corregir" como en CM-4: si algo se reportó mal, se elimina (soft delete, no se pierde el dato) y se vuelve a cargar — cada fila de Ejecutado es un movimiento atómico, no un documento con número.
+- Formulario de página completa con lista dinámica de ítems (mismo patrón que CM-4). Se elige la cuadrilla primero (recarga la página por GET) para traer su saldo "en su poder" actualizado antes de cargar cantidades.
+- Pantallas: `employee/materiales/ejecutados` (listado con filtros) y `.../ejecutados/crear` (formulario). Botón "Ejecutado" en el header de Catálogo.
+- **Pendiente para que corra:** `php artisan migrate` (1 tabla nueva: `ejecutados`).
+
+### CM-7. Entregas de herramientas — ✅ implementado (19/09/2026)
 Registro de entrega/devolución de herramientas a las cuadrillas: cada fila es un movimiento (ENTREGA o DEVOLUCIÓN); de ahí sale el responsable actual y la ubicación (ALMACÉN / EN CAMPO / PERDIDA) que se ve en el catálogo de herramientas (CM-1).
+
+- **Sin macro dedicada en el Excel** (a diferencia de COTIZACION/REGISTRO RAPIDO): ENTREGAS es una tabla de llenado manual, así que el UI es un CRUD simple con `crudModal` — mismo patrón que CM-1/CM-2/CM-3, no el formulario de página completa de CM-4/CM-6.
+- **PERSONA (texto libre en el Excel) → `cuadrilla_id`** (FK a `cuadrillas`), misma convención del módulo: nunca texto libre, para poder cruzar reportes por cuadrilla.
+- Con esto se completaron los últimos placeholders de CM-1: `Herramienta::responsableActual()`/`ubicacion()` ya no son stubs — replican `LOOKUP(2,1/(ENTREGAS!$B=código),...)` del Excel: se busca el ÚLTIMO movimiento (por fecha, luego id) de la herramienta; si es DEVOLUCION → vuelve a ALMACEN; si es ENTREGA → responsable = la cuadrilla de esa fila; sin movimientos → ALMACEN. `ubicacion()` deriva de eso (PERDIDA si el estado lo dice; si no, EN CAMPO cuando hay responsable, si no ALMACEN) — ya se veía en el catálogo de herramientas (CM-1), ahora con datos reales en vez de siempre "ALMACEN".
+- Pantalla: `employee/materiales/entregas` (listado con filtros por herramienta/cuadrilla/búsqueda + modal crear/editar). Botón "Entregas" en el header de Catálogo.
+- **Pendiente para que corra:** `php artisan migrate` (1 tabla nueva: `entregas`).
 
 ### CM-8. Resumen / Panel de control
 Equivalente a RESUMEN: indicadores generales (valor del inventario, ítems sin stock/por reponer, alarmas de precio, total valorizado a contratistas, ejecutado por personal directo, cotizaciones pendientes, herramientas en campo/perdidas) + el corte por cuadrilla:
@@ -104,8 +118,8 @@ Archiva un snapshot del estado del módulo, migra stock final → inicial, conso
 2. ~~**CM-2** Cuadrillas~~ — hecho el 18/09/2026 (falta `migrate`), necesario antes de poder emitir nada.
 3. ~~**CM-3** Ingresos~~ — hecho el 18/09/2026 (falta `migrate`), para tener kardex real antes de probar salidas.
 4. ~~**CM-4** Cotización/Vale + **CM-5** Registro de emitidos~~ — hecho el 18/09/2026 (falta `composer require` + `migrate`).
-5. **CM-6** Registro rápido + Ejecutado.
-6. **CM-7** Entregas de herramientas.
+5. ~~**CM-6** Registro rápido + Ejecutado~~ — hecho el 19/09/2026 (falta `migrate`).
+6. ~~**CM-7** Entregas de herramientas~~ — hecho el 19/09/2026 (falta `migrate`).
 7. **CM-8** Resumen/Panel — necesita todo lo anterior para tener datos que resumir.
 8. **CM-9** Imprimibles + **CM-10** Inventario físico (documentos, bajo riesgo).
 9. **CM-11** Cierre de mes — al final, cuando todo esté validado en uso real.
