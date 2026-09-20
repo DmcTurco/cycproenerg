@@ -97,14 +97,26 @@ Registro de entrega/devolución de herramientas a las cuadrillas: cada fila es u
 - Pantalla: `employee/materiales/entregas` (listado con filtros por herramienta/cuadrilla/búsqueda + modal crear/editar). Botón "Entregas" en el header de Catálogo.
 - **Pendiente para que corra:** `php artisan migrate` (1 tabla nueva: `entregas`).
 
-### CM-8. Resumen / Panel de control
-Equivalente a RESUMEN: indicadores generales (valor del inventario, ítems sin stock/por reponer, alarmas de precio, total valorizado a contratistas, ejecutado por personal directo, cotizaciones pendientes, herramientas en campo/perdidas) + el corte por cuadrilla:
-- **Contratista**: lista de cotizaciones PENDIENTES hasta una fecha de corte, con opción de marcarlas como DESCONTADO EN VALORIZACIÓN (con su N° de valorización).
-- **Personal directo**: liquidación automática por material (retirado por vales − ejecutado − devuelto = saldo en su poder, valorizado a costo; saldo negativo no cuenta a favor).
-Genera un PDF del corte (con las cotizaciones pendientes anexadas, si se quiere, para contratistas).
+### CM-8. Resumen / Panel de control — ✅ implementado (19/09/2026)
+Equivalente a RESUMEN (indicadores generales, filas 4-15) + la macro `GenerarResumenPDF` de `MacrosCYC.bas` (corte por cuadrilla, hoja oculta RESUMEN CUADRILLA). A diferencia de los indicadores generales (100% fórmulas de hoja, igual que PUNTAJE/INICIO en Control Interno), el corte por cuadrilla SÍ tenía macro — se descompiló con oletools en vez de adivinar, porque tiene reglas no obvias (ver abajo).
 
-### CM-9. Imprimibles
-Actas de entrega de materiales (formato en blanco para firmar en campo) y stickers de herramientas (código + datos, varios por hoja A4) — son documentos de impresión, no requieren tanto backend como una vista lista para imprimir/exportar a PDF.
+- **Sin tabla ni migración propia**: todo se calcula en vivo sobre lo que ya existe (CM-1 a CM-7), en `App\Services\ControlMaterialesResumen`. `generales()` se cachea 5 min (igual que `ControlInternoDashboard`) porque recorre todo el catálogo/ejecutados en PHP (`Material::precioVigente()`/`Ejecutado::total()` son cálculos en vivo, no columnas).
+- **Indicadores generales** (`RESUMEN!C4:C15`, sin partir por Empresa CYC/CLB: el almacén es único, decisión de CM-1): valor del inventario = SUMPRODUCT(precio **vigente** × stock actual, no precio base, pese a la etiqueta "a costo" del Excel); ítems SIN STOCK/POR REPONER; alarmas de precio — dos conteos DISTINTOS, no el mismo dos veces (`Ingreso::alertaPrecio()` por fila con umbral vs. `Material::alertaPrecio()` por material sin umbral, ver CM-3); total valorizado a CONTRATISTAS = TODAS las cotizaciones "C&C-*" alguna vez emitidas (cualquier estado, no solo pendientes); ejecutado PERSONAL DIRECTO = neto SALIDA−DEVOLUCION (`Ejecutado::total()` ya trae el signo); cotizaciones PENDIENTES + su monto; herramientas en campo/perdidas. **Diferencia deliberada con el Excel:** "herramientas en campo" ahí es un conteo crudo (ENTREGA−DEVOLUCION en todo el historial, sin agrupar); acá se usa `Herramienta::ubicacion()` (CM-7, basado en el ÚLTIMO movimiento por herramienta) — más preciso si algún historial es irregular, mismo criterio que otras veces de preferir la fuente de verdad ya construida.
+- **Corte por cuadrilla** (`corteCuadrilla()`), dos formatos completamente distintos según el tipo — traducción directa de `GenerarResumenPDF`:
+  - **CONTRATISTA**: sus cotizaciones `PENDIENTE` con fecha ≤ la fecha de corte (**sin filtro "desde"**: el corte siempre es acumulado hasta una fecha, igual que el Excel — "desde" es solo una referencia visual, no filtra nada, fiel a la macro). Acción "cerrar corte": marca TODAS las listadas como `DESCONTADO EN VALORIZACION` con un N° de valorización, en un solo paso (a diferencia de la acción individual de CM-4/CM-5, que marca una cotización a la vez). Igual que `Cotizacion::emitir()` al corregir, la observación se **anexa**, nunca se pisa (el Excel sí pisaba la columna OBSERVACION con la nota del corte — se decidió no perder datos, mismo criterio que el resto del módulo).
+  - **PERSONAL DIRECTO**: liquidación acumulada al `hasta`, material por material: retirado por vale (convertido a la unidad reportada con `factor_metros_por_unidad`, igual que `Cuadrilla::saldosEnPoder()`) − ejecutado − devuelto = saldo en su poder, valorizado al costo vigente actual. Saldo negativo (usó más de lo que retiró con vale) se muestra para revisar pero su VALOR es 0 (no cuenta a favor, igual que la macro). Solo se listan materiales con algún movimiento.
+- **PDF** (`Barryvdh\DomPDF`, mismo patrón que CM-4): un solo template con las dos variantes (`resumen/pdf.blade.php`). **Simplificación deliberada** respecto al Excel: no se implementó la opción de la macro de anexar las cotizaciones completas como PDF adjunto (mergear varios PDFs) — se dejó fuera por complejidad/bajo valor frente al resto del roadmap; el PDF del corte trae el resumen solamente, con enlace a cada cotización individual desde la pantalla (no desde el PDF).
+- Pantallas: `employee/materiales/resumen` (indicadores + tabla "Registro de cuadrillas y valorizado por persona", reutilizando `Cuadrilla::numRetiros()/totalValorizado()/pendienteDescuento()` de CM-4/CM-5 — no se repitió esa lógica) y `employee/materiales/resumen/{cuadrilla}/corte` (detalle + acción de cierre para contratistas + botón de PDF). Botón "Resumen" agregado al header de Catálogo.
+- **Sin nada pendiente para que corra**: no agrega tablas ni columnas nuevas, así que no hace falta `php artisan migrate` esta vez.
+
+### CM-9. Imprimibles — ✅ implementado (19/09/2026)
+Equivalente a la hoja IMPRIMIBLES (leída con openpyxl campo por campo antes de programar: sin macro dedicada, es la única hoja del módulo que es puro layout de impresión). Tres piezas, sin tabla ni migración propia:
+
+- **Acta de entrega de materiales** (`IMPRIMIBLES!A1:F30`): formato EN BLANCO a propósito — las filas (N°/código/descripción/cantidad/unidad) se llenan a mano en campo, antes de que exista la cotización/vale formal de CM-4 (por eso el Excel aclara que lo entregado a CONTRATISTA se cotiza después y lo de PERSONAL DIRECTO se sustenta con Ejecutado). Elegir una cuadrilla es opcional y solo pre-llena el encabezado (nombre, empresa(s), tipo).
+- **Acta de entrega de herramientas** (`IMPRIMIBLES!A33:F57`): a diferencia de la de materiales, **sí** conviene pre-llenar filas cuando se eligen herramientas puntuales — cada una ya tiene identidad única en el catálogo (código, descripción, marca/serie, estado), no es una cantidad a decidir en campo como los materiales. Máximo 12 filas por página, igual que el Excel; si se eligen más, se reparten en varias páginas automáticamente (mejora sobre el Excel, que estaba fijo a 12).
+- **Stickers de herramientas** (`IMPRIMIBLES!A61` en adelante, para papel adhesivo A4): traducción literal de la fórmula de cada etiqueta — "C&C PROENERG" + código + descripción + marca/modelo (si tiene) + "SERIE: ..." (si tiene) + "RESP.: " (el responsable actual de CM-7, o una línea en blanco si está en ALMACEN). 3 columnas × 7 filas = 21 por hoja, igual que el Excel. **Diferencia deliberada:** el Excel estaba limitado a 100 herramientas fijas repartidas en 5 hojas A4 fijas (`HOJA 1..5`, `21/21/21/21/16` etiquetas); acá se genera para las herramientas que se elijan (o todas si no se marca ninguna) y dompdf pagina solo, sin ese límite de 100.
+- Controlador `ImprimibleController` (sin service propio: no hay cálculo de negocio, solo armar los PDFs) + pantalla `employee/materiales/imprimibles` (los tres formularios de descarga) + botón "Imprimibles" en el header de Catálogo.
+- **Sin nada pendiente para que corra**: no agrega tablas ni columnas nuevas.
 
 ### CM-10. Inventario físico
 Cierre de conteo: lista de materiales con stock del sistema, conteo físico (a llenar), diferencia calculada, observación/ubicación, y firmas de almacenero/supervisor.
@@ -120,8 +132,8 @@ Archiva un snapshot del estado del módulo, migra stock final → inicial, conso
 4. ~~**CM-4** Cotización/Vale + **CM-5** Registro de emitidos~~ — hecho el 18/09/2026 (falta `composer require` + `migrate`).
 5. ~~**CM-6** Registro rápido + Ejecutado~~ — hecho el 19/09/2026 (falta `migrate`).
 6. ~~**CM-7** Entregas de herramientas~~ — hecho el 19/09/2026 (falta `migrate`).
-7. **CM-8** Resumen/Panel — necesita todo lo anterior para tener datos que resumir.
-8. **CM-9** Imprimibles + **CM-10** Inventario físico (documentos, bajo riesgo).
+7. ~~**CM-8** Resumen/Panel~~ — hecho el 19/09/2026, sin migración nueva.
+8. ~~**CM-9** Imprimibles~~ — hecho el 19/09/2026, sin migración nueva. **CM-10** Inventario físico sigue pendiente (documento, bajo riesgo).
 9. **CM-11** Cierre de mes — al final, cuando todo esté validado en uso real.
 
 ## 5. Puntos a confirmar con Turco antes/durante la implementación

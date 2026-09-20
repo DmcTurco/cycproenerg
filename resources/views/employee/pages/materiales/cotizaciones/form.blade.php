@@ -3,18 +3,25 @@
 @php
     $fullBleed = true;
     $esCorreccion = $cotizacion !== null;
+
+    $materialesData = $materiales->map(fn ($m) => [
+        'id' => $m->id,
+        'label' => $m->codigo . ' — ' . $m->descripcion,
+        'precio_vale' => $m->precioVigente(),
+        'precio_cotizacion' => $m->precioVentaSinIgv(),
+    ])->values()->all();
+
+    $cuadrillasData = $cuadrillas->map(fn ($c) => [
+        'id' => $c->id,
+        'tipo' => $c->tipo,
+    ])->values()->all();
 @endphp
 
 @section('content')
     <div
         x-data="cotizacionForm({
-            materiales: @json($materiales->map(fn ($m) => [
-                'id' => $m->id,
-                'label' => $m->codigo . ' — ' . $m->descripcion,
-                'precio_vale' => $m->precioVigente(),
-                'precio_cotizacion' => $m->precioVentaSinIgv(),
-            ])),
-            cuadrillas: @json($cuadrillas->map(fn ($c) => ['id' => $c->id, 'tipo' => $c->tipo])),
+            materiales: @json($materialesData),
+            cuadrillas: @json($cuadrillasData),
             cuadrillaId: {{ old('cuadrilla_id', $cotizacion->cuadrilla_id ?? '') ?: 'null' }},
             igvRate: {{ \App\Models\ParametroControlMaterial::actual()->igv }},
             initialItems: @json(old('items', $initialItems)),

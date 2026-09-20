@@ -19,32 +19,6 @@
     <div class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
         <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
             <h2 class="text-base font-semibold text-white">Catálogo</h2>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('employee.materiales.ejecutados.index') }}"
-                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
-                    Ejecutado
-                </a>
-                <a href="{{ route('employee.materiales.cotizaciones.index') }}"
-                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
-                    Cotizaciones
-                </a>
-                <a href="{{ route('employee.materiales.entregas.index') }}"
-                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
-                    Entregas
-                </a>
-                <a href="{{ route('employee.materiales.ingresos.index') }}"
-                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
-                    Ingresos
-                </a>
-                <a href="{{ route('employee.materiales.cuadrillas.index') }}"
-                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
-                    Cuadrillas
-                </a>
-                <a href="{{ route('employee.materiales.parametros.edit') }}"
-                    class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
-                    Parámetros
-                </a>
-            </div>
         </div>
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">

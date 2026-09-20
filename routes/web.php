@@ -143,5 +143,20 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         Route::post('entregas', [Employee\EntregaController::class, 'store'])->name('entregas.store');
         Route::get('entregas/{entrega}/edit', [Employee\EntregaController::class, 'edit'])->name('entregas.edit');
         Route::delete('entregas/{entrega}', [Employee\EntregaController::class, 'destroy'])->name('entregas.destroy');
+
+        // CM-8: resumen / panel de control (indicadores generales +
+        // corte por cuadrilla, macro GenerarResumenPDF traducida en
+        // App\Services\ControlMaterialesResumen).
+        Route::get('resumen', [Employee\MaterialesResumenController::class, 'index'])->name('resumen.index');
+        Route::get('resumen/{cuadrilla}/corte', [Employee\MaterialesResumenController::class, 'corte'])->name('resumen.corte');
+        Route::post('resumen/{cuadrilla}/cerrar', [Employee\MaterialesResumenController::class, 'cerrar'])->name('resumen.cerrar');
+        Route::get('resumen/{cuadrilla}/pdf', [Employee\MaterialesResumenController::class, 'pdf'])->name('resumen.pdf');
+
+        // CM-9: imprimibles (actas en blanco para firmar en campo +
+        // stickers de herramientas). Sin macro dedicada en el Excel.
+        Route::get('imprimibles', [Employee\ImprimibleController::class, 'index'])->name('imprimibles.index');
+        Route::get('imprimibles/acta-materiales', [Employee\ImprimibleController::class, 'actaMateriales'])->name('imprimibles.acta-materiales');
+        Route::get('imprimibles/acta-herramientas', [Employee\ImprimibleController::class, 'actaHerramientas'])->name('imprimibles.acta-herramientas');
+        Route::get('imprimibles/stickers', [Employee\ImprimibleController::class, 'stickers'])->name('imprimibles.stickers');
     });
 });
