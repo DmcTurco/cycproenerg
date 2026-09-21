@@ -21,12 +21,6 @@
         </div>
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">
-            <p class="mb-3 max-w-3xl text-sm text-gray-500">
-                Equivalente a COTIZACION (formulario) + COTIZACIONES (registro). CONTRATISTA genera una cotización
-                con IGV que descuenta stock al toque; PERSONAL DIRECTO genera un vale a costo, sin IGV, que recién
-                descuenta stock cuando se reporte lo ejecutado (CM-6).
-            </p>
-
             <form method="GET" action="{{ route('employee.materiales.cotizaciones.index') }}" class="mb-3 flex flex-wrap items-end gap-2">
                 <div>
                     <label class="form-label" for="filter_cuadrilla">Cuadrilla</label>
@@ -66,6 +60,7 @@
                     <thead>
                         <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                             <th class="sticky top-0 z-10 bg-white px-4 py-3">N° documento</th>
+                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Correlativo</th>
                             <th class="sticky top-0 z-10 bg-white px-4 py-3">Fecha</th>
                             <th class="sticky top-0 z-10 bg-white px-4 py-3">Cuadrilla</th>
                             <th class="sticky top-0 z-10 bg-white px-4 py-3 text-right">Monto S/IGV</th>
@@ -79,6 +74,7 @@
                         @forelse ($cotizaciones as $cotizacion)
                             <tr>
                                 <td class="px-4 py-3 font-medium text-gray-900">{{ $cotizacion->numero }}</td>
+                                <td class="px-4 py-3 text-gray-500">{{ $cotizacion->serie }}-{{ $cotizacion->correlativo }}</td>
                                 <td class="px-4 py-3 text-gray-600">{{ $cotizacion->fecha->format('d/m/Y') }}</td>
                                 <td class="px-4 py-3 text-gray-600">{{ $cotizacion->cuadrilla->nombre ?? '—' }}</td>
                                 <td class="px-4 py-3 text-right text-gray-600">{{ number_format($cotizacion->monto_sin_igv, 2) }}</td>
@@ -136,7 +132,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <x-empty-state colspan="8" message="No hay cotizaciones ni vales registrados." />
+                            <x-empty-state colspan="9" message="No hay cotizaciones ni vales registrados." />
                         @endforelse
                     </tbody>
                 </table>
@@ -152,3 +148,23 @@
         </div>
     </div>
 @endsection
+
+@if (session('pdfUrl'))
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                Swal.fire({
+                    icon: 'success',
+                    title: @json(session('message')),
+                    confirmButtonText: 'Ver PDF',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cerrar',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open(@json(session('pdfUrl')), '_blank');
+                    }
+                });
+            });
+        </script>
+    @endpush
+@endif

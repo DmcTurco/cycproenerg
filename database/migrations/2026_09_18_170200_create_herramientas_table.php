@@ -21,7 +21,12 @@ return new class extends Migration
         Schema::create('herramientas', function (Blueprint $table) {
             $table->id();
             $table->string('codigo', 20)->unique()
-                ->comment('CATALOGO!B164+ — "HER-###" autogenerado (ver Herramienta::siguienteCodigo())');
+                ->comment('CATALOGO!B164+ — código libre, lo escribe el staff a mano');
+            $table->string('serie', 10)
+                ->comment('Serie del correlativo interno, ej. "HER" — no confundir con numero_serie (N° de serie del fabricante)');
+            $table->string('correlativo', 8)
+                ->comment('Correlativo interno de 8 dígitos, generado solo al crear (ver Herramienta::siguienteCorrelativo())');
+            $table->unique(['serie', 'correlativo']);
             $table->string('descripcion');
             $table->string('marca_modelo')->nullable();
             $table->string('numero_serie')->nullable();

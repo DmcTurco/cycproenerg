@@ -66,6 +66,7 @@
                             <thead>
                                 <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Código</th>
+                                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Correlativo</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Descripción</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Unid.</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Precio vigente</th>
@@ -78,6 +79,7 @@
                                 @forelse ($materiales as $material)
                                     <tr>
                                         <td class="px-4 py-3 font-medium text-gray-900">{{ $material->codigo }}</td>
+                                        <td class="px-4 py-3 text-gray-500">{{ $material->serie }}-{{ $material->correlativo }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $material->descripcion }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $material->unidad }}</td>
                                         <td class="px-4 py-3 text-gray-600">
@@ -111,7 +113,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <x-empty-state colspan="7" message="No hay materiales registrados." />
+                                    <x-empty-state colspan="8" message="No hay materiales registrados." />
                                 @endforelse
                             </tbody>
                         </table>
@@ -139,6 +141,7 @@
                             <thead>
                                 <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Código</th>
+                                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Correlativo</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Descripción</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Marca / modelo</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Estado</th>
@@ -151,6 +154,7 @@
                                 @forelse ($herramientas as $herramienta)
                                     <tr>
                                         <td class="px-4 py-3 font-medium text-gray-900">{{ $herramienta->codigo }}</td>
+                                        <td class="px-4 py-3 text-gray-500">{{ $herramienta->serie }}-{{ $herramienta->correlativo }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $herramienta->descripcion }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ $herramienta->marca_modelo ?? '—' }}</td>
                                         <td class="px-4 py-3">
@@ -176,7 +180,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <x-empty-state colspan="7" message="No hay herramientas registradas." />
+                                    <x-empty-state colspan="8" message="No hay herramientas registradas." />
                                 @endforelse
                             </tbody>
                         </table>

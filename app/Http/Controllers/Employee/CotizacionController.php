@@ -44,12 +44,12 @@ class CotizacionController extends Controller
 
     public function create()
     {
-        return view('employee.pages.materiales.cotizaciones.form', [
-            'cotizacion' => null,
-            'cuadrillas' => Cuadrilla::where('estado', 'ACTIVO')->orderBy('nombre')->get(),
-            'materiales' => Material::orderBy('codigo')->get(),
-            'initialItems' => [],
-        ]);
+        $cotizacion = null;
+        $cuadrillas = Cuadrilla::where('estado', 'ACTIVO')->orderBy('nombre')->get();
+        $materiales = Material::orderBy('codigo')->get();
+        $initialItems = [];
+
+        return view('employee.pages.materiales.cotizaciones.form', compact('cotizacion', 'cuadrillas', 'materiales', 'initialItems'));
     }
 
     public function store(Request $request)
@@ -60,23 +60,23 @@ class CotizacionController extends Controller
         $cotizacion = Cotizacion::emitir($cuadrilla, $data['items'], $data['fecha']);
 
         session()->flash('message', ($cotizacion->es_vale ? 'Vale generado: ' : 'Cotización generada: ') . $cotizacion->numero);
+        session()->flash('pdfUrl', route('employee.materiales.cotizaciones.pdf', $cotizacion));
 
-        return redirect()->route('employee.materiales.cotizaciones.pdf', $cotizacion);
+        return redirect()->route('employee.materiales.cotizaciones.index');
     }
 
     public function edit(Cotizacion $cotizacion)
     {
         $cotizacion->load('detalles');
 
-        return view('employee.pages.materiales.cotizaciones.form', [
-            'cotizacion' => $cotizacion,
-            'cuadrillas' => Cuadrilla::where('estado', 'ACTIVO')->orWhere('id', $cotizacion->cuadrilla_id)->orderBy('nombre')->get(),
-            'materiales' => Material::orderBy('codigo')->get(),
-            'initialItems' => $cotizacion->detalles->map(fn ($detalle) => [
-                'material_id' => $detalle->material_id,
-                'cantidad' => $detalle->cantidad,
-            ])->values(),
-        ]);
+        $cuadrillas = Cuadrilla::where('estado', 'ACTIVO')->orWhere('id', $cotizacion->cuadrilla_id)->orderBy('nombre')->get();
+        $materiales = Material::orderBy('codigo')->get();
+        $initialItems = $cotizacion->detalles->map(fn ($detalle) => [
+            'material_id' => $detalle->material_id,
+            'cantidad' => $detalle->cantidad,
+        ])->values();
+
+        return view('employee.pages.materiales.cotizaciones.form', compact('cotizacion', 'cuadrillas', 'materiales', 'initialItems'));
     }
 
     public function update(Request $request, Cotizacion $cotizacion)
@@ -87,8 +87,9 @@ class CotizacionController extends Controller
         Cotizacion::emitir($cuadrilla, $data['items'], $data['fecha'], $cotizacion);
 
         session()->flash('message', 'Documento ' . $cotizacion->numero . ' corregido (mismo número, no se creó uno nuevo).');
+        session()->flash('pdfUrl', route('employee.materiales.cotizaciones.pdf', $cotizacion));
 
-        return redirect()->route('employee.materiales.cotizaciones.pdf', $cotizacion);
+        return redirect()->route('employee.materiales.cotizaciones.index');
     }
 
     /**
@@ -128,11 +129,9 @@ class CotizacionController extends Controller
     public function pdf(Cotizacion $cotizacion)
     {
         $cotizacion->load(['detalles.material', 'cuadrilla']);
+        $parametros = \App\Models\ParametroControlMaterial::actual();
 
-        $pdf = Pdf::loadView('employee.pages.materiales.cotizaciones.pdf', [
-            'cotizacion' => $cotizacion,
-            'parametros' => \App\Models\ParametroControlMaterial::actual(),
-        ])->setPaper('a4');
+        $pdf = Pdf::loadView('employee.pages.materiales.cotizaciones.pdf', compact('cotizacion', 'parametros'))->setPaper('a4');
 
         return $pdf->download($cotizacion->numero . '.pdf');
     }
@@ -144,7 +143,7 @@ class CotizacionController extends Controller
             'cuadrilla_id' => 'required|exists:cuadrillas,id',
             'items' => 'required|array|min:1',
             'items.*.material_id' => ['required', Rule::exists('materiales', 'id')],
-            'items.*.cantidad' => 'required|numeric|min:0.01',
+            'items.*.cantidad' => 'required|integer|min:1',
         ], [
             'items.required' => 'Agrega al menos un ítem con material y cantidad.',
             'items.min' => 'Agrega al menos un ítem con material y cantidad.',

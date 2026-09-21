@@ -23,6 +23,7 @@ class HerramientaController extends Controller
         $herramientaId = $request->id;
 
         $rules = [
+            'codigo' => 'required|string|max:20|unique:herramientas,codigo' . ($herramientaId ? ",$herramientaId" : ''),
             'descripcion' => 'required|string|max:255',
             'marca_modelo' => 'nullable|string|max:255',
             'numero_serie' => 'nullable|string|max:100',
@@ -38,18 +39,19 @@ class HerramientaController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['descripcion', 'marca_modelo', 'numero_serie', 'fecha_compra', 'precio', 'estado', 'observacion']);
+        $data = $request->only(['codigo', 'descripcion', 'marca_modelo', 'numero_serie', 'fecha_compra', 'precio', 'estado', 'observacion']);
 
         if ($herramientaId) {
             $herramienta = Herramienta::findOrFail($herramientaId);
             $herramienta->update($data);
             $message = 'Herramienta actualizada.';
         } else {
-            // El código nunca lo escribe el staff: se autogenera, igual que
-            // la fórmula "HER-"&TEXT(fila,"000") del Excel.
-            $data['codigo'] = Herramienta::siguienteCodigo();
+            // El correlativo nunca lo escribe el staff: se autogenera, igual
+            // que la fórmula "HER-"&TEXT(fila,"000") del Excel.
+            $data['serie'] = Herramienta::SERIE;
+            $data['correlativo'] = Herramienta::siguienteCorrelativo();
             $herramienta = Herramienta::create($data);
-            $message = 'Herramienta registrada: ' . $herramienta->codigo;
+            $message = 'Herramienta registrada: ' . $herramienta->serie . '-' . $herramienta->correlativo;
         }
 
         session()->flash('message', $message);
@@ -65,6 +67,8 @@ class HerramientaController extends Controller
             'herramienta' => [
                 'id' => $herramienta->id,
                 'codigo' => $herramienta->codigo,
+                'serie' => $herramienta->serie,
+                'correlativo' => $herramienta->correlativo,
                 'descripcion' => $herramienta->descripcion,
                 'marca_modelo' => $herramienta->marca_modelo,
                 'numero_serie' => $herramienta->numero_serie,

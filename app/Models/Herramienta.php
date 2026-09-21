@@ -9,9 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * CM-1: catálogo de herramientas (hoja CATALOGO, bloque de herramientas,
- * filas 164+ del Excel). El código HER-### se autogenera (nunca lo llena
- * el staff); responsable actual y ubicación se calculan desde `entregas`
- * (CM-7).
+ * filas 164+ del Excel). `codigo` es texto libre, lo escribe el staff a
+ * mano (igual que Material::codigo); `correlativo` es el identificador
+ * interno estable "HER-###" que se autogenera al crear y nunca cambia.
+ * Responsable actual y ubicación se calculan desde `entregas` (CM-7).
  */
 class Herramienta extends Model
 {
@@ -20,8 +21,16 @@ class Herramienta extends Model
 
     protected $table = 'herramientas';
 
+    /**
+     * Serie fija del correlativo interno (ver siguienteCorrelativo()) —
+     * no confundir con la columna `numero_serie` (N° de serie de fábrica).
+     */
+    public const SERIE = 'HER';
+
     protected $fillable = [
         'codigo',
+        'serie',
+        'correlativo',
         'descripcion',
         'marca_modelo',
         'numero_serie',
@@ -37,17 +46,15 @@ class Herramienta extends Model
     ];
 
     /**
-     * CATALOGO!B164+ — "HER-" + correlativo de 3 dígitos, igual que la
-     * fórmula del Excel ("HER-"&TEXT(ROW()-164,"000")), pero basado en el
-     * máximo código ya usado en vez de la fila.
+     * Correlativo de 8 dígitos para la serie HER, igual criterio que
+     * Material::siguienteCorrelativo() (MAX() sobre el string funciona
+     * bien porque todos los correlativos tienen el mismo ancho).
      */
-    public static function siguienteCodigo(): string
+    public static function siguienteCorrelativo(): string
     {
-        $ultimo = static::withTrashed()
-            ->selectRaw("MAX(CAST(SUBSTRING(codigo FROM 5) AS INTEGER)) as n")
-            ->value('n');
+        $max = static::withTrashed()->where('serie', self::SERIE)->max('correlativo');
 
-        return 'HER-' . str_pad((int) $ultimo + 1, 3, '0', STR_PAD_LEFT);
+        return str_pad((string) ((int) $max + 1), 8, '0', STR_PAD_LEFT);
     }
 
     public function entregas(): HasMany

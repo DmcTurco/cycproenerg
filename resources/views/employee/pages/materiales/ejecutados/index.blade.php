@@ -20,12 +20,6 @@
         </div>
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">
-            <p class="mb-3 max-w-3xl text-sm text-gray-500">
-                Lo que el personal directo realmente usó (SALIDA) o devolvió (DEVOLUCION) — se valoriza a costo con el
-                precio vigente actual del material (no una foto: si el precio cambia, el total mostrado acá cambia
-                también, igual que en el Excel). Los contratistas no reportan acá.
-            </p>
-
             <form method="GET" action="{{ route('employee.materiales.ejecutados.index') }}" class="mb-3 flex flex-wrap items-end gap-2">
                 <div>
                     <label class="form-label" for="filter_cuadrilla">Cuadrilla</label>

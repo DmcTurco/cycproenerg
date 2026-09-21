@@ -55,6 +55,8 @@ class MaterialController extends Controller
             $material->update($data);
             $message = 'Material actualizado.';
         } else {
+            $data['serie'] = Material::SERIE;
+            $data['correlativo'] = Material::siguienteCorrelativo();
             $material = Material::create($data);
             $message = 'Material agregado.';
         }
@@ -77,6 +79,8 @@ class MaterialController extends Controller
             'material' => [
                 'id' => $item->id,
                 'codigo' => $item->codigo,
+                'serie' => $item->serie,
+                'correlativo' => $item->correlativo,
                 'descripcion' => $item->descripcion,
                 'unidad' => $item->unidad,
                 'precio_base' => $item->precio_base,

@@ -21,19 +21,6 @@
             <div class="flex flex-1 flex-col gap-4 lg:min-h-0 lg:flex-row">
 
                 <div class="flex min-w-0 flex-1 flex-col lg:min-h-0">
-                    <div class="mb-4 flex shrink-0 items-center justify-between gap-3">
-                        <h2 class="text-lg font-semibold text-gray-900">Asignadas</h2>
-                        <button type="button" @click="deleteSelected()" :disabled="selectedAssigned.length === 0 || busyDeleteAll"
-                            class="btn-secondary text-red-600 hover:bg-red-50">
-                            <span x-show="!busyDeleteAll">Eliminar seleccionadas</span>
-                            <span x-show="busyDeleteAll" x-cloak>Eliminando...</span>
-                        </button>
-                    </div>
-
-                    @include('employee.pages.solicitudesTecnico.partials.tabla-asignadas')
-                </div>
-
-                <div class="flex min-w-0 flex-1 flex-col lg:min-h-0">
                     <form action="{{ route('employee.technicals.requests.index', $tecnico->id) }}" method="GET"
                         class="mb-4 flex shrink-0 flex-wrap items-center gap-3">
                         <h2 class="flex-1 text-lg font-semibold text-gray-900">Disponibles</h2>
@@ -52,6 +39,19 @@
                     </form>
 
                     @include('employee.pages.solicitudesTecnico.partials.tabla-disponibles')
+                </div>
+
+                <div class="flex min-w-0 flex-1 flex-col lg:min-h-0">
+                    <div class="mb-4 flex shrink-0 items-center justify-between gap-3">
+                        <h2 class="text-lg font-semibold text-gray-900">Asignadas</h2>
+                        <button type="button" @click="deleteSelected()" :disabled="selectedAssigned.length === 0 || busyDeleteAll"
+                            class="btn-secondary text-red-600 hover:bg-red-50">
+                            <span x-show="!busyDeleteAll">Eliminar seleccionadas</span>
+                            <span x-show="busyDeleteAll" x-cloak>Eliminando...</span>
+                        </button>
+                    </div>
+
+                    @include('employee.pages.solicitudesTecnico.partials.tabla-asignadas')
                 </div>
             </div>
         </div>

@@ -32,8 +32,15 @@ class Material extends Model
 
     protected $table = 'materiales';
 
+    /**
+     * Serie fija del correlativo interno (ver siguienteCorrelativo()).
+     */
+    public const SERIE = 'MAT';
+
     protected $fillable = [
         'codigo',
+        'serie',
+        'correlativo',
         'descripcion',
         'unidad',
         'precio_base',
@@ -50,6 +57,21 @@ class Material extends Model
         'stock_minimo' => 'float',
         'factor_metros_por_unidad' => 'float',
     ];
+
+    /**
+     * Correlativo interno estable de 8 dígitos (serie MAT + 00000001,
+     * 00000002...), aparte de `codigo` (que el staff escribe a mano y
+     * puede repetir estilo o quedar vacío de un patrón). Mismo criterio
+     * que Herramienta::siguienteCorrelativo(): se asigna una sola vez, al
+     * crear. MAX() sobre el string funciona bien porque todos los
+     * correlativos tienen el mismo ancho (8, con ceros a la izquierda).
+     */
+    public static function siguienteCorrelativo(): string
+    {
+        $max = static::withTrashed()->where('serie', self::SERIE)->max('correlativo');
+
+        return str_pad((string) ((int) $max + 1), 8, '0', STR_PAD_LEFT);
+    }
 
     /**
      * Relación con el kardex de entradas (CM-3). Nombre distinto del

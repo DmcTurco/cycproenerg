@@ -1,7 +1,7 @@
-<div x-show="mode === 'edit'" x-cloak>
-    <label class="form-label">Código</label>
-    <input type="text" :value="form.codigo" class="form-input bg-gray-50" disabled />
-    <p class="mt-1 text-xs text-gray-400">Se autogenera al crear, no se edita.</p>
+<div>
+    <label class="form-label" for="h_codigo">Código</label>
+    <input id="h_codigo" type="text" x-model="form.codigo" class="form-input" />
+    <p class="form-error" x-show="errors.codigo" x-text="errors.codigo"></p>
 </div>
 
 <div>

@@ -23,7 +23,12 @@ return new class extends Migration
         Schema::create('materiales', function (Blueprint $table) {
             $table->id();
             $table->string('codigo', 30)->unique()
-                ->comment('CATALOGO!B — correlativo del catálogo, ej. 20251001');
+                ->comment('CATALOGO!B — código libre, lo escribe el staff a mano');
+            $table->string('serie', 10)
+                ->comment('Serie del correlativo interno, ej. "MAT" — fija por tipo de documento/catálogo');
+            $table->string('correlativo', 8)
+                ->comment('Correlativo interno de 8 dígitos (00000001, 00000002...), generado solo al crear, único por serie');
+            $table->unique(['serie', 'correlativo']);
             $table->string('descripcion');
             $table->string('unidad', 20)
                 ->comment('CATALOGO!D — ej. RLL, UNID');

@@ -20,8 +20,15 @@ return new class extends Migration
         Schema::create('cotizaciones', function (Blueprint $table) {
             $table->id();
             // Numeración correlativa por prefijo+fecha, ej. "C&C-260826-01"
-            // / "VALE-260716-01" — ver Cotizacion::siguienteNumero().
+            // / "VALE-260716-01" — ver Cotizacion::siguienteNumero(). Es el
+            // documento visible para el staff (Excel/PDF), no un simple
+            // contador — por eso, igual que Material/Herramienta, va aparte
+            // una serie ("COT"/"VAL", según es_vale) + un correlativo interno
+            // de 8 dígitos que nunca cambia (ver Cotizacion::siguienteCorrelativo()).
             $table->string('numero', 30)->unique();
+            $table->string('serie', 10);
+            $table->string('correlativo', 8);
+            $table->unique(['serie', 'correlativo']);
             $table->date('fecha');
             $table->unsignedBigInteger('cuadrilla_id');
             // true = VALE (PERSONAL DIRECTO, a costo, sin IGV, no descuenta

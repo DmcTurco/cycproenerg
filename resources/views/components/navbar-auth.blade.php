@@ -1,4 +1,4 @@
-@props(['titlePage' => null, 'backUrl' => null])
+@props(['titlePage' => null, 'backUrl' => null, 'titleVariant' => 'default'])
 
 <header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 sm:px-6">
     <button
@@ -22,7 +22,10 @@
         </a>
     @endif
 
-    <h1 class="flex-1 text-base font-semibold text-gray-900">{{ $titlePage }}</h1>
+    <h1 @class([
+        'flex-1 text-base font-semibold text-gray-900' => $titleVariant === 'default',
+        'flex-1 rounded-lg bg-amber-50 px-3 py-1.5 text-sm text-amber-800' => $titleVariant === 'warning',
+    ])>{{ $titlePage }}</h1>
 
     <div x-data="{ open: false }" class="relative">
         <button @click="open = !open" class="btn-icon" aria-label="Notificaciones">

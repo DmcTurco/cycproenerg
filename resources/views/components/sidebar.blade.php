@@ -24,8 +24,9 @@
                         type="button"
                         @click="open = !open"
                         @class([
-                            'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition hover:bg-sidenav-hover hover:text-white',
-                            'bg-brand-600 text-white hover:bg-brand-600' => $isActive,
+                            'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
+                            'text-gray-300 hover:bg-sidenav-hover hover:text-white' => ! $isActive,
+                            'bg-brand-600 text-white' => $isActive,
                         ])
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -37,13 +38,14 @@
                         </svg>
                     </button>
 
-                    <div x-show="open" x-transition class="mt-1 space-y-1 pl-4">
+                    <div x-show="open" x-transition x-cloak class="mt-1 space-y-1 pl-4">
                         @foreach ($link['children'] as $child)
                             <a
                                 href="{{ route($child['route']) }}"
                                 @class([
-                                    'flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-400 transition hover:bg-sidenav-hover hover:text-white',
-                                    'bg-brand-500 text-white hover:bg-brand-500' => request()->is(...(array) $child['match']),
+                                    'flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition',
+                                    'text-gray-400 hover:bg-sidenav-hover hover:text-white' => ! request()->is(...(array) $child['match']),
+                                    'bg-brand-500 text-white' => request()->is(...(array) $child['match']),
                                 ])
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -58,8 +60,9 @@
                 <a
                     href="{{ route($link['route']) }}"
                     @class([
-                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition hover:bg-sidenav-hover hover:text-white',
-                        'bg-brand-600 text-white hover:bg-brand-600' => $isActive,
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
+                        'text-gray-300 hover:bg-sidenav-hover hover:text-white' => ! $isActive,
+                        'bg-brand-600 text-white' => $isActive,
                     ])
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
