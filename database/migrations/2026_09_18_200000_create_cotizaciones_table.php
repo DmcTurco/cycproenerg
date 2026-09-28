@@ -19,6 +19,10 @@ return new class extends Migration
     {
         Schema::create('cotizaciones', function (Blueprint $table) {
             $table->id();
+            // CM-11: cierre de mes que archivó esta fila (ver
+            // create_cierres_materiales_table). null = no archivada (las
+            // PENDIENTES nunca se archivan).
+            $table->foreignId('cierre_materiales_id')->nullable()->constrained('cierres_materiales')->nullOnDelete();
             // Numeración correlativa por prefijo+fecha, ej. "C&C-260826-01"
             // / "VALE-260716-01" — ver Cotizacion::siguienteNumero(). Es el
             // documento visible para el staff (Excel/PDF), no un simple

@@ -36,6 +36,7 @@ class Cotizacion extends Model
     public const SERIE_VALE = 'VAL';
 
     protected $fillable = [
+        'cierre_materiales_id',
         'numero',
         'serie',
         'correlativo',
@@ -213,5 +214,14 @@ class Cotizacion extends Model
                 $reintentado = true;
             }
         } while (true);
+    }
+
+    /**
+     * CM-11: cierre de mes que archivó esta fila (null si todavía
+     * está "viva", contando en el kardex del mes actual).
+     */
+    public function cierre(): BelongsTo
+    {
+        return $this->belongsTo(CierreMaterial::class, 'cierre_materiales_id');
     }
 }

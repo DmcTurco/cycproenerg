@@ -158,5 +158,21 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         Route::get('imprimibles/acta-materiales', [Employee\ImprimibleController::class, 'actaMateriales'])->name('imprimibles.acta-materiales');
         Route::get('imprimibles/acta-herramientas', [Employee\ImprimibleController::class, 'actaHerramientas'])->name('imprimibles.acta-herramientas');
         Route::get('imprimibles/stickers', [Employee\ImprimibleController::class, 'stickers'])->name('imprimibles.stickers');
+
+        // CM-10: inventario físico de fin de mes (hoja "INVENTARIO
+        // FISICO"). Con historial, a diferencia del Excel (ver
+        // App\Models\InventarioFisico).
+        Route::get('inventario-fisico', [Employee\InventarioFisicoController::class, 'index'])->name('inventario-fisico.index');
+        Route::get('inventario-fisico/crear', [Employee\InventarioFisicoController::class, 'create'])->name('inventario-fisico.create');
+        Route::post('inventario-fisico', [Employee\InventarioFisicoController::class, 'store'])->name('inventario-fisico.store');
+        Route::get('inventario-fisico/{inventarioFisico}', [Employee\InventarioFisicoController::class, 'show'])->name('inventario-fisico.show');
+        Route::delete('inventario-fisico/{inventarioFisico}', [Employee\InventarioFisicoController::class, 'destroy'])->name('inventario-fisico.destroy');
+
+        // CM-11: cierre de mes (macro CerrarMes traducida en
+        // App\Services\ControlMaterialesCierre — archiva en vez de
+        // borrar, ver ese servicio).
+        Route::get('cierres', [Employee\CierreMaterialesController::class, 'index'])->name('cierres.index');
+        Route::post('cierres', [Employee\CierreMaterialesController::class, 'store'])->name('cierres.store');
+        Route::get('cierres/{cierre}', [Employee\CierreMaterialesController::class, 'show'])->name('cierres.show');
     });
 });

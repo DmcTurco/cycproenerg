@@ -20,6 +20,9 @@ return new class extends Migration
     {
         Schema::create('ejecutados', function (Blueprint $table) {
             $table->id();
+            // CM-11: cierre de mes que archivó esta fila (ver
+            // create_cierres_materiales_table). null = movimiento del mes en curso.
+            $table->foreignId('cierre_materiales_id')->nullable()->constrained('cierres_materiales')->nullOnDelete();
             $table->date('fecha');
             // Obligatorio solo si movimiento = SALIDA (igual que la macro
             // GuardarEjecutado); en una DEVOLUCION puede ir vacío.

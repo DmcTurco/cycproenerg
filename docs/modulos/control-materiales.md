@@ -118,11 +118,28 @@ Equivalente a la hoja IMPRIMIBLES (leída con openpyxl campo por campo antes de 
 - Controlador `ImprimibleController` (sin service propio: no hay cálculo de negocio, solo armar los PDFs) + pantalla `employee/materiales/imprimibles` (los tres formularios de descarga) + botón "Imprimibles" en el header de Catálogo.
 - **Sin nada pendiente para que corra**: no agrega tablas ni columnas nuevas.
 
-### CM-10. Inventario físico
-Cierre de conteo: lista de materiales con stock del sistema, conteo físico (a llenar), diferencia calculada, observación/ubicación, y firmas de almacenero/supervisor.
+### CM-10. Inventario físico — ✅ implementado (22/09/2026)
+Equivalente a la hoja "INVENTARIO FISICO" (leída con openpyxl fila por fila antes de programar: sin macro, es una hoja de trabajo con fórmulas simples). A diferencia del Excel, que BORRA los conteos al cerrar el mes (no queda historial salvo la copia completa del archivo), Turco pidió que el sistema SÍ guarde historial: cada conteo guardado es una fila en `inventarios_fisicos`, con su detalle en `inventario_fisico_detalles` — se puede consultar cualquier inventario pasado.
 
-### CM-11. Cierre de mes (opcional, acción manual)
-Archiva un snapshot del estado del módulo, migra stock final → inicial, consolida el precio base con el vigente, limpia INGRESOS/EJECUTADO/movimientos, y conserva cotizaciones PENDIENTES + catálogo + cuadrillas + herramientas. Es la operación más delicada (irreversible salvo por el archivo histórico) — se deja para el final del roadmap, cuando todo lo demás ya esté probado.
+- **Dos secciones dentro de la misma hoja**, confirmado leyendo las fórmulas exactas: MATERIALES (INVENTARIO FISICO!A6:G162, filas = CATALOGO 5-161) y HERRAMIENTAS (A166:G265, filas = CATALOGO 165-264, con el título "HERRAMIENTAS (verificar presencia física...)" en A164). Son conceptualmente distintas:
+  - **Materiales**: stock sistema = `Material::stockActual()`; conteo físico = cantidad real contada (número); diferencia = conteo − stock; observación/ubicación es texto libre a mano.
+  - **Herramientas**: stock sistema = 1 si el sistema espera que esté en ALMACEN, 0 si espera EN CAMPO (`Herramienta::ubicacion()`, igual que `CATALOGO!J164+ = IF(CATALOGO!$J="ALMACEN",1,0)`); conteo físico = 1/0 según si efectivamente se encontró en el almacén; observación/ubicación es AUTOMÁTICA (la ubicación que el sistema tenía registrada), no manual como en materiales.
+- **Solo se guarda fila para lo que se contó**: si el conteo físico de un ítem quedó vacío, no se crea `InventarioFisicoDetalle` para él (igual que el Excel, que deja la columna DIFERENCIA en blanco si CONTEO FISICO está vacío).
+- `codigo`/`descripcion`/`unidad` se guardan como FOTO en cada detalle (no solo el FK), para que el historial de un inventario viejo se siga leyendo igual aunque el material/herramienta cambie de nombre o se elimine después — mismo criterio de "nunca perder el dato" del resto del módulo.
+- Formulario de página completa, SIN Alpine/JS nuevo (a diferencia de CM-4/CM-6): la lista de ítems es fija (todo el catálogo actual, no una lista que el usuario arma), así que es un `@foreach` plano — no hace falta `npm run build` para este submódulo.
+- Encabezado (INVENTARIO FISICO!B3/E3: fecha + "REALIZADO POR") + pie de firma (B268/B270: Almacenero/Supervisor del día) se guardan como campos de texto — no son firmas digitales reales, el papel impreso sigue siendo el que se firma a mano si Turco lo necesita así.
+- Pantallas: `employee/materiales/inventario-fisico` (listado con historial, resalta cuántos ítems tuvieron descuadre) → `.../crear` (formulario) → `.../{id}` (detalle de un conteo guardado, filas con diferencia resaltadas en rojo).
+- **Pendiente para que corra:** `php artisan migrate` (2 tablas nuevas: `inventarios_fisicos`, `inventario_fisico_detalles`).
+
+### CM-11. Cierre de mes — ✅ implementado (22/09/2026)
+Traducción de la macro `CerrarMes` de `MacrosCYC.bas` (descompilada con oletools antes de programar, en vez de adivinar). El Excel original, al cerrar: (1) guarda una COPIA completa del archivo como histórico, (2) pasa STOCK ACTUAL → STOCK INICIAL, (3) consolida el PRECIO VIGENTE como PRECIO BASE (solo si sube), (4) BORRA por completo Ingresos, Ejecutado, TODOS los vales de personal directo, y las cotizaciones de contratista ya DESCONTADAS (solo sobreviven las PENDIENTES), (5) conserva catálogo, cuadrillas y herramientas.
+
+- **Diferencia deliberada acordada con Turco** (22/09/2026, mismo criterio de "nunca perder el dato" del resto del módulo): en vez de BORRAR, el sistema ARCHIVA — cada fila que la macro original borraría se marca con `cierre_materiales_id` (nueva columna en `ingresos`, `ejecutados` y `cotizaciones`) y se le hace soft-delete. Como TODOS los cálculos del módulo (`Material::salidas()`, `Cuadrilla::saldosEnPoder()`, `Cuadrilla::numRetiros()`, etc.) ya usan el scope estándar de soft-delete de Eloquent, el kardex y los saldos del mes nuevo arrancan limpios automáticamente — no hizo falta tocar ningún accessor existente.
+- **No se toca ninguna `Cotizacion` PENDIENTE**: a diferencia de la macro (que las conservaba pero tenía que "compensar" el stock porque limpiaba y reconstruía filas), acá simplemente no se archivan — siguen contando en `Material::salidas()` exactamente igual que antes del cierre. Sin compensación, más simple y sin riesgo de descuadre.
+- **Snapshot antes de archivar**: cada cierre guarda en `cierres_materiales.resumen` (json) los indicadores generales (`ControlMaterialesResumen::generales()`), el registro de cuadrillas, y el catálogo completo de materiales (stock/precio antes y después) y herramientas — así el detalle de ESE mes queda disponible para siempre, aunque después se archiven sus movimientos.
+- Servicio `App\Services\ControlMaterialesCierre::cerrar($etiqueta, $fechaCierre, $employeeId)`, dentro de una transacción. `App\Models\CierreMaterial` (etiqueta única, no se puede cerrar el mismo mes dos veces). Validación: la fecha de corte de un cierre nuevo debe ser posterior a la del último cierre.
+- Pantallas: `employee/materiales/cierres` (indicadores actuales antes de cerrar + formulario de cierre con casilla de confirmación + historial de cierres pasados) → `.../{id}` (detalle del snapshot de un cierre).
+- **Pendiente para que corra:** `php artisan migrate` (tabla nueva `cierres_materiales` + columna `cierre_materiales_id` en `ingresos`/`ejecutados`/`cotizaciones`).
 
 ## 4. Orden sugerido para ir "por partes"
 
@@ -133,14 +150,15 @@ Archiva un snapshot del estado del módulo, migra stock final → inicial, conso
 5. ~~**CM-6** Registro rápido + Ejecutado~~ — hecho el 19/09/2026 (falta `migrate`).
 6. ~~**CM-7** Entregas de herramientas~~ — hecho el 19/09/2026 (falta `migrate`).
 7. ~~**CM-8** Resumen/Panel~~ — hecho el 19/09/2026, sin migración nueva.
-8. ~~**CM-9** Imprimibles~~ — hecho el 19/09/2026, sin migración nueva. **CM-10** Inventario físico sigue pendiente (documento, bajo riesgo).
-9. **CM-11** Cierre de mes — al final, cuando todo esté validado en uso real.
+8. ~~**CM-9** Imprimibles~~ — hecho el 19/09/2026, sin migración nueva.
+9. ~~**CM-10** Inventario físico~~ — hecho el 22/09/2026 (falta `migrate`).
+10. ~~**CM-11** Cierre de mes~~ — hecho el 22/09/2026 (falta `migrate`). Con esto, el roadmap completo de Control de Materiales (CM-1 a CM-11) queda implementado.
 
 ## 5. Puntos a confirmar con Turco antes/durante la implementación
 
 - ~~Exactamente en qué momento se asocia cada cotización/cuadrilla a una `Empresa` (CYC/CLB)~~ — **resuelto en CM-2** (18/09/2026): relación muchos-a-muchos `Cuadrilla`↔`Empresa`, una cuadrilla puede estar ligada a una o ambas empresas. Sigue abierto si además hace falta asociar la `Empresa` a nivel de cada cotización individual (CM-4) — se decide cuando lleguemos ahí.
 - Generación de PDF: el proyecto no tiene ninguna librería de PDF instalada todavía (Control Interno no generó ningún PDF) — se usaría `barryvdh/laravel-dompdf` (estándar en Laravel), salvo que Turco prefiera otra.
-- CM-11 (Cierre de mes) es una operación destructiva por diseño (limpia movimientos) — su implementación exacta se conversa con Turco recién cuando lleguemos ahí, con los demás submódulos ya probados en uso real.
+- ~~CM-11 (Cierre de mes) es una operación destructiva por diseño~~ — resuelto el 22/09/2026: Turco pidió que en vez de borrar (como el Excel), el sistema ARCHIVE (soft-delete + referencia al cierre), conservando todo el detalle para siempre. Ver CM-11 arriba y App\Services\ControlMaterialesCierre.
 
 ---
 *Generado a partir del análisis de `CONTROL_MATERIALES_CC_08-2026 rev 02.xlsm` (hojas INICIO, CATALOGO, INGRESOS, REGISTRO RAPIDO, EJECUTADO, COTIZACION, COTIZACIONES, ENTREGAS, IMPRIMIBLES, INVENTARIO FISICO, RESUMEN, RESUMEN CUADRILLA, COTIZ_DETALLE, y macro MacrosCYC.bas) el 18/09/2026.*

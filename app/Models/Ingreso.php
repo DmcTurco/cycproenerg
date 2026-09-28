@@ -19,6 +19,7 @@ class Ingreso extends Model
     protected $table = 'ingresos';
 
     protected $fillable = [
+        'cierre_materiales_id',
         'material_id',
         'fecha',
         'cantidad',
@@ -73,5 +74,14 @@ class Ingreso extends Model
         }
 
         return 'ESTABLE';
+    }
+
+    /**
+     * CM-11: cierre de mes que archivó esta fila (null si todavía
+     * está "viva", contando en el kardex del mes actual).
+     */
+    public function cierre(): BelongsTo
+    {
+        return $this->belongsTo(CierreMaterial::class, 'cierre_materiales_id');
     }
 }

@@ -23,6 +23,7 @@ class Ejecutado extends Model
     public const MOVIMIENTO_DEVOLUCION = 'DEVOLUCION';
 
     protected $fillable = [
+        'cierre_materiales_id',
         'fecha',
         'tipo_trabajo',
         'cuadrilla_id',
@@ -75,5 +76,14 @@ class Ejecutado extends Model
         $total = round($this->cantidad * $this->precioCosto(), 2);
 
         return $this->movimiento === self::MOVIMIENTO_DEVOLUCION ? -$total : $total;
+    }
+
+    /**
+     * CM-11: cierre de mes que archivó esta fila (null si todavía
+     * está "viva", contando en el kardex del mes actual).
+     */
+    public function cierre(): BelongsTo
+    {
+        return $this->belongsTo(CierreMaterial::class, 'cierre_materiales_id');
     }
 }
