@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::create('cotizacion_detalles', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cotizacion_id');
-            $table->unsignedBigInteger('material_id');
+            $table->unsignedBigInteger('cotizacion_id')->index();
+            $table->unsignedBigInteger('material_id')->index();
             $table->decimal('cantidad', 12, 2);
             // Precio unitario S/IGV al momento de emitir (vale: precio
             // vigente; cotización: precio de venta S/IGV) — se guarda como

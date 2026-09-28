@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('categoria_proyecto')->nullable();
             $table->string('sub_categoria_proyecto')->nullable();
             $table->string('codigo_objeto_conexion')->nullable();
-            $table->unsignedBigInteger('solicitud_id')->nullable();
+            $table->unsignedBigInteger('solicitud_id')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
         });

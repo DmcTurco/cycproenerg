@@ -57,7 +57,10 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
-            'engine' => null,
+            // Forzado: algunos hostings (cPanel) crean las tablas en
+            // MyISAM/Aria por defecto, donde los índices tienen un límite
+            // de 1000 bytes y las foreign keys se ignoran.
+            'engine' => 'InnoDB',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],

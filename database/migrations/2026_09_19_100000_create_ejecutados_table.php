@@ -27,8 +27,8 @@ return new class extends Migration
             // Obligatorio solo si movimiento = SALIDA (igual que la macro
             // GuardarEjecutado); en una DEVOLUCION puede ir vacío.
             $table->string('tipo_trabajo', 60)->nullable();
-            $table->unsignedBigInteger('cuadrilla_id');
-            $table->unsignedBigInteger('material_id');
+            $table->unsignedBigInteger('cuadrilla_id')->index();
+            $table->unsignedBigInteger('material_id')->index();
             // En la unidad que se REPORTA (metros para tuberías, la unidad
             // del catálogo para el resto) — no en la unidad de stock.
             $table->decimal('cantidad', 12, 2);

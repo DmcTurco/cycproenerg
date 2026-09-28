@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('provincia')->nullable();
             $table->string('distrito')->nullable();
             $table->string('venta_zona_no_gasificada')->nullable();
-            $table->unsignedBigInteger('solicitud_id')->nullable();
+            $table->unsignedBigInteger('solicitud_id')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
         });

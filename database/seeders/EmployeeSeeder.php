@@ -17,7 +17,7 @@ class EmployeeSeeder extends Seeder
         Employee::create([
             'name' => 'David Moises Mamani Chino',
             'email' => 'david_1993@cycproenerg.com',
-            'password' => Hash::make('0000'),
+            'password' => Hash::make('NgMG2gihTY7xnWa8'),
         ]);
     }
 }

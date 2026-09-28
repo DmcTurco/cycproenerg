@@ -19,7 +19,7 @@ use App\MyApp;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/' . MyApp::EMPLOYEE_SUBDIR . '/login');
 });
 
 

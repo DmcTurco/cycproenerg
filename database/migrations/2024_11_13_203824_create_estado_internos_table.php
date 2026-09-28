@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('estado_internos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('estado_const_id');
-            $table->unsignedBigInteger('solicitud_id');
+            $table->unsignedBigInteger('estado_const_id')->index();
+            $table->unsignedBigInteger('solicitud_id')->index();
             $table->timestamps();
             $table->softDeletes();
         });

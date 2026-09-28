@@ -26,7 +26,7 @@ return new class extends Migration
             // CM-11: cierre de mes que archivó esta fila (ver
             // create_cierres_materiales_table). null = movimiento del mes en curso.
             $table->foreignId('cierre_materiales_id')->nullable()->constrained('cierres_materiales')->nullOnDelete();
-            $table->unsignedBigInteger('material_id');
+            $table->unsignedBigInteger('material_id')->index();
             $table->date('fecha');
             $table->decimal('cantidad', 12, 2);
             $table->string('proveedor')->nullable();

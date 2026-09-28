@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('solicitud_tecnico', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tecnico_id');
-            $table->unsignedBigInteger('solicitud_id');
+            $table->unsignedBigInteger('solicitud_id')->index();
+            $table->index(['tecnico_id', 'solicitud_id']);
             $table->timestamps();
             $table->softDeletes();
         });

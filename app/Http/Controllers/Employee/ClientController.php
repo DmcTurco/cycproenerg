@@ -207,7 +207,10 @@ class ClientController extends Controller
      */
     private function runQueueWorkerInBackground(): void
     {
-        $phpBinary = escapeshellarg(PHP_BINARY);
+        // En cPanel PHP_BINARY es el PHP del servidor web, no el de consola
+        // (ver config app.php_cli_binary); si no se configura, el cron de
+        // queue:work recoge el job igual, solo que hasta 1 minuto después.
+        $phpBinary = escapeshellarg(config('app.php_cli_binary') ?: PHP_BINARY);
         $artisan = escapeshellarg(base_path('artisan'));
         $command = "{$phpBinary} {$artisan} queue:work --stop-when-empty --tries=3";
 

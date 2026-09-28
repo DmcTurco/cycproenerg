@@ -141,4 +141,18 @@ return [
         // 'store' => 'redis',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | PHP de consola (CLI)
+    |--------------------------------------------------------------------------
+    |
+    | Binario con el que se lanza `artisan queue:work` al subir un Excel
+    | (ClientController::runQueueWorkerInBackground). Vacío = PHP_BINARY, que
+    | sirve en local; en cPanel PHP_BINARY es el PHP del servidor web (lsphp),
+    | que no puede correr artisan, así que ahí se indica el de consola.
+    |
+    */
+
+    'php_cli_binary' => env('PHP_CLI_BINARY'),
+
 ];

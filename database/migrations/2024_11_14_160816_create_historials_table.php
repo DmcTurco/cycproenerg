@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('historials', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('solicitud_id');
-            $table->unsignedBigInteger('tecnico_id');
+            $table->unsignedBigInteger('solicitud_id')->index();
+            $table->unsignedBigInteger('tecnico_id')->index();
             $table->unsignedBigInteger('estado_const_id');
             $table->string('descripcion')->nullable();
             $table->unsignedBigInteger('employee_id')->nullable();

@@ -31,7 +31,7 @@ class CotizacionController extends Controller
         $cotizaciones = Cotizacion::with('cuadrilla')
             ->when($estado, fn ($query) => $query->where('estado', $estado))
             ->when($cuadrillaId, fn ($query) => $query->where('cuadrilla_id', $cuadrillaId))
-            ->when($search, fn ($query) => $query->where('numero', 'ilike', "%{$search}%"))
+            ->when($search, fn ($query) => $query->whereLike('numero', "%{$search}%"))
             ->orderByDesc('fecha')
             ->orderByDesc('id')
             ->paginate(20)

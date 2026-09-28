@@ -25,11 +25,11 @@ class IngresoController extends Controller
             ->when($materialId, fn ($query) => $query->where('material_id', $materialId))
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('proveedor', 'ilike', "%{$search}%")
-                        ->orWhere('guia_factura', 'ilike', "%{$search}%")
+                    $q->whereLike('proveedor', "%{$search}%")
+                        ->orWhereLike('guia_factura', "%{$search}%")
                         ->orWhereHas('material', function ($mq) use ($search) {
-                            $mq->where('codigo', 'ilike', "%{$search}%")
-                                ->orWhere('descripcion', 'ilike', "%{$search}%");
+                            $mq->whereLike('codigo', "%{$search}%")
+                                ->orWhereLike('descripcion', "%{$search}%");
                         });
                 });
             })

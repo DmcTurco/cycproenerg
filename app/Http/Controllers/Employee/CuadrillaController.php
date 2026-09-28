@@ -23,8 +23,8 @@ class CuadrillaController extends Controller
         $cuadrillas = Cuadrilla::with('empresas')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('nombre', 'ilike', "%{$search}%")
-                        ->orWhere('dni', 'ilike', "%{$search}%");
+                    $q->whereLike('nombre', "%{$search}%")
+                        ->orWhereLike('dni', "%{$search}%");
                 });
             })
             ->orderBy('nombre')

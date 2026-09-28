@@ -40,7 +40,7 @@ class ControlInternoController extends Controller
                 $query->whereHas('proyecto', fn ($q) => $q->whereIn('categoria_proyecto', $categoriaTextos));
             })
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('numero_solicitud', 'ilike', '%' . $request->query('search') . '%');
+                $query->whereLike('numero_solicitud', '%' . $request->query('search') . '%');
             });
 
         // Conteo por fase para las pestañas — respeta empresa/categoría/

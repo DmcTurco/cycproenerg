@@ -36,7 +36,7 @@ return new class extends Migration
                 ->comment('Columna "Motivo de anulación" del portal');
 
             $table->date('fecha_programacion_habilitacion')->nullable();
-            $table->unsignedBigInteger('solicitud_id')->nullable();
+            $table->unsignedBigInteger('solicitud_id')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
         });

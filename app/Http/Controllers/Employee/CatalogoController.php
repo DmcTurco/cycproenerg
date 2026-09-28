@@ -21,8 +21,8 @@ class CatalogoController extends Controller
 
         $materiales = Material::when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('codigo', 'ilike', "%{$search}%")
-                        ->orWhere('descripcion', 'ilike', "%{$search}%");
+                    $q->whereLike('codigo', "%{$search}%")
+                        ->orWhereLike('descripcion', "%{$search}%");
                 });
             })
             ->orderBy('codigo')
@@ -30,8 +30,8 @@ class CatalogoController extends Controller
 
         $herramientas = Herramienta::when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('codigo', 'ilike', "%{$search}%")
-                        ->orWhere('descripcion', 'ilike', "%{$search}%");
+                    $q->whereLike('codigo', "%{$search}%")
+                        ->orWhereLike('descripcion', "%{$search}%");
                 });
             })
             ->orderBy('codigo')

@@ -29,10 +29,10 @@ class EntregaController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('herramienta', function ($hq) use ($search) {
-                        $hq->where('codigo', 'ilike', "%{$search}%")
-                            ->orWhere('descripcion', 'ilike', "%{$search}%");
+                        $hq->whereLike('codigo', "%{$search}%")
+                            ->orWhereLike('descripcion', "%{$search}%");
                     })->orWhereHas('cuadrilla', function ($cq) use ($search) {
-                        $cq->where('nombre', 'ilike', "%{$search}%");
+                        $cq->whereLike('nombre', "%{$search}%");
                     });
                 });
             })
