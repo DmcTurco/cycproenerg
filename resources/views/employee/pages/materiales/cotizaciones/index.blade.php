@@ -21,6 +21,7 @@
         </div>
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">
+            <x-form-errors class="mb-3" />
             <form method="GET" action="{{ route('employee.materiales.cotizaciones.index') }}" class="mb-3 flex flex-wrap items-end gap-2">
                 <div>
                     <label class="form-label" for="filter_cuadrilla">Cuadrilla</label>
@@ -119,7 +120,7 @@
                                                 </form>
                                             </x-modal>
                                         @endif
-                                        <form method="POST" action="{{ route('employee.materiales.cotizaciones.destroy', $cotizacion) }}" onsubmit="return confirm('¿Eliminar {{ $cotizacion->numero }}? Queda en la papelera (soft delete), no se borra el dato.');">
+                                        <form method="POST" action="{{ route('employee.materiales.cotizaciones.destroy', $cotizacion) }}" data-confirm="¿Eliminar {{ $cotizacion->numero }}?" data-confirm-text="Queda en la papelera, no se borra el dato." data-confirm-button="Sí, eliminar">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-icon text-red-500 hover:bg-red-50" title="Eliminar">

@@ -47,6 +47,7 @@
             </div>
 
             <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <x-form-errors class="mb-3" />
                 <h3 class="mb-2 text-sm font-semibold text-amber-800">Cerrar el mes hará lo siguiente</h3>
                 <ul class="mb-4 list-inside list-disc space-y-1 text-sm text-amber-800">
                     <li>Guardará un resumen (snapshot) del estado actual, ligado a este cierre, para siempre.</li>
@@ -56,7 +57,10 @@
                     <li>Las cotizaciones a contratistas todavía PENDIENTES <strong>no se tocan</strong>: sigue abiertas hasta que se descuenten.</li>
                 </ul>
 
-                <form method="POST" action="{{ route('employee.materiales.cierres.store') }}" class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <form method="POST" action="{{ route('employee.materiales.cierres.store') }}" class="grid grid-cols-1 gap-3 sm:grid-cols-3"
+                    data-confirm="¿Cerrar el mes?"
+                    data-confirm-text="El stock se consolida y los movimientos hasta la fecha de corte quedan archivados. Esta acción no se puede deshacer (solo se puede consultar el historial)."
+                    data-confirm-button="Sí, cerrar el mes">
                     @csrf
                     <div>
                         <label class="form-label" for="etiqueta">Etiqueta del mes que cierras</label>
@@ -67,7 +71,7 @@
                         <x-date-input id="fecha_cierre" name="fecha_cierre" value="{{ old('fecha_cierre', $fechaSugerida) }}" required />
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="btn-brand w-full px-4 py-2 text-sm" onclick="return confirm('¿Cerrar el mes? El stock se consolida y los movimientos hasta la fecha de corte quedan archivados. Esta acción no se puede deshacer (solo se puede consultar el historial).');">
+                        <button type="submit" class="btn-brand w-full px-4 py-2 text-sm">
                             Cerrar mes
                         </button>
                     </div>

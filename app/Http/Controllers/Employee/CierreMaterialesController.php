@@ -43,7 +43,11 @@ class CierreMaterialesController extends Controller
             'confirmacion' => 'required|accepted',
         ], [
             'etiqueta.unique' => 'Ya existe un cierre con esa etiqueta.',
-            'confirmacion.accepted' => 'Confirma la casilla para poder cerrar el mes.',
+            'confirmacion.required' => 'Marque la casilla "Entiendo que esta acción…" para poder cerrar el mes.',
+            'confirmacion.accepted' => 'Marque la casilla "Entiendo que esta acción…" para poder cerrar el mes.',
+        ], [
+            'etiqueta' => 'etiqueta del mes',
+            'fecha_cierre' => 'fecha de corte',
         ]);
 
         $fechaCierre = Carbon::parse($data['fecha_cierre'])->endOfDay();

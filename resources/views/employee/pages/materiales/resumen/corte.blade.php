@@ -21,6 +21,8 @@
                 </div>
             @endif
 
+            <x-form-errors />
+
             <form method="GET" action="{{ route('employee.materiales.resumen.corte', $cuadrilla) }}" class="flex flex-wrap items-end gap-3">
                 <div>
                     <label class="mb-1 block text-xs font-medium text-gray-600">Desde (solo referencia, no filtra)</label>
@@ -138,7 +140,9 @@
                 @if (count($corte['cotizaciones']))
                     <form method="POST" action="{{ route('employee.materiales.resumen.cerrar', $cuadrilla) }}"
                         class="flex flex-wrap items-end gap-3 rounded-lg bg-amber-50 p-3 ring-1 ring-amber-200"
-                        onsubmit="return confirm('¿Marcar las {{ count($corte['cotizaciones']) }} cotización(es) listadas como DESCONTADO EN VALORIZACION? Esto no se puede deshacer desde acá.');">
+                        data-confirm="¿Marcar {{ count($corte['cotizaciones']) }} cotización(es) como DESCONTADO EN VALORIZACIÓN?"
+                        data-confirm-text="Esto no se puede deshacer desde acá."
+                        data-confirm-button="Sí, marcar">
                         @csrf
                         <input type="hidden" name="hasta" value="{{ $corte['hasta']->toDateString() }}" />
                         <input type="hidden" name="desde" value="{{ $desde?->toDateString() }}" />

@@ -91,7 +91,7 @@
                                 </td>
                                 <td class="px-4 py-3 text-right text-gray-600">{{ number_format($ejecutado->total(), 2) }}</td>
                                 <td class="px-4 py-3">
-                                    <form method="POST" action="{{ route('employee.materiales.ejecutados.destroy', $ejecutado) }}" onsubmit="return confirm('¿Eliminar este registro? Queda en la papelera (soft delete).');">
+                                    <form method="POST" action="{{ route('employee.materiales.ejecutados.destroy', $ejecutado) }}" data-confirm="¿Eliminar este registro?" data-confirm-text="Queda en la papelera, no se borra el dato." data-confirm-button="Sí, eliminar">
                                         @csrf
                                         @method('DELETE')
                                         <div class="flex justify-center">

@@ -101,6 +101,10 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         // arriesgarse con "herramientas" -> {herramienta}).
         Route::get('items', [Employee\MaterialController::class, 'index'])->name('items.index');
         Route::post('items', [Employee\MaterialController::class, 'store'])->name('items.store');
+        // Agregar materiales: vista propia (uno por uno o desde Excel).
+        Route::get('items/crear', [Employee\MaterialController::class, 'create'])->name('items.create');
+        Route::get('items/plantilla', [Employee\MaterialController::class, 'plantilla'])->name('items.plantilla');
+        Route::post('items/importar', [Employee\MaterialController::class, 'importar'])->name('items.importar');
         Route::get('items/{item}/edit', [Employee\MaterialController::class, 'edit'])->name('items.edit');
         Route::delete('items/{item}', [Employee\MaterialController::class, 'destroy'])->name('items.destroy');
 

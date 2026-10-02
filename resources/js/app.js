@@ -5,5 +5,7 @@ import './crud-modal';
 import './solicitud-detail';
 import './control-interno-detail';
 import './datepicker';
+import './confirm-form';
+import './forms';
 
 window.Swal = Swal;

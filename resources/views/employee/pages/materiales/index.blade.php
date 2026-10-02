@@ -58,7 +58,7 @@
                     class="flex min-h-0 flex-1 flex-col"
                 >
                     <div class="mb-3 flex shrink-0 justify-end">
-                        <button type="button" @click="openCreate()" class="btn-brand px-3 py-1.5 text-sm">Agregar material</button>
+                        <a href="{{ route('employee.materiales.items.create') }}" class="btn-brand px-3 py-1.5 text-sm">Agregar material</a>
                     </div>
 
                     <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">

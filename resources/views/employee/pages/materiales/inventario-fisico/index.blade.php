@@ -61,7 +61,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         </a>
-                                        <form method="POST" action="{{ route('employee.materiales.inventario-fisico.destroy', $inventario) }}" onsubmit="return confirm('¿Eliminar este inventario? Queda en la papelera (soft delete).');">
+                                        <form method="POST" action="{{ route('employee.materiales.inventario-fisico.destroy', $inventario) }}" data-confirm="¿Eliminar este inventario?" data-confirm-text="Queda en la papelera, no se borra el dato." data-confirm-button="Sí, eliminar">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-icon text-red-500 hover:bg-red-50" title="Eliminar">
