@@ -53,7 +53,9 @@
 
             <div class="mb-3 flex shrink-0 items-center justify-between">
                 <p class="text-xs text-gray-500">Total: <strong>{{ $cotizaciones->total() }}</strong></p>
+                @can('cotizaciones.crear')
                 <a href="{{ route('employee.materiales.cotizaciones.create') }}" class="btn-brand px-3 py-1.5 text-sm">Nueva cotización / vale</a>
+                @endcan
             </div>
 
             <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
@@ -93,12 +95,14 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H8a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </a>
+                                        @can('cotizaciones.editar')
                                         <a href="{{ route('employee.materiales.cotizaciones.edit', $cotizacion) }}" class="btn-icon" title="Corregir (mismo número)">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </a>
-                                        @if (!$cotizacion->es_vale && $cotizacion->estado === \App\Models\Cotizacion::ESTADO_PENDIENTE)
+                                        @endcan
+                                        @if (!$cotizacion->es_vale && $cotizacion->estado === \App\Models\Cotizacion::ESTADO_PENDIENTE && auth('employee')->user()->can('cotizaciones.descontar'))
                                             <button type="button" @click="open = true" class="btn-icon text-green-600 hover:bg-green-50" title="Marcar descontado en valorización">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -120,6 +124,7 @@
                                                 </form>
                                             </x-modal>
                                         @endif
+                                        @can('cotizaciones.eliminar')
                                         <form method="POST" action="{{ route('employee.materiales.cotizaciones.destroy', $cotizacion) }}" data-confirm="¿Eliminar {{ $cotizacion->numero }}?" data-confirm-text="Queda en la papelera, no se borra el dato." data-confirm-button="Sí, eliminar">
                                             @csrf
                                             @method('DELETE')
@@ -129,6 +134,7 @@
                                                 </svg>
                                             </button>
                                         </form>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

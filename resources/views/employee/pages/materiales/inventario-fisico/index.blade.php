@@ -23,7 +23,9 @@
                 <p class="text-xs text-gray-500">
                     Cuenta físicamente el almacén y anota el conteo. La diferencia se calcula sola. Queda guardado para siempre, a diferencia del Excel original.
                 </p>
+                @can('inventario.crear')
                 <a href="{{ route('employee.materiales.inventario-fisico.create') }}" class="btn-brand shrink-0 px-3 py-1.5 text-sm">Nuevo conteo</a>
+                @endcan
             </div>
 
             <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
@@ -61,6 +63,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         </a>
+                                        @can('inventario.eliminar')
                                         <form method="POST" action="{{ route('employee.materiales.inventario-fisico.destroy', $inventario) }}" data-confirm="¿Eliminar este inventario?" data-confirm-text="Queda en la papelera, no se borra el dato." data-confirm-button="Sí, eliminar">
                                             @csrf
                                             @method('DELETE')
@@ -70,6 +73,7 @@
                                                 </svg>
                                             </button>
                                         </form>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

@@ -10,6 +10,7 @@ use App\Models\PersonaCampo;
 use App\Http\Controllers\Controller;
 use App\Models\EstadoInterno;
 use App\Models\Historial;
+use App\Models\Auditoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -188,6 +189,17 @@ class SolicitudTecnicoController extends Controller
                 ]);
             }
 
+            // Auditoría: la asignación es un attach + update masivo (no
+            // dispara eventos de modelo), se registra a mano.
+            $numeros = $this->numerosSolicitud($solicitudIds);
+            Auditoria::registrar(
+                'asignado',
+                'Asignó ' . count($numeros) . ' solicitud(es) a ' . $tecnico->nombre . ': ' . implode(', ', $numeros),
+                $tecnico,
+                null,
+                ['solicitudes' => $numeros],
+            );
+
             DB::commit();
             return response()->json([
                 'success' => true,
@@ -232,6 +244,16 @@ class SolicitudTecnicoController extends Controller
                 Historial::where('tecnico_id', $tecnicoId)
                     ->where('solicitud_id', $solicitudId)
                     ->delete();
+
+                $tecnico = PersonaCampo::withTrashed()->find($tecnicoId);
+                $numeros = $this->numerosSolicitud([$solicitudId]);
+                Auditoria::registrar(
+                    'desasignado',
+                    'Quitó la solicitud ' . implode(', ', $numeros) . ' a ' . ($tecnico->nombre ?? "técnico #{$tecnicoId}"),
+                    $tecnico,
+                    ['solicitudes' => $numeros],
+                    null,
+                );
 
                 DB::commit();
                 return response()->json([
@@ -291,6 +313,16 @@ class SolicitudTecnicoController extends Controller
                 ->whereIn('solicitud_id', $solicitudesAsignadas)
                 ->delete();
 
+            $tecnico = PersonaCampo::withTrashed()->find($tecnicoId);
+            $numeros = $this->numerosSolicitud($solicitudesAsignadas);
+            Auditoria::registrar(
+                'desasignado',
+                'Quitó ' . count($numeros) . ' solicitud(es) a ' . ($tecnico->nombre ?? "técnico #{$tecnicoId}") . ': ' . implode(', ', $numeros),
+                $tecnico,
+                ['solicitudes' => $numeros],
+                null,
+            );
+
             DB::commit();
 
             $eliminadas = count($solicitudesAsignadas);
@@ -314,5 +346,11 @@ class SolicitudTecnicoController extends Controller
                 'message' => 'Error al eliminar las solicitudes'
             ], 500);
         }
+    }
+
+    /** N° de solicitud (lo que ve el usuario) de una lista de ids. */
+    private function numerosSolicitud(array $ids): array
+    {
+        return DB::table('solicituds')->whereIn('id', $ids)->orderBy('numero_solicitud')->pluck('numero_solicitud')->all();
     }
 }

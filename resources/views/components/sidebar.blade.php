@@ -1,5 +1,29 @@
 @props(['links' => [], 'brand' => 'CYC PROENERG'])
 
+@php
+    // Solo se muestran los enlaces que el usuario puede abrir según su rol
+    // (config/permisos.php). Un grupo sin hijos visibles desaparece; si su
+    // ruta principal no está permitida, apunta al primer hijo visible.
+    $links = collect($links)->map(function ($link) {
+        if (!empty($link['children'])) {
+            $link['children'] = array_values(array_filter(
+                $link['children'],
+                fn ($child) => \App\Support\Permisos::puedeRuta($child['route'])
+            ));
+            if (!$link['children']) {
+                return null;
+            }
+            if (!\App\Support\Permisos::puedeRuta($link['route'])) {
+                $link['route'] = $link['children'][0]['route'];
+            }
+
+            return $link;
+        }
+
+        return \App\Support\Permisos::puedeRuta($link['route']) ? $link : null;
+    })->filter()->values()->all();
+@endphp
+
 <aside
     :class="{ 'translate-x-0': $store.sidebar.open, '-translate-x-full': !$store.sidebar.open }"
     class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-sidenav -translate-x-full transition-transform duration-200 ease-in-out lg:translate-x-0"

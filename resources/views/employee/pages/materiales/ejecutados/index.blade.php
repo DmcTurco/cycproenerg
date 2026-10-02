@@ -54,7 +54,9 @@
 
             <div class="mb-3 flex shrink-0 items-center justify-between">
                 <p class="text-xs text-gray-500">Total: <strong>{{ $ejecutados->total() }}</strong></p>
+                @can('ejecutados.crear')
                 <a href="{{ route('employee.materiales.ejecutados.create') }}" class="btn-brand px-3 py-1.5 text-sm">Nuevo registro rápido</a>
+                @endcan
             </div>
 
             <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
@@ -91,6 +93,7 @@
                                 </td>
                                 <td class="px-4 py-3 text-right text-gray-600">{{ number_format($ejecutado->total(), 2) }}</td>
                                 <td class="px-4 py-3">
+                                    @can('ejecutados.eliminar')
                                     <form method="POST" action="{{ route('employee.materiales.ejecutados.destroy', $ejecutado) }}" data-confirm="¿Eliminar este registro?" data-confirm-text="Queda en la papelera, no se borra el dato." data-confirm-button="Sí, eliminar">
                                         @csrf
                                         @method('DELETE')
@@ -102,6 +105,7 @@
                                             </button>
                                         </div>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty

@@ -6,7 +6,9 @@
     <div class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
         <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
             <h2 class="text-base font-semibold text-white">Gestión de Clientes</h2>
+            @can('clientes.cargar_excel')
             <a href="{{ route('employee.client.excel') }}" class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Cargar Excel</a>
+            @endcan
         </div>
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">

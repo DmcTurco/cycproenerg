@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
+use App\Models\Auditoria;
 use App\Models\Empresa;
 use App\Models\PersonaCampo;
 use Illuminate\Http\Request;
@@ -104,7 +105,19 @@ class PersonaCampoController extends Controller
             ->values()
             ->all();
 
-        $persona->empresas()->sync($empresaIds);
+        $cambiosEmpresas = $persona->empresas()->sync($empresaIds);
+
+        // sync() no dispara eventos de modelo: se audita a mano si cambió algo.
+        if ($cambiosEmpresas['attached'] || $cambiosEmpresas['detached']) {
+            $nombres = fn ($ids) => Empresa::whereIn('id', $ids)->pluck('nombre')->all();
+            Auditoria::registrar(
+                'actualizado',
+                'Personal de campo ' . $persona->nombre . ': cambió sus empresas',
+                $persona,
+                ['empresas_quitadas' => $nombres($cambiosEmpresas['detached'])],
+                ['empresas_agregadas' => $nombres($cambiosEmpresas['attached'])],
+            );
+        }
 
         // Si se quitó el acceso a la app, se cierran sus sesiones abiertas.
         if (!$persona->usaApp()) {

@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Solicitante extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Solicitante';
+
     use HasFactory;
     use SoftDeletes;
 

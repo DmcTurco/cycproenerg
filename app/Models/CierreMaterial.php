@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -13,6 +14,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class CierreMaterial extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Cierre de mes';
+
     protected $table = 'cierres_materiales';
 
     protected $fillable = [

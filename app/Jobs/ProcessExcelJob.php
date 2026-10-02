@@ -23,6 +23,8 @@ use App\Models\EstadoPortal;
 use App\Models\FaseControlInterno;
 use App\Models\Instalacion;
 use App\Models\Logs;
+use App\Models\Auditoria;
+use App\Models\Employee;
 use App\Services\ControlInternoClasificador;
 use App\Services\ControlInternoIndicadores;
 use Illuminate\Support\Facades\Cache;
@@ -116,7 +118,19 @@ class ProcessExcelJob implements ShouldQueue
             // completa apenas se sabe cuántas filas trae.
             $this->log()?->update(['total_filas' => $totalFilas]);
 
-            $result = $this->processRows($rows);
+            // Auditoría: la carga toca miles de registros; en vez de una
+            // entrada por fila se registra UNA entrada resumen (abajo).
+            $result = Auditoria::sinRegistrar(fn () => $this->processRows($rows));
+
+            Auditoria::registrar(
+                'importado',
+                "Cargó el Excel del portal ({$totalFilas} filas): {$result['created']} solicitudes nuevas, {$result['updated']} actualizadas, {$result['failed']} con error",
+                $this->log(),
+                null,
+                ['resultado' => $result, 'control_interno' => $this->ciCounters],
+                'Carga Excel del portal',
+                $this->log()?->employee_id ? Employee::find($this->log()->employee_id) : null,
+            );
 
             // Marcar como completado
             Cache::put("excel_progress_{$this->processId}", [

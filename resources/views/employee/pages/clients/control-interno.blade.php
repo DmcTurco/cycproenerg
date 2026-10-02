@@ -121,10 +121,12 @@
                     </div>
 
                     <div class="mt-4 flex justify-end">
+                        @can('control_interno.editar')
                         <button type="button" @click="save()" :disabled="saving" class="btn-brand">
                             <span x-show="!saving">Guardar Control Interno</span>
                             <span x-show="saving" x-cloak>Guardando...</span>
                         </button>
+                        @endcan
                     </div>
                 </div>
             </div>

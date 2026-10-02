@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Instalacion extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Instalación';
+
     use HasFactory;
     use SoftDeletes;
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
+use App\Models\Auditoria;
 use App\Models\Material;
 use App\Models\ParametroControlMaterial;
 use Illuminate\Http\Request;
@@ -222,13 +223,23 @@ class MaterialController extends Controller
             return back()->with('import_errores', ['La hoja MATERIALES no tiene filas para cargar (se llena desde la fila 2).']);
         }
 
-        DB::transaction(function () use ($nuevos) {
+        DB::transaction(function () use ($nuevos, $request) {
             foreach ($nuevos as $datos) {
                 $datos['margen_pct'] = $datos['margen_pct'] !== null ? round($datos['margen_pct'] / 100, 4) : null;
                 $datos['serie'] = Material::SERIE;
                 $datos['correlativo'] = Material::siguienteCorrelativo();
                 Material::create($datos);
             }
+
+            // Cada material queda auditado como "creado"; esto agrupa la carga.
+            Auditoria::registrar(
+                'importado',
+                'Importó ' . count($nuevos) . ' material(es) desde Excel (' . $request->file('archivo')->getClientOriginalName() . ')',
+                null,
+                null,
+                ['codigos' => array_column($nuevos, 'codigo')],
+                'Material',
+            );
         });
 
         session()->flash('message', count($nuevos) . ' material(es) cargado(s) desde el Excel.');

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,6 +30,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Material extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Material';
+
+    // Calculados automáticamente: no son acciones de nadie.
+    protected array $auditExcluir = ['precio_venta_sin_igv', 'precio_venta_con_igv'];
+
     use HasFactory;
     use SoftDeletes;
 

@@ -39,10 +39,11 @@ Route::prefix(MyApp::COMPANIES_SUBDIR)->middleware('auth:company')->name('compan
 });
 
 
-Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employee.')->group(function () {
+// "permiso": cada ruta exige el permiso que le asigna config/permisos.php.
+Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware(['auth:employee', 'permiso'])->name('employee.')->group(function () {
     Route::get('/', function () {
         return redirect()->route('employee.home');
-    })->withoutMiddleware('auth:employee');
+    })->withoutMiddleware(['auth:employee', 'permiso']);
     Route::get('/home', [Employee\EmployeeController::class, 'index'])->name('home');
     Route::get('/client/carga-excel', function () {
         return view('employee.pages.clients.excel');
@@ -89,6 +90,16 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
     });
 
     // Control de Materiales (migración de CONTROL_MATERIALES_CC_08-2026 rev 02.xlsm).
+    // Auditoría: quién hizo qué (solo lectura).
+    Route::get('auditoria', [Employee\AuditoriaController::class, 'index'])->name('auditoria.index');
+
+    // Usuarios del panel y roles/permisos (config/permisos.php).
+    Route::get('usuarios', [Employee\UsuarioController::class, 'index'])->name('usuarios.index');
+    Route::post('usuarios', [Employee\UsuarioController::class, 'store'])->name('usuarios.store');
+    Route::get('usuarios/{usuario}/edit', [Employee\UsuarioController::class, 'edit'])->name('usuarios.edit');
+    Route::delete('usuarios/{usuario}', [Employee\UsuarioController::class, 'destroy'])->name('usuarios.destroy');
+    Route::resource('roles', Employee\RolController::class)->except('show')->parameters(['roles' => 'rol']);
+
     // Módulo nuevo e independiente de Control Interno (ver docs/modulos/control-materiales.md).
     Route::prefix('materiales')->name('materiales.')->group(function () {
         // CM-1: pantalla de Catálogo (pestañas Materiales / Herramientas).

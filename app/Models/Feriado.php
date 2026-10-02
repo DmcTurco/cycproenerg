@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,6 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Feriado extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Feriado';
+
     protected $table = 'feriados';
 
     protected $fillable = [

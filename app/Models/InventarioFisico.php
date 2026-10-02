@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class InventarioFisico extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Inventario físico';
+
     use HasFactory;
     use SoftDeletes;
 

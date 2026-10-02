@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -15,6 +16,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class FaseControlInterno extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Control Interno';
+
+    // Calculados automáticamente: no son acciones de nadie.
+    protected array $auditExcluir = ['ind_semaforo', 'ind_desface_dias', 'ind_dias_habiles', 'ind_fuera_de_plazo', 'ind_actualizado_en'];
+
     use SoftDeletes;
 
     protected $table = 'fase_control_internos';

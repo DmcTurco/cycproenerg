@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,10 @@ use Illuminate\Support\Facades\DB;
  */
 class Cotizacion extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Cotización';
+
     use HasFactory;
     use SoftDeletes;
 

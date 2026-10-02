@@ -57,6 +57,7 @@
                     <li>Las cotizaciones a contratistas todavía PENDIENTES <strong>no se tocan</strong>: sigue abiertas hasta que se descuenten.</li>
                 </ul>
 
+                @can('cierres.cerrar')
                 <form method="POST" action="{{ route('employee.materiales.cierres.store') }}" class="grid grid-cols-1 gap-3 sm:grid-cols-3"
                     data-confirm="¿Cerrar el mes?"
                     data-confirm-text="El stock se consolida y los movimientos hasta la fecha de corte quedan archivados. Esta acción no se puede deshacer (solo se puede consultar el historial)."
@@ -80,6 +81,7 @@
                         Entiendo que esta acción archiva movimientos y no se puede deshacer.
                     </label>
                 </form>
+                @endcan
             </div>
 
             <div>

@@ -52,7 +52,9 @@
             >
                 <div class="mb-3 flex shrink-0 items-center justify-between">
                     <p class="text-xs text-gray-500">Total: <strong>{{ $ingresos->total() }}</strong></p>
+                    @can('ingresos.crear')
                     <button type="button" @click="openCreate()" class="btn-brand px-3 py-1.5 text-sm">Registrar ingreso</button>
+                    @endcan
                 </div>
 
                 <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
@@ -97,16 +99,20 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center justify-center gap-1">
+                                            @can('ingresos.editar')
                                             <button type="button" @click="openEdit({{ $ingreso->id }})" class="btn-icon" title="Editar ingreso">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                             </button>
+                                            @endcan
+                                            @can('ingresos.eliminar')
                                             <button type="button" @click="remove({{ $ingreso->id }})" class="btn-icon text-red-500 hover:bg-red-50" title="Eliminar ingreso">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                             </button>
+                                            @endcan
                                         </div>
                                     </td>
                                 </tr>

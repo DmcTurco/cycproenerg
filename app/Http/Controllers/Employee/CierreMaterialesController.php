@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
+use App\Models\Auditoria;
 use App\Models\CierreMaterial;
 use App\Services\ControlMaterialesCierre;
 use App\Services\ControlMaterialesResumen;
@@ -59,7 +60,19 @@ class CierreMaterialesController extends Controller
             ])->withInput();
         }
 
-        $cierre = ControlMaterialesCierre::cerrar($data['etiqueta'], $fechaCierre, Auth::id());
+        // El cierre toca muchos registros (stock de cada material, archiva
+        // movimientos): en vez de una entrada por registro se audita UNA
+        // acción "cierre de mes".
+        $cierre = Auditoria::sinRegistrar(
+            fn () => ControlMaterialesCierre::cerrar($data['etiqueta'], $fechaCierre, Auth::id())
+        );
+        Auditoria::registrar(
+            'cierre_mes',
+            'Cerró el mes "' . $cierre->etiqueta . '" con fecha de corte ' . $fechaCierre->format('d/m/Y'),
+            $cierre,
+            null,
+            ['etiqueta' => $cierre->etiqueta, 'fecha_cierre' => $fechaCierre->toDateString()],
+        );
 
         session()->flash('message', 'Mes "' . $cierre->etiqueta . '" cerrado. El stock quedó consolidado y los movimientos hasta el ' . $fechaCierre->format('d/m/Y') . ' quedaron archivados en el historial de cierres.');
 

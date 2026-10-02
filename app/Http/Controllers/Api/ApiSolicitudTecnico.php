@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\TipoDocumentoHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Auditoria;
 use App\Models\EstadoInterno;
 use App\Models\Historial;
 use App\Models\PersonaCampo;
@@ -83,8 +84,21 @@ class ApiSolicitudTecnico extends Controller
         try {
             DB::beginTransaction();
 
+            $estadoAnterior = EstadoInterno::where('solicitud_id', $request->solicitud_id)->value('estado_const_id');
+
             EstadoInterno::where('solicitud_id', $request->solicitud_id)
                 ->update(['estado_const_id' => $request->estado_id]);
+
+            // Update masivo (sin eventos de modelo): se audita a mano.
+            $numero = DB::table('solicituds')->where('id', $request->solicitud_id)->value('numero_solicitud');
+            Auditoria::registrar(
+                'cambio_estado',
+                "App móvil: {$tecnico->nombre} cambió la solicitud {$numero} a {$request->estado_nombre}",
+                \App\Models\Solicitud::find($request->solicitud_id),
+                ['estado_const_id' => $estadoAnterior],
+                ['estado_const_id' => (int) $request->estado_id, 'estado' => $request->estado_nombre],
+                usuario: $tecnico,
+            );
 
             Historial::create([
                 'solicitud_id' => $request->solicitud_id,

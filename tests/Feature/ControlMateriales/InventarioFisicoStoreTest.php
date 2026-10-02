@@ -20,11 +20,11 @@ class InventarioFisicoStoreTest extends TestCase
 
     private function employee(): Employee
     {
-        return Employee::create([
+        return $this->comoAdministrador(Employee::create([
             'name' => 'Turco',
             'email' => 'turco@example.com',
             'password' => bcrypt('secret'),
-        ]);
+        ]));
     }
 
     private function material(array $overrides = []): Material

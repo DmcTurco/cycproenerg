@@ -137,7 +137,7 @@
                     </table>
                 </div>
 
-                @if (count($corte['cotizaciones']))
+                @if (count($corte['cotizaciones']) && auth('employee')->user()->can('cotizaciones.descontar'))
                     <form method="POST" action="{{ route('employee.materiales.resumen.cerrar', $cuadrilla) }}"
                         class="flex flex-wrap items-end gap-3 rounded-lg bg-amber-50 p-3 ring-1 ring-amber-200"
                         data-confirm="¿Marcar {{ count($corte['cotizaciones']) }} cotización(es) como DESCONTADO EN VALORIZACIÓN?"

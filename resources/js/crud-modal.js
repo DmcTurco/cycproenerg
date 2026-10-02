@@ -27,7 +27,10 @@ document.addEventListener('alpine:init', () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error('load failed');
+                    const error = await response.json().catch(() => ({}));
+                    this.open = false;
+                    window.Swal?.fire({ icon: 'error', title: error.message || 'No se pudo cargar el registro' });
+                    return;
                 }
 
                 const data = await response.json();
@@ -76,7 +79,10 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 if (!response.ok) {
-                    throw new Error('submit failed');
+                    // 403 sin permiso u otro rechazo con mensaje del servidor.
+                    const error = await response.json().catch(() => ({}));
+                    window.Swal?.fire({ icon: 'error', title: error.message || 'Ocurrió un error al guardar' });
+                    return;
                 }
 
                 const data = await response.json().catch(() => ({}));
@@ -121,7 +127,9 @@ document.addEventListener('alpine:init', () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error('delete failed');
+                    const error = await response.json().catch(() => ({}));
+                    window.Swal?.fire({ icon: 'error', title: error.message || 'No se pudo eliminar el registro' });
+                    return;
                 }
 
                 window.location.reload();

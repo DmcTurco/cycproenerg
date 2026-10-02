@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -11,6 +12,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ParametroControlMaterial extends Model
 {
+    use Auditable;
+
+    protected string $auditModuloNombre = 'Parámetros Materiales';
+
     protected $table = 'parametros_control_materiales';
 
     protected $fillable = [

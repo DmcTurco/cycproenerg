@@ -19,11 +19,11 @@ class PersonaCampoTest extends TestCase
 
     private function employee(): Employee
     {
-        return Employee::create([
+        return $this->comoAdministrador(Employee::create([
             'name' => 'Turco',
             'email' => 'turco@example.com',
             'password' => bcrypt('secret'),
-        ]);
+        ]));
     }
 
     public function test_listado_separa_personal_directo_y_contratistas_por_pestana(): void

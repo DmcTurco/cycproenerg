@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => Authenticate::class,
             'guest' => RedirectIfAuthenticated::class,
+            // Roles y permisos del panel de empleados (config/permisos.php).
+            'permiso' => \App\Http\Middleware\VerificarPermiso::class,
         ]);
 
         // El resto (TrustProxies, TrimStrings, VerifyCsrfToken, EncryptCookies,
