@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * mano); el resto (ingresos, salidas, stock actual, precio vigente,
  * alerta de precio, estado) son fórmulas en el Excel y se calculan aquí
  * como accessors, no como columnas — así nunca quedan desactualizados.
+ * Excepción: el precio de venta (sin/con IGV) SÍ se guarda, y se mantiene
+ * al día solo (ver booted()).
  *
  * IMPORTANTE (roadmap, ver docs/modulos/control-materiales.md): estos
  * accessors se completan por partes a medida que avanzan los submódulos
@@ -53,10 +55,35 @@ class Material extends Model
     protected $casts = [
         'precio_base' => 'float',
         'margen_pct' => 'float',
+        'precio_venta_sin_igv' => 'float',
+        'precio_venta_con_igv' => 'float',
         'stock_inicial' => 'float',
         'stock_minimo' => 'float',
         'factor_metros_por_unidad' => 'float',
     ];
+
+    /**
+     * precio_venta_sin_igv / precio_venta_con_igv se guardan en la tabla
+     * (no son fillable: nadie los escribe a mano). Se recalculan cada vez
+     * que se guarda el material; Ingreso y ParametroControlMaterial llaman a
+     * recalcularPreciosVenta() cuando cambian lo que alimenta el cálculo.
+     */
+    protected static function booted(): void
+    {
+        static::saving(fn (Material $material) => $material->llenarPreciosVenta());
+    }
+
+    public function recalcularPreciosVenta(): void
+    {
+        $this->llenarPreciosVenta();
+        $this->saveQuietly();
+    }
+
+    private function llenarPreciosVenta(): void
+    {
+        $this->precio_venta_sin_igv = $this->precioVentaSinIgv();
+        $this->precio_venta_con_igv = $this->precioVentaConIgv();
+    }
 
     /**
      * Correlativo interno estable de 8 dígitos (serie MAT + 00000001,

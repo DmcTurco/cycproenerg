@@ -3,7 +3,7 @@
 namespace Tests\Feature\ControlMateriales;
 
 use App\Models\Cotizacion;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Ejecutado;
 use App\Models\Ingreso;
 use App\Models\Material;
@@ -47,7 +47,7 @@ class ControlMaterialesCierreTest extends TestCase
     public function test_archiva_ingresos_y_ejecutados_con_fecha_hasta_el_cierre(): void
     {
         $material = $this->material();
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         $ingreso = Ingreso::create(['material_id' => $material->id, 'fecha' => '2026-09-10', 'cantidad' => 20.0]);
         $ejecutado = Ejecutado::create([
@@ -68,8 +68,8 @@ class ControlMaterialesCierreTest extends TestCase
     public function test_no_archiva_cotizaciones_pendientes_pero_si_las_ya_descontadas_o_vales(): void
     {
         $material = $this->material();
-        $contratista = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
-        $personalDirecto = Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $contratista = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
+        $personalDirecto = PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         $pendiente = Cotizacion::emitir($contratista, [['material_id' => $material->id, 'cantidad' => 1.0]], '2026-09-05');
         $descontada = Cotizacion::emitir($contratista, [['material_id' => $material->id, 'cantidad' => 1.0]], '2026-09-06');

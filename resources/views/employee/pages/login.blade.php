@@ -14,6 +14,12 @@
             <h2 class="mb-1 text-center text-xl font-semibold text-gray-900">Bienvenido de nuevo</h2>
             <p class="mb-6 text-center text-sm text-gray-500">Ingresa tus credenciales para acceder al panel</p>
 
+            @if (session('status'))
+                <div class="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 ring-1 ring-amber-200">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
 

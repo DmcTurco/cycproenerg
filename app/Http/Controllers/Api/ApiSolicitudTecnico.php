@@ -6,7 +6,7 @@ use App\Helpers\TipoDocumentoHelper;
 use App\Http\Controllers\Controller;
 use App\Models\EstadoInterno;
 use App\Models\Historial;
-use App\Models\Tecnico;
+use App\Models\PersonaCampo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +17,7 @@ class ApiSolicitudTecnico extends Controller
     public function getSolicitudTecnico(Request $request)
     {
         // Verificar autenticación
-        $tecnico = Tecnico::find(auth()->id());
+        $tecnico = PersonaCampo::find(auth()->id());
         if (!$tecnico) {
             return response()->json(['error' => 'No autorizado'], 401);
         }
@@ -108,7 +108,7 @@ class ApiSolicitudTecnico extends Controller
     public function getSolicitudById(Request $request, $id)
     {
         // Verificar autenticación
-        $tecnico = Tecnico::find(auth()->id());
+        $tecnico = PersonaCampo::find(auth()->id());
         if (!$tecnico) {
             return response()->json(['error' => 'No autorizado'], 401);
         }

@@ -3,7 +3,7 @@
 namespace Tests\Feature\ControlMateriales;
 
 use App\Models\Cotizacion;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Ejecutado;
 use App\Models\Material;
 use App\Models\ParametroControlMaterial;
@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * CM-6: Cuadrilla::saldosEnPoder() — "EN SU PODER (por vales)" de
+ * CM-6: PersonaCampo::saldosEnPoder() — "EN SU PODER (por vales)" de
  * REGISTRO RAPIDO. Solo tiene sentido para PERSONAL DIRECTO.
  */
 class CuadrillaSaldosEnPoderTest extends TestCase
@@ -42,7 +42,7 @@ class CuadrillaSaldosEnPoderTest extends TestCase
     public function test_saldo_convierte_el_vale_de_rollos_a_metros_con_el_factor(): void
     {
         $material = $this->material(['factor_metros_por_unidad' => 100.0]);
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         // Vale de 2 rollos = 200 metros en poder.
         Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 2.0]], '2026-09-01');
@@ -54,7 +54,7 @@ class CuadrillaSaldosEnPoderTest extends TestCase
     public function test_salida_ejecutada_reduce_el_saldo_en_poder(): void
     {
         $material = $this->material(['factor_metros_por_unidad' => 100.0]);
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 2.0]], '2026-09-01'); // 200 m en poder
 
@@ -72,7 +72,7 @@ class CuadrillaSaldosEnPoderTest extends TestCase
         // material salió de manos de la cuadrilla (volvió al almacén), así
         // que también deja de estar "en su poder" — igual que una SALIDA.
         $material = $this->material(['factor_metros_por_unidad' => 100.0]);
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 2.0]], '2026-09-01'); // 200 m en poder
 
@@ -87,7 +87,7 @@ class CuadrillaSaldosEnPoderTest extends TestCase
     public function test_cotizacion_de_contratista_no_cuenta_como_vale_en_el_saldo(): void
     {
         $material = $this->material();
-        $contratista = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
+        $contratista = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
 
         Cotizacion::emitir($contratista, [['material_id' => $material->id, 'cantidad' => 5.0]], '2026-09-01');
 
@@ -97,7 +97,7 @@ class CuadrillaSaldosEnPoderTest extends TestCase
     public function test_numero_de_retiros_y_totales_de_registro_de_cuadrillas(): void
     {
         $material = $this->material(['precio_base' => 100.0, 'margen_pct' => 0.10]);
-        $contratista = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
+        $contratista = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
 
         Cotizacion::emitir($contratista, [['material_id' => $material->id, 'cantidad' => 1.0]], '2026-09-01');
         Cotizacion::emitir($contratista, [['material_id' => $material->id, 'cantidad' => 1.0]], '2026-09-05');

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Herramienta;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ class ImprimibleController extends Controller
     public function index()
     {
         return view('employee.pages.materiales.imprimibles.index', [
-            'cuadrillas' => Cuadrilla::where('estado', 'ACTIVO')->orderBy('nombre')->get(),
+            'cuadrillas' => PersonaCampo::where('estado', 'ACTIVO')->orderBy('nombre')->get(),
             'herramientas' => Herramienta::orderBy('codigo')->get(),
         ]);
     }
@@ -38,7 +38,7 @@ class ImprimibleController extends Controller
      */
     public function actaMateriales(Request $request)
     {
-        $cuadrilla = $request->filled('cuadrilla_id') ? Cuadrilla::with('empresas')->findOrFail($request->cuadrilla_id) : null;
+        $cuadrilla = $request->filled('cuadrilla_id') ? PersonaCampo::with('empresas')->findOrFail($request->cuadrilla_id) : null;
 
         $pdf = Pdf::loadView('employee.pages.materiales.imprimibles.acta-materiales-pdf', [
             'cuadrilla' => $cuadrilla,
@@ -59,7 +59,7 @@ class ImprimibleController extends Controller
      */
     public function actaHerramientas(Request $request)
     {
-        $cuadrilla = $request->filled('cuadrilla_id') ? Cuadrilla::findOrFail($request->cuadrilla_id) : null;
+        $cuadrilla = $request->filled('cuadrilla_id') ? PersonaCampo::findOrFail($request->cuadrilla_id) : null;
 
         $herramientas = $request->filled('herramientas')
             ? Herramienta::whereIn('id', (array) $request->input('herramientas'))->orderBy('codigo')->get()

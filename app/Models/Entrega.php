@@ -42,6 +42,6 @@ class Entrega extends Model
 
     public function cuadrilla(): BelongsTo
     {
-        return $this->belongsTo(Cuadrilla::class);
+        return $this->belongsTo(PersonaCampo::class);
     }
 }

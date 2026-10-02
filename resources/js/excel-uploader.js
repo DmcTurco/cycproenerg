@@ -68,7 +68,24 @@ document.addEventListener('alpine:init', () => {
                 this.previewHeaders = (rows[0] || []).map((h) => (h === '' || h == null ? '—' : String(h)));
                 const dataRows = rows.slice(1);
                 this.previewTotalRows = dataRows.length;
-                this.previewRows = dataRows.slice(0, 8);
+                // Las fechas del portal vienen como número de serie de Excel
+                // (ej. 46274.70204993056): en la vista previa se muestran como fecha.
+                const fechaCols = (rows[0] || [])
+                    .map((h, i) => (/^fecha/i.test(String(h).trim()) ? i : -1))
+                    .filter((i) => i >= 0);
+                this.previewRows = dataRows.slice(0, 8).map((row) => {
+                    const copy = [...row];
+                    fechaCols.forEach((i) => {
+                        const v = copy[i];
+                        if (typeof v === 'number' && v > 0) {
+                            const d = XLSX.SSF.parse_date_code(v);
+                            if (d) {
+                                copy[i] = `${String(d.d).padStart(2, '0')}/${String(d.m).padStart(2, '0')}/${d.y}`;
+                            }
+                        }
+                    });
+                    return copy;
+                });
                 this.status = 'preview';
             } catch (e) {
                 this.selectedFile = null;

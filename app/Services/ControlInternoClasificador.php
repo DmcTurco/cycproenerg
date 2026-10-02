@@ -21,18 +21,31 @@ use App\Models\Solicitud;
  *  2. marcado_para_anular (CI-3), en cualquier fase abierta -> PEND_ANULACION.
  *  3. TC es histórico cerrado: no se reclasifica con datos del portal.
  *  4. CONSTRUIDO -> TC si el portal ya reportó TC concluida.
- *  5. GENERAL -> CONSTRUIDO (o TC directo) si ya hay F. CONSTRUCCIÓN (CI-3).
+ *  5. GENERAL -> CONSTRUIDO (o TC directo) si ya hay F. CONSTRUCCIÓN (CI-3,
+ *     o la fecha de fin de interna del portal si la manual está vacía).
+ *
+ * GENERAL = aprobadas pend. construir; CONSTRUIDO = pend. TC.
  *
  * Nunca pisa las columnas manuales de CI-3: solo las lee.
  */
 class ControlInternoClasificador
 {
-    public static function clasificar(Solicitud $solicitud, bool $tcConcluida, ?string $fechaTc = null): FaseControlInterno
+    public static function clasificar(Solicitud $solicitud, bool $tcConcluida, ?string $fechaTc = null, ?string $fechaFinInterna = null): FaseControlInterno
     {
         $fase = FaseControlInterno::firstOrCreate(
             ['solicitud_id' => $solicitud->id],
             ['fase' => FaseControlInterno::GENERAL, 'fecha_ingreso_general' => now()->toDateString()]
         );
+
+        // Igual que el VBA (`If IsEmpty(K_CONS) Then K_CONS = P_FIN`): si
+        // F. CONSTRUCCIÓN está vacía se completa con la "Fecha de
+        // finalización de la Instalación Interna" del portal. Sin esto las
+        // ya construidas se quedaban en GENERAL hasta que alguien cargara la
+        // fecha a mano. Nunca pisa una fecha manual ya cargada.
+        if ($fechaFinInterna && is_null($fase->fecha_construccion_control)
+            && in_array($fase->fase, [FaseControlInterno::GENERAL, FaseControlInterno::CONSTRUIDO], true)) {
+            $fase->update(['fecha_construccion_control' => $fechaFinInterna]);
+        }
 
         if ($fase->fase === FaseControlInterno::PEND_ANULACION) {
             return $fase;

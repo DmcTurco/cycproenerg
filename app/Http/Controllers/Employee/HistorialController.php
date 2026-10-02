@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Employee;
 use App\Helpers\TipoDocumentoHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Historial;
-use App\Models\Tecnico;
+use App\Models\PersonaCampo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +19,7 @@ class HistorialController extends Controller
             'search' => 'nullable|string|max:50'
         ]);
 
-        $tecnico = Tecnico::findOrFail($tecnicoId);
+        $tecnico = PersonaCampo::findOrFail($tecnicoId);
         $estadosCase = TipoDocumentoHelper::buildEstadosCase("h.estado_const_id");
         // $historial = Historial::where('tecnico_id', $tecnicoId)->paginate(10);
         try {

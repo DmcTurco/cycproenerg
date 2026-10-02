@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Services\ControlMaterialesResumen;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -26,7 +26,7 @@ class MaterialesResumenController extends Controller
         return view('employee.pages.materiales.resumen.index', compact('generales', 'cuadrillas', 'hastaDefault'));
     }
 
-    public function corte(Request $request, Cuadrilla $cuadrilla)
+    public function corte(Request $request, PersonaCampo $cuadrilla)
     {
         $hasta = Carbon::parse($request->query('hasta', now()->toDateString()))->endOfDay();
         $desde = $request->query('desde') ? Carbon::parse($request->query('desde')) : null;
@@ -35,9 +35,9 @@ class MaterialesResumenController extends Controller
         return view('employee.pages.materiales.resumen.corte', compact('corte', 'desde'));
     }
 
-    public function cerrar(Request $request, Cuadrilla $cuadrilla)
+    public function cerrar(Request $request, PersonaCampo $cuadrilla)
     {
-        if ($cuadrilla->tipo !== Cuadrilla::TIPO_CONTRATISTA) {
+        if ($cuadrilla->tipo !== PersonaCampo::TIPO_CONTRATISTA) {
             abort(422, 'Solo se cierra corte de contratistas: los vales de personal directo no se descuentan en valorización.');
         }
 
@@ -57,7 +57,7 @@ class MaterialesResumenController extends Controller
         return redirect()->route('employee.materiales.resumen.index');
     }
 
-    public function pdf(Request $request, Cuadrilla $cuadrilla)
+    public function pdf(Request $request, PersonaCampo $cuadrilla)
     {
         $hasta = Carbon::parse($request->query('hasta', now()->toDateString()))->endOfDay();
         $desde = $request->query('desde') ? Carbon::parse($request->query('desde')) : null;

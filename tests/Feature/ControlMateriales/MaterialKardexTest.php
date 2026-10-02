@@ -49,7 +49,7 @@ class MaterialKardexTest extends TestCase
     public function test_stock_actual_resta_salidas_de_contratista_al_emitir_la_cotizacion(): void
     {
         $material = $this->material(['stock_inicial' => 50.0]);
-        $cuadrilla = \App\Models\Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => \App\Models\Cuadrilla::TIPO_CONTRATISTA]);
+        $cuadrilla = \App\Models\PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => \App\Models\PersonaCampo::TIPO_CONTRATISTA]);
 
         \App\Models\Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 10.0]], '2026-09-10');
 
@@ -61,7 +61,7 @@ class MaterialKardexTest extends TestCase
         // factor_metros_por_unidad = 100 (se entrega en rollos, se ejecuta en
         // metros): 250 metros ejecutados = 2.5 rollos de salida.
         $material = $this->material(['stock_inicial' => 50.0, 'factor_metros_por_unidad' => 100.0]);
-        $cuadrilla = \App\Models\Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => \App\Models\Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $cuadrilla = \App\Models\PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => \App\Models\PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         \App\Models\Ejecutado::create([
             'fecha' => '2026-09-10',
@@ -79,7 +79,7 @@ class MaterialKardexTest extends TestCase
     public function test_devolucion_de_personal_directo_resta_de_las_salidas_y_repone_stock(): void
     {
         $material = $this->material(['stock_inicial' => 50.0, 'factor_metros_por_unidad' => 100.0]);
-        $cuadrilla = \App\Models\Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => \App\Models\Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $cuadrilla = \App\Models\PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => \App\Models\PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         \App\Models\Ejecutado::create([
             'fecha' => '2026-09-10', 'cuadrilla_id' => $cuadrilla->id, 'material_id' => $material->id,
@@ -163,5 +163,58 @@ class MaterialKardexTest extends TestCase
 
         $this->assertSame(110.0, $material->precioVentaSinIgv());
         $this->assertSame(129.8, $material->precioVentaConIgv());
+    }
+
+    public function test_precio_venta_se_guarda_en_la_tabla_al_crear_y_editar(): void
+    {
+        ParametroControlMaterial::actual(); // igv = 0.18, margen_general = 0.10
+
+        $material = $this->material(['precio_base' => 100.0, 'margen_pct' => null]);
+        $this->assertDatabaseHas('materiales', ['id' => $material->id, 'precio_venta_sin_igv' => 110.00, 'precio_venta_con_igv' => 129.80]);
+
+        $material->update(['margen_pct' => 0.20]);
+        $this->assertDatabaseHas('materiales', ['id' => $material->id, 'precio_venta_sin_igv' => 120.00, 'precio_venta_con_igv' => 141.60]);
+    }
+
+    public function test_precio_venta_guardado_se_recalcula_al_registrar_modificar_y_eliminar_ingresos(): void
+    {
+        ParametroControlMaterial::actual();
+        $material = $this->material(['precio_base' => 100.0, 'margen_pct' => 0.10]);
+
+        $ingreso = Ingreso::create(['material_id' => $material->id, 'fecha' => '2026-09-01', 'cantidad' => 1, 'precio_compra' => 200.0]);
+        $this->assertSame(220.0, $material->fresh()->precio_venta_sin_igv);
+
+        $ingreso->update(['precio_compra' => 150.0]);
+        $this->assertSame(165.0, $material->fresh()->precio_venta_sin_igv);
+
+        $ingreso->delete();
+        $this->assertSame(110.0, $material->fresh()->precio_venta_sin_igv);
+    }
+
+    public function test_precio_venta_guardado_se_recalcula_en_ambos_materiales_si_el_ingreso_cambia_de_material(): void
+    {
+        ParametroControlMaterial::actual();
+        $a = $this->material(['codigo' => 'MAT-A', 'precio_base' => 100.0, 'margen_pct' => 0.10]);
+        $b = $this->material(['codigo' => 'MAT-B', 'precio_base' => 100.0, 'margen_pct' => 0.10]);
+
+        $ingreso = Ingreso::create(['material_id' => $a->id, 'fecha' => '2026-09-01', 'cantidad' => 1, 'precio_compra' => 200.0]);
+        $ingreso->update(['material_id' => $b->id]);
+
+        $this->assertSame(110.0, $a->fresh()->precio_venta_sin_igv);
+        $this->assertSame(220.0, $b->fresh()->precio_venta_sin_igv);
+    }
+
+    public function test_precio_venta_guardado_se_recalcula_al_cambiar_margen_general_o_igv(): void
+    {
+        $parametros = ParametroControlMaterial::actual();
+        $general = $this->material(['codigo' => 'MAT-GEN', 'precio_base' => 100.0, 'margen_pct' => null]);
+        $propio = $this->material(['codigo' => 'MAT-PRO', 'precio_base' => 100.0, 'margen_pct' => 0.25]);
+
+        $parametros->update(['margen_general' => 0.30, 'igv' => 0.10]);
+
+        $this->assertSame(130.0, $general->fresh()->precio_venta_sin_igv);
+        $this->assertSame(143.0, $general->fresh()->precio_venta_con_igv);
+        $this->assertSame(125.0, $propio->fresh()->precio_venta_sin_igv, 'el margen propio no cambia con el general');
+        $this->assertSame(137.5, $propio->fresh()->precio_venta_con_igv, 'pero el IGV sí aplica a todos');
     }
 }

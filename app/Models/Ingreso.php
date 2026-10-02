@@ -35,6 +35,25 @@ class Ingreso extends Model
         'precio_compra' => 'float',
     ];
 
+    /**
+     * El precio de compra del último ingreso mueve el precio vigente y, con
+     * él, el precio de venta guardado en el material. El UPDATE en bloque del
+     * cierre de mes (CM-11) no dispara esto, pero no hace falta: ese mismo
+     * cierre consolida precio_base = precio vigente antes de archivar.
+     */
+    protected static function booted(): void
+    {
+        $recalcular = function (Ingreso $ingreso) {
+            $ids = array_filter(array_unique([$ingreso->material_id, $ingreso->getOriginal('material_id')]));
+
+            Material::whereIn('id', $ids)->get()->each->recalcularPreciosVenta();
+        };
+
+        static::saved($recalcular);
+        static::deleted($recalcular);
+        static::restored($recalcular);
+    }
+
     public function material(): BelongsTo
     {
         return $this->belongsTo(Material::class);

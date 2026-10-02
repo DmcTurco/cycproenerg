@@ -41,7 +41,7 @@ class Ejecutado extends Model
 
     public function cuadrilla(): BelongsTo
     {
-        return $this->belongsTo(Cuadrilla::class);
+        return $this->belongsTo(PersonaCampo::class);
     }
 
     public function material(): BelongsTo

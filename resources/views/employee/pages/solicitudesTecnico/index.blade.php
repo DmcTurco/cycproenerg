@@ -1,7 +1,7 @@
 @extends('employee.layouts.user_type.auth')
 
 @php($fullBleed = true)
-@php($backUrl = route('employee.technicals.index'))
+@php($backUrl = route('employee.technicals.index', ['tipo' => $tecnico->tipo]))
 
 @section('content')
     <div

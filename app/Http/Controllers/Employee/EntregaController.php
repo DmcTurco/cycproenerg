@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Entrega;
 use App\Models\Herramienta;
 use Illuminate\Http\Request;
@@ -42,7 +42,7 @@ class EntregaController extends Controller
             ->appends($request->query());
 
         $herramientas = Herramienta::orderBy('codigo')->get();
-        $cuadrillas = Cuadrilla::where('estado', 'ACTIVO')->orderBy('nombre')->get();
+        $cuadrillas = PersonaCampo::where('estado', 'ACTIVO')->orderBy('nombre')->get();
 
         return view('employee.pages.materiales.entregas', compact(
             'entregas', 'herramientas', 'cuadrillas', 'search', 'herramientaId', 'cuadrillaId'
@@ -57,7 +57,7 @@ class EntregaController extends Controller
             'fecha' => 'required|date',
             'herramienta_id' => 'required|exists:herramientas,id',
             'tipo' => 'required|string|in:ENTREGA,DEVOLUCION',
-            'cuadrilla_id' => 'required|exists:cuadrillas,id',
+            'cuadrilla_id' => 'required|exists:personas_campo,id',
             'observacion' => 'nullable|string|max:1000',
         ];
 

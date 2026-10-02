@@ -31,6 +31,40 @@
     </div>
 </div>
 
+{{-- Vista previa del precio de venta — mismo cálculo que
+     Material::precioVentaSinIgv()/ConIgv(); el valor que se guarda lo
+     calcula el backend al grabar. --}}
+<div
+    x-data="{
+        margenGeneral: {{ (float) $parametros->margen_general }},
+        igv: {{ (float) $parametros->igv }},
+        get vigente() {
+            const base = parseFloat(form.precio_base) || 0;
+            const ultimo = parseFloat(form.ultimo_precio_ingresos);
+            return !isNaN(ultimo) && ultimo > base ? ultimo : base;
+        },
+        get margen() {
+            return form.margen_pct === '' || form.margen_pct === null ? this.margenGeneral : (parseFloat(form.margen_pct) || 0) / 100;
+        },
+        get ventaSinIgv() { return Math.round(this.vigente * (1 + this.margen) * 100) / 100 },
+        get ventaConIgv() { return Math.round(this.ventaSinIgv * (1 + this.igv) * 100) / 100 },
+    }"
+    class="grid grid-cols-1 gap-4 rounded-lg bg-gray-50 p-3 text-sm sm:grid-cols-3"
+>
+    <div>
+        <p class="text-xs text-gray-500">Precio vigente</p>
+        <p class="font-medium text-gray-900" x-text="vigente.toFixed(2)"></p>
+    </div>
+    <div>
+        <p class="text-xs text-gray-500">Venta S/IGV <span x-text="'(margen ' + (margen * 100).toFixed(2) + '%)'"></span></p>
+        <p class="font-medium text-gray-900" x-text="ventaSinIgv.toFixed(2)"></p>
+    </div>
+    <div>
+        <p class="text-xs text-gray-500">Venta C/IGV</p>
+        <p class="font-semibold text-gray-900" x-text="ventaConIgv.toFixed(2)"></p>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
     <div>
         <label class="form-label" for="stock_inicial">Stock inicial</label>

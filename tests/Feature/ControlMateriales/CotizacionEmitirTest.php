@@ -3,7 +3,7 @@
 namespace Tests\Feature\ControlMateriales;
 
 use App\Models\Cotizacion;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Material;
 use App\Models\ParametroControlMaterial;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,7 +45,7 @@ class CotizacionEmitirTest extends TestCase
     public function test_cotizacion_a_contratista_usa_precio_de_venta_y_suma_igv(): void
     {
         $material = $this->material(['precio_base' => 100.0, 'margen_pct' => 0.10]); // venta S/IGV = 110
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
 
         $cotizacion = Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 2.0]], '2026-09-10');
 
@@ -61,7 +61,7 @@ class CotizacionEmitirTest extends TestCase
     public function test_vale_a_personal_directo_usa_precio_vigente_sin_margen_ni_igv(): void
     {
         $material = $this->material(['precio_base' => 100.0, 'margen_pct' => 0.10]);
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         $vale = Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 2.0]], '2026-07-16');
 
@@ -77,7 +77,7 @@ class CotizacionEmitirTest extends TestCase
     public function test_numeracion_correlativa_por_prefijo_reinicia_por_tipo_y_fecha(): void
     {
         $material = $this->material();
-        $contratista = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
+        $contratista = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
         $items = [['material_id' => $material->id, 'cantidad' => 1.0]];
 
         $c1 = Cotizacion::emitir($contratista, $items, '2026-09-10');
@@ -92,7 +92,7 @@ class CotizacionEmitirTest extends TestCase
     public function test_correlativo_interno_de_8_digitos_es_unico_por_serie_y_no_se_reutiliza_al_corregir(): void
     {
         $material = $this->material();
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
 
         $c1 = Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 1.0]], '2026-09-10');
         $this->assertSame('00000001', $c1->correlativo);
@@ -106,7 +106,7 @@ class CotizacionEmitirTest extends TestCase
     public function test_corregir_reemplaza_el_detalle_entero_y_no_toca_el_estado(): void
     {
         $material = $this->material();
-        $cuadrilla = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
 
         $original = Cotizacion::emitir($cuadrilla, [['material_id' => $material->id, 'cantidad' => 1.0]], '2026-09-10');
         $original->update(['estado' => Cotizacion::ESTADO_DESCONTADO, 'n_valorizacion' => 'VAL-01']);
@@ -122,8 +122,8 @@ class CotizacionEmitirTest extends TestCase
     public function test_emitir_descuenta_stock_de_inmediato_para_contratista_pero_no_para_vale(): void
     {
         $material = $this->material(['stock_inicial' => 100.0]);
-        $contratista = Cuadrilla::create(['nombre' => 'Contratista X', 'tipo' => Cuadrilla::TIPO_CONTRATISTA]);
-        $personalDirecto = Cuadrilla::create(['nombre' => 'Cuadrilla 1', 'tipo' => Cuadrilla::TIPO_PERSONAL_DIRECTO]);
+        $contratista = PersonaCampo::create(['nombre' => 'Contratista X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA]);
+        $personalDirecto = PersonaCampo::create(['nombre' => 'Cuadrilla 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO]);
 
         Cotizacion::emitir($contratista, [['material_id' => $material->id, 'cantidad' => 10.0]], '2026-09-10');
         $this->assertSame(90.0, $material->stockActual(), 'la cotización a contratista SÍ descuenta al emitir');

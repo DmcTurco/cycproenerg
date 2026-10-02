@@ -6,7 +6,7 @@ use App\Helpers\TipoDocumentoHelper;
 use App\Models\Solicitante;
 use App\Models\Solicitud;
 use App\Models\SolicitudTecnico;
-use App\Models\Tecnico;
+use App\Models\PersonaCampo;
 use App\Http\Controllers\Controller;
 use App\Models\EstadoInterno;
 use App\Models\Historial;
@@ -30,7 +30,7 @@ class SolicitudTecnicoController extends Controller
     }
     public function index($tecnicoId, Request $request)
     {
-        $tecnico = Tecnico::findOrFail($tecnicoId);
+        $tecnico = PersonaCampo::findOrFail($tecnicoId);
         $estados = $this->getEstados();
         $estadosCase = TipoDocumentoHelper::buildEstadosCase("ei.estado_const_id");
 
@@ -121,7 +121,7 @@ class SolicitudTecnicoController extends Controller
         try {
             DB::beginTransaction();
 
-            $tecnico = Tecnico::findOrFail($tecnicoId);
+            $tecnico = PersonaCampo::findOrFail($tecnicoId);
 
             // Verificar si es una asignación múltiple o individual
             $solicitudIds = $request->has('solicitudes') ? $request->solicitudes : [$request->solicitud_id];

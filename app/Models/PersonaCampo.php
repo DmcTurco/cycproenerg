@@ -3,53 +3,122 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Collection;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
- * CM-2: personas que retiran materiales/herramientas (equivalente a
- * "REGISTRO DE CUADRILLAS" dentro de RESUMEN, en el Excel de Control de
- * Materiales). Tabla nueva, sin relación con `Tecnico`.
+ * Persona de campo: une lo que antes eran `Tecnico` (Gestión de Técnicos /
+ * app móvil) y `Cuadrilla` (Control de Materiales, "REGISTRO DE
+ * CUADRILLAS" del Excel) — es la misma gente (28/09/2026, ver
+ * create_personas_campo_table.php).
+ *
+ * El TIPO decide qué puede hacer cada uno:
+ *   - Los dos: recibir solicitudes asignadas y usar la app (si tienen
+ *     email/contraseña), recibir herramientas (Entregas).
+ *   - PERSONAL DIRECTO: retira con VALE a costo y reporta EJECUTADO.
+ *   - CONTRATISTA: retira con COTIZACIÓN con IGV, nunca reporta EJECUTADO.
+ *
+ * En el resto del sistema se la sigue llamando por su rol: "cuadrilla" en
+ * Control de Materiales (columna cuadrilla_id) y "técnico" en solicitudes
+ * y app (columna tecnico_id).
  */
-class Cuadrilla extends Model
+class PersonaCampo extends Authenticatable
 {
+    use HasApiTokens;
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'cuadrillas';
+    protected $table = 'personas_campo';
 
     public const TIPO_CONTRATISTA = 'CONTRATISTA';
     public const TIPO_PERSONAL_DIRECTO = 'PERSONAL DIRECTO';
+
+    public const ESTADO_ACTIVO = 'ACTIVO';
+    public const ESTADO_INACTIVO = 'INACTIVO';
 
     protected $fillable = [
         'nombre',
         'tipo',
         'estado',
-        'dni',
+        'tipo_documento',
+        'numero_documento',
         'fecha_nacimiento',
         'celular',
+        'email',
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
     ];
 
     protected $casts = [
         'fecha_nacimiento' => 'date',
+        'tipo_documento' => 'integer',
     ];
+
+    public static function tipos(): array
+    {
+        return [self::TIPO_PERSONAL_DIRECTO, self::TIPO_CONTRATISTA];
+    }
+
+    public function esPersonalDirecto(): bool
+    {
+        return $this->tipo === self::TIPO_PERSONAL_DIRECTO;
+    }
+
+    public function esContratista(): bool
+    {
+        return $this->tipo === self::TIPO_CONTRATISTA;
+    }
+
+    /**
+     * Tiene credenciales para la app móvil.
+     */
+    public function usaApp(): bool
+    {
+        return filled($this->email) && filled($this->password);
+    }
 
     public function empresas(): BelongsToMany
     {
-        return $this->belongsToMany(Empresa::class);
+        return $this->belongsToMany(Empresa::class, 'empresa_persona_campo', 'persona_campo_id', 'empresa_id')
+            ->withTimestamps();
     }
+
+    // ── Solicitudes / app (antes Tecnico) ──────────────────────────────
+
+    public function solicitudes(): BelongsToMany
+    {
+        return $this->belongsToMany(Solicitud::class, 'solicitud_tecnico', 'tecnico_id', 'solicitud_id')
+            ->withTimestamps()
+            ->whereNull('solicitud_tecnico.deleted_at');
+    }
+
+    public function historiales(): HasMany
+    {
+        return $this->hasMany(Historial::class, 'tecnico_id');
+    }
+
+    // ── Control de Materiales (antes Cuadrilla) ────────────────────────
 
     public function cotizaciones(): HasMany
     {
-        return $this->hasMany(Cotizacion::class);
+        return $this->hasMany(Cotizacion::class, 'cuadrilla_id');
     }
 
     public function ejecutados(): HasMany
     {
-        return $this->hasMany(Ejecutado::class);
+        return $this->hasMany(Ejecutado::class, 'cuadrilla_id');
+    }
+
+    public function entregas(): HasMany
+    {
+        return $this->hasMany(Entrega::class, 'cuadrilla_id');
     }
 
     /**
@@ -91,7 +160,6 @@ class Cuadrilla extends Model
 
     /**
      * N° de retiros (cotizaciones y vales) — columna I de RESUMEN.
-     * ✅ CM-4/CM-5 (18/09/2026).
      */
     public function numRetiros(): int
     {
@@ -100,7 +168,6 @@ class Cuadrilla extends Model
 
     /**
      * Total valorizado S/IGV — columna J de RESUMEN.
-     * ✅ CM-4/CM-5.
      */
     public function totalValorizado(): float
     {
@@ -112,7 +179,6 @@ class Cuadrilla extends Model
      * PENDIENTE (cotizaciones a contratistas sin descontar todavía en una
      * valorización real); los vales de personal directo nunca quedan
      * PENDIENTE (su estado es "VALE - USO INTERNO").
-     * ✅ CM-4/CM-5.
      */
     public function pendienteDescuento(): float
     {

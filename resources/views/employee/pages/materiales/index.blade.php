@@ -53,7 +53,7 @@
                     x-data="crudModal({
                         baseUrl: '{{ route('employee.materiales.items.index') }}',
                         unwrap: 'material',
-                        defaults: { id: null, codigo: '', descripcion: '', unidad: '', precio_base: '', margen_pct: '', stock_inicial: 0, stock_minimo: 0, factor_metros_por_unidad: 1 },
+                        defaults: { id: null, codigo: '', descripcion: '', unidad: '', precio_base: '', margen_pct: '', stock_inicial: 0, stock_minimo: 0, factor_metros_por_unidad: 1, ultimo_precio_ingresos: null },
                     })"
                     class="flex min-h-0 flex-1 flex-col"
                 >
@@ -70,6 +70,9 @@
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Descripción</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Unid.</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Precio vigente</th>
+                                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Margen %</th>
+                                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Venta S/IGV</th>
+                                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Venta C/IGV</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Stock actual</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3">Estado</th>
                                     <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Acciones</th>
@@ -91,6 +94,14 @@
                                                 </span>
                                             @endif
                                         </td>
+                                        <td class="px-4 py-3 text-gray-600">
+                                            {{ number_format($material->margenEfectivo() * 100, 2) }}%
+                                            @if ($material->margen_pct === null)
+                                                <span class="text-xs text-gray-400" title="Usa el margen general de Parámetros">(general)</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600">{{ number_format($material->precio_venta_sin_igv, 2) }}</td>
+                                        <td class="px-4 py-3 font-medium text-gray-900">{{ number_format($material->precio_venta_con_igv, 2) }}</td>
                                         <td class="px-4 py-3 text-gray-600">{{ number_format($material->stockActual(), 2) }}</td>
                                         <td class="px-4 py-3">
                                             <span class="badge {{ $coloresEstado[$material->estado()] ?? 'bg-gray-100 text-gray-700' }}">
@@ -113,7 +124,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <x-empty-state colspan="8" message="No hay materiales registrados." />
+                                    <x-empty-state colspan="11" message="No hay materiales registrados." />
                                 @endforelse
                             </tbody>
                         </table>

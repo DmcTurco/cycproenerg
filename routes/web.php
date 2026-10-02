@@ -48,7 +48,10 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         return view('employee.pages.clients.excel');
     })->name('client.excel');
     Route::resource('client', Employee\ClientController::class);
-    Route::resource('technicals', Employee\TecnicoController::class);
+    // Personal de campo (antes "Técnicos" + "Cuadrillas" de Materiales).
+    // Se mantiene la URL/nombre "technicals" para no romper las pantallas
+    // de asignar solicitudes e historial que cuelgan de acá.
+    Route::resource('technicals', Employee\PersonaCampoController::class)->only(['index', 'store', 'edit', 'destroy']);
     Route::resource('advisers', Employee\AsesorController::class);
     Route::delete('technicals/{tecnico}/requests/bulk-delete', [Employee\SolicitudTecnicoController::class, 'destroyMultiple'])->name('technicals.requests.bulk-delete');
 
@@ -106,11 +109,7 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware('auth:employee')->name('employ
         Route::get('herramientas/{herramienta}/edit', [Employee\HerramientaController::class, 'edit'])->name('herramientas.edit');
         Route::delete('herramientas/{herramienta}', [Employee\HerramientaController::class, 'destroy'])->name('herramientas.destroy');
 
-        // CM-2: registro de cuadrillas (personas que retiran materiales).
-        Route::get('cuadrillas', [Employee\CuadrillaController::class, 'index'])->name('cuadrillas.index');
-        Route::post('cuadrillas', [Employee\CuadrillaController::class, 'store'])->name('cuadrillas.store');
-        Route::get('cuadrillas/{cuadrilla}/edit', [Employee\CuadrillaController::class, 'edit'])->name('cuadrillas.edit');
-        Route::delete('cuadrillas/{cuadrilla}', [Employee\CuadrillaController::class, 'destroy'])->name('cuadrillas.destroy');
+        // CM-2: las cuadrillas ahora son Personal de campo (employee.technicals.*).
 
         // CM-3: ingresos (kardex de entradas de materiales al almacén).
         Route::get('ingresos', [Employee\IngresoController::class, 'index'])->name('ingresos.index');

@@ -46,6 +46,31 @@ class ControlInternoClasificadorTest extends TestCase
         $this->assertSame(FaseControlInterno::CONSTRUIDO, $fase->fase);
     }
 
+    public function test_fecha_fin_interna_del_portal_completa_f_construccion_y_mueve_a_construido(): void
+    {
+        $solicitud = $this->solicitud();
+
+        $fase = ControlInternoClasificador::clasificar($solicitud, tcConcluida: false, fechaFinInterna: '2026-08-31');
+
+        $this->assertSame(FaseControlInterno::CONSTRUIDO, $fase->fase);
+        $this->assertSame('2026-08-31', $fase->fecha_construccion_control->toDateString());
+    }
+
+    public function test_fecha_fin_interna_del_portal_no_pisa_f_construccion_manual(): void
+    {
+        $solicitud = $this->solicitud();
+        FaseControlInterno::create([
+            'solicitud_id' => $solicitud->id,
+            'fase' => FaseControlInterno::GENERAL,
+            'fecha_construccion_control' => '2026-09-01',
+        ]);
+
+        $fase = ControlInternoClasificador::clasificar($solicitud, tcConcluida: true, fechaTc: '2026-09-10', fechaFinInterna: '2026-08-31');
+
+        $this->assertSame(FaseControlInterno::TC, $fase->fase);
+        $this->assertSame('2026-09-01', $fase->fecha_construccion_control->toDateString());
+    }
+
     public function test_general_pasa_directo_a_tc_si_el_portal_ya_reporta_tc_concluida(): void
     {
         $solicitud = $this->solicitud();

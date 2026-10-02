@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cotizacion;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Material;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -37,7 +37,7 @@ class CotizacionController extends Controller
             ->paginate(20)
             ->appends($request->query());
 
-        $cuadrillas = Cuadrilla::orderBy('nombre')->get();
+        $cuadrillas = PersonaCampo::orderBy('nombre')->get();
 
         return view('employee.pages.materiales.cotizaciones.index', compact('cotizaciones', 'cuadrillas', 'estado', 'cuadrillaId', 'search'));
     }
@@ -45,7 +45,7 @@ class CotizacionController extends Controller
     public function create()
     {
         $cotizacion = null;
-        $cuadrillas = Cuadrilla::where('estado', 'ACTIVO')->orderBy('nombre')->get();
+        $cuadrillas = PersonaCampo::where('estado', 'ACTIVO')->orderBy('nombre')->get();
         $materiales = Material::orderBy('codigo')->get();
         $initialItems = [];
 
@@ -56,7 +56,7 @@ class CotizacionController extends Controller
     {
         $data = $this->validarFormulario($request);
 
-        $cuadrilla = Cuadrilla::findOrFail($data['cuadrilla_id']);
+        $cuadrilla = PersonaCampo::findOrFail($data['cuadrilla_id']);
         $cotizacion = Cotizacion::emitir($cuadrilla, $data['items'], $data['fecha']);
 
         session()->flash('message', ($cotizacion->es_vale ? 'Vale generado: ' : 'Cotización generada: ') . $cotizacion->numero);
@@ -69,7 +69,7 @@ class CotizacionController extends Controller
     {
         $cotizacion->load('detalles');
 
-        $cuadrillas = Cuadrilla::where('estado', 'ACTIVO')->orWhere('id', $cotizacion->cuadrilla_id)->orderBy('nombre')->get();
+        $cuadrillas = PersonaCampo::where('estado', 'ACTIVO')->orWhere('id', $cotizacion->cuadrilla_id)->orderBy('nombre')->get();
         $materiales = Material::orderBy('codigo')->get();
         $initialItems = $cotizacion->detalles->map(fn ($detalle) => [
             'material_id' => $detalle->material_id,
@@ -83,7 +83,7 @@ class CotizacionController extends Controller
     {
         $data = $this->validarFormulario($request);
 
-        $cuadrilla = Cuadrilla::findOrFail($data['cuadrilla_id']);
+        $cuadrilla = PersonaCampo::findOrFail($data['cuadrilla_id']);
         Cotizacion::emitir($cuadrilla, $data['items'], $data['fecha'], $cotizacion);
 
         session()->flash('message', 'Documento ' . $cotizacion->numero . ' corregido (mismo número, no se creó uno nuevo).');
@@ -140,7 +140,7 @@ class CotizacionController extends Controller
     {
         $validated = $request->validate([
             'fecha' => 'required|date',
-            'cuadrilla_id' => 'required|exists:cuadrillas,id',
+            'cuadrilla_id' => 'required|exists:personas_campo,id',
             'items' => 'required|array|min:1',
             'items.*.material_id' => ['required', Rule::exists('materiales', 'id')],
             'items.*.cantidad' => 'required|integer|min:1',

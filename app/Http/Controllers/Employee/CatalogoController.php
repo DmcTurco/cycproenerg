@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Employee;
 use App\Http\Controllers\Controller;
 use App\Models\Herramienta;
 use App\Models\Material;
+use App\Models\ParametroControlMaterial;
 use Illuminate\Http\Request;
 
 /**
@@ -37,6 +38,8 @@ class CatalogoController extends Controller
             ->orderBy('codigo')
             ->get();
 
-        return view('employee.pages.materiales.index', compact('tab', 'materiales', 'herramientas', 'search'));
+        $parametros = ParametroControlMaterial::actual();
+
+        return view('employee.pages.materiales.index', compact('tab', 'materiales', 'herramientas', 'search', 'parametros'));
     }
 }

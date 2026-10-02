@@ -27,7 +27,7 @@
     ],
     [
         'route' => 'employee.technicals.index',
-        'label' => 'Gestión de Técnicos',
+        'label' => 'Personal de Campo',
         'match' => 'employee/technicals*',
         'icon' => '<path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z\' />',
     ],
@@ -110,12 +110,6 @@
                 'label' => 'Ingresos',
                 'match' => ['employee/materiales/ingresos', 'employee/materiales/ingresos/*'],
                 'icon' => '<path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3\' />',
-            ],
-            [
-                'route' => 'employee.materiales.cuadrillas.index',
-                'label' => 'Cuadrillas',
-                'match' => ['employee/materiales/cuadrillas', 'employee/materiales/cuadrillas/*'],
-                'icon' => '<path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z\' />',
             ],
             [
                 'route' => 'employee.materiales.parametros.edit',

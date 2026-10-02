@@ -55,6 +55,8 @@ class ProcessExcelJob implements ShouldQueue
         'movidas_construido_tc' => 0,
         'movidas_a_pend_anulacion' => 0,
         'filas_omitidas_validacion' => 0,
+        'ignoradas_no_aprobadas' => 0,
+        'ignoradas_anuladas' => 0,
     ];
 
     // Añadir estas propiedades:
@@ -264,13 +266,6 @@ class ProcessExcelJob implements ShouldQueue
                     $created++;
                 } else {
                     $updated++;
-                    // CI-8: "Actualizadas" de la bitácora del Excel — total de
-                    // solicitudes que ya existían y se volvieron a procesar en
-                    // esta carga (se movieran de fase o no). El Excel original
-                    // lo etiqueta "(GENERAL + CONSTRUIDO + PEND...)" pero no
-                    // se desglosa por fase acá: es el mismo total que ya se
-                    // usaba para la barra de progreso ($updated).
-                    $this->ciCounters['actualizadas']++;
                 }
             } catch (\Throwable $e) {
                 // Una fila con datos inesperados no debe tirar abajo el resto del
@@ -330,6 +325,11 @@ class ProcessExcelJob implements ShouldQueue
 
         // Limpiar la fecha de posibles espacios u otros caracteres
         $date = trim($date);
+
+        // Número de serie de Excel (ej. 46274.70204993056): días desde 1900
+        if (is_numeric($date) && (float) $date > 0 && (float) $date < 2958466) {
+            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject((float) $date)->format('Y-m-d');
+        }
 
         // Verificar si la fecha está en formato dd/mm/yyyy o d/m/yyyy
         if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', $date, $matches)) {
@@ -531,7 +531,30 @@ class ProcessExcelJob implements ShouldQueue
         // que todavía no tenía fila en fase_control_internos (es nueva).
         $faseAntes = FaseControlInterno::where('solicitud_id', $solicitud->id)->value('fase');
 
-        $fase = ControlInternoClasificador::clasificar($solicitud, $tcConcluida, $fechaTc);
+        // Mismos filtros del VBA para filas NUEVAS en Control Interno:
+        //  - sin suministro o sin contrato (ni número ni fecha) = todavía no
+        //    aprobada, no entra al control;
+        //  - Rechazada/Anulada en el portal y nunca estuvo en el control: no
+        //    se agrega. (Las que YA estaban siguen el flujo manual de CI-6.)
+        if ($faseAntes === null) {
+            $sinSuministro = trim((string) $this->col($row, 'Número de Suministro')) === '';
+            $sinContrato = trim((string) $this->col($row, 'Número de Contrato de Suministro')) === ''
+                && $this->parseDate(trim((string) $this->col($row, 'Fecha de suscripción de contrato'))) === null;
+
+            if ($sinSuministro || $sinContrato) {
+                $this->ciCounters['ignoradas_no_aprobadas']++;
+                return;
+            }
+
+            if ($this->esSi($this->col($row, 'Rechazada')) || $this->esSi($this->col($row, 'Anulada'))) {
+                $this->ciCounters['ignoradas_anuladas']++;
+                return;
+            }
+        }
+
+        $fechaFinInterna = $this->parseDate(trim((string) $this->col($row, 'Fecha de finalización de la Instalación Interna')));
+
+        $fase = ControlInternoClasificador::clasificar($solicitud, $tcConcluida, $fechaTc, $fechaFinInterna);
 
         $this->registrarMovimientoControlInterno($faseAntes, $fase->fase);
     }
@@ -542,25 +565,41 @@ class ProcessExcelJob implements ShouldQueue
      */
     private function registrarMovimientoControlInterno(?string $antes, string $despues): void
     {
+        // Se cuenta igual que la bitácora del VBA (st(2)/st(4)/st(5)) para
+        // que los números cuadren con el Excel: una NUEVA que entra ya
+        // construida también suma en GENERAL -> CONSTRUIDO, y una que entra
+        // en TC suma en CONSTRUIDO -> TC; GENERAL -> TC suma en ambas.
         if ($antes === null) {
             $this->ciCounters['nuevas_general']++;
+            if ($despues === FaseControlInterno::CONSTRUIDO) {
+                $this->ciCounters['movidas_general_construido']++;
+            } elseif ($despues === FaseControlInterno::TC) {
+                $this->ciCounters['movidas_construido_tc']++;
+            }
             return;
+        }
+
+        // "Actualizadas (GENERAL + CONSTRUIDO + PEND...)" del VBA: solo las
+        // que ya estaban en Control Interno, no las que estaban en TC (el VBA
+        // no toca TC) ni las solicitudes que existen fuera del control.
+        if ($antes !== FaseControlInterno::TC) {
+            $this->ciCounters['actualizadas']++;
         }
 
         if ($antes === $despues) {
             return;
         }
 
-        $clave = match (true) {
-            $antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::CONSTRUIDO => 'movidas_general_construido',
-            $antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::TC => 'movidas_general_tc',
-            $antes === FaseControlInterno::CONSTRUIDO && $despues === FaseControlInterno::TC => 'movidas_construido_tc',
-            $despues === FaseControlInterno::PEND_ANULACION => 'movidas_a_pend_anulacion',
-            default => null,
-        };
-
-        if ($clave !== null) {
-            $this->ciCounters[$clave]++;
+        if ($despues === FaseControlInterno::PEND_ANULACION) {
+            $this->ciCounters['movidas_a_pend_anulacion']++;
+        } elseif ($antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::CONSTRUIDO) {
+            $this->ciCounters['movidas_general_construido']++;
+        } elseif ($antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::TC) {
+            $this->ciCounters['movidas_general_tc']++;
+            $this->ciCounters['movidas_general_construido']++;
+            $this->ciCounters['movidas_construido_tc']++;
+        } elseif ($antes === FaseControlInterno::CONSTRUIDO && $despues === FaseControlInterno::TC) {
+            $this->ciCounters['movidas_construido_tc']++;
         }
     }
 
@@ -655,7 +694,8 @@ class ProcessExcelJob implements ShouldQueue
      */
     private function esSi($value): bool
     {
-        $texto = strtoupper(trim((string) $value));
+        // mb_strtoupper: strtoupper() no convierte la "í" y "Sí" nunca coincidía.
+        $texto = mb_strtoupper(trim((string) $value), 'UTF-8');
 
         return $texto === 'SÍ' || $texto === 'SI';
     }

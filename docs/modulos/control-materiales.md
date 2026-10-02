@@ -4,7 +4,7 @@
 
 Es un módulo **nuevo e independiente** de Control Interno (otro negocio: almacén, cotizaciones a contratistas y liquidación de materiales — no tiene que ver con el flujo de instalaciones del portal de gas), pero **ligado a `Empresa` (CYC/CLB)** igual que Control Interno, para poder cruzar reportes entre ambos módulos más adelante (a confirmar con Turco en qué punto exacto se asocia: por cotización, por cuadrilla, o ambos).
 
-Las personas que retiran materiales (**cuadrillas**: CONTRATISTA o PERSONAL DIRECTO) son gente **distinta** de la tabla `tecnicos` existente (la de Asignación a Técnicos) — se crea una tabla nueva, sin tocar `tecnicos`.
+~~Las personas que retiran materiales (**cuadrillas**) son gente distinta de la tabla `tecnicos`.~~ **Cambiado el 28/09/2026:** técnicos y cuadrillas son la misma gente. Se unieron en una sola tabla `personas_campo` (modelo `PersonaCampo`, pantalla "Personal de Campo" con pestañas Personal directo / Contratistas). El tipo decide qué puede hacer cada uno; los dos tipos pueden recibir solicitudes y usar la app. En Control de Materiales se la sigue llamando "cuadrilla" (columna `cuadrilla_id`), y en solicitudes/app "técnico" (columna `tecnico_id`). Ver `create_personas_campo_table.php`.
 
 Fuente: `CONTROL_MATERIALES_CC_08-2026 rev 02.xlsm` (13 hojas + macro `MacrosCYC.bas`: `GenerarPDF`, `CorregirCotizacion`, `GenerarResumenPDF`, `CerrarMes`, `GuardarEjecutado`), analizado con `openpyxl` (fórmulas) y `oletools` (VBA) el 18/09/2026.
 
@@ -24,7 +24,7 @@ Fuente: `CONTROL_MATERIALES_CC_08-2026 rev 02.xlsm` (13 hojas + macro `MacrosCYC
 Equivalente a INICIO (parámetros: IGV, margen general, umbral de alarma de precio) + CATALOGO.
 
 - Parámetros: IGV (18%), margen sobre compra general (10%, editable por ítem), umbral de alarma de precio (5%).
-- Catálogo de materiales: código, descripción, unidad, precio base (editable), margen % por ítem, precio vigente (autocalculado, solo sube), precio venta (con y sin IGV), stock inicial/mínimo (editables), stock actual (kardex, calculado), estado (OK/REPONER/SIN STOCK), factor metros-por-unidad (para tuberías).
+- Catálogo de materiales: código, descripción, unidad, precio base (editable), margen % por ítem, precio vigente (autocalculado, solo sube), precio venta (con y sin IGV; se muestra en el catálogo y SE GUARDA en `materiales.precio_venta_sin_igv/con_igv`, recalculado solo al guardar el material, al registrar/editar/eliminar un ingreso y al cambiar IGV o margen general), stock inicial/mínimo (editables), stock actual (kardex, calculado), estado (OK/REPONER/SIN STOCK), factor metros-por-unidad (para tuberías).
 - Catálogo de herramientas (mismo sheet en el Excel, tabla aparte): código autogenerado, descripción, marca/modelo, N° serie, fecha de compra, precio, estado (OPERATIVA/MALOGRADA/PERDIDA), responsable actual y ubicación (calculados desde CM-7, no editables a mano).
 
 **Estado:** implementado. Migraciones `parametros_control_materiales`, `materiales`, `herramientas`; modelos `ParametroControlMaterial` (patrón `actual()`, igual que `ParametroControlInterno`), `Material` y `Herramienta`. Ni `materiales` ni `herramientas` tienen columna `empresa_id`: el almacén es uno solo, compartido — la asociación con `Empresa` (CYC/CLB) que se decidió con Turco entra recién en CM-2/CM-4 (cuadrillas y cotizaciones), no en el catálogo.

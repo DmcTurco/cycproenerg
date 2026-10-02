@@ -128,8 +128,25 @@ class ControlInternoPuntaje
 
             $ind2 = $totalFise > 0 ? round($totalEnPlazo / $totalFise, 4) : null;
 
+            // "No puntúan en el trimestre" (PUNTAJE!B18/B27): construidas en
+            // el trimestre que no son FISE, y multifamiliares FISE.
+            $inicioTrimestre = Carbon::create($anio, $meses[0], 1)->startOfDay();
+            $finTrimestre = Carbon::create($anio, $meses[2], 1)->endOfMonth()->endOfDay();
+            $construidasTrimestre = Solicitud::query()
+                ->where('empresa_id', $empresa->id)
+                ->whereHas('faseControlInterno', fn ($q) => $q->whereIn('fase', self::FASES_QUE_CUENTAN))
+                ->whereHas('instalacion', fn ($q) => $q->whereBetween('fecha_finalizacion_instalacion_interna', [$inicioTrimestre, $finTrimestre]));
+            $multiTextos = array_keys(array_filter($categoriasMap, fn ($codigo) => $codigo === 'MULTI'));
+
             $resultado['empresas'][$empresa->codigo] = [
                 'nombre' => $empresa->nombre,
+                'no_fise' => (clone $construidasTrimestre)
+                    ->whereHas('solicitante', fn ($q) => $q->where('usuario_fise', 'No'))
+                    ->count(),
+                'multi_fise' => (clone $construidasTrimestre)
+                    ->whereHas('solicitante', fn ($q) => $q->where('usuario_fise', 'Sí'))
+                    ->whereHas('proyecto', fn ($q) => $q->whereIn('categoria_proyecto', $multiTextos))
+                    ->count(),
                 'meses' => $mesesData,
                 'total_fise' => $totalFise,
                 'en_plazo' => $totalEnPlazo,

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\CierreMaterial;
 use App\Models\Cotizacion;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Ejecutado;
 use App\Models\Herramienta;
 use App\Models\Ingreso;

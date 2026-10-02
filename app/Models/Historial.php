@@ -25,7 +25,7 @@ class Historial extends Model
 
     public function tecnico()
     {
-        return $this->belongsTo(Tecnico::class);
+        return $this->belongsTo(PersonaCampo::class);
     }
 
     // public function estadoInterno()

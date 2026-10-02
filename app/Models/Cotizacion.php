@@ -61,7 +61,7 @@ class Cotizacion extends Model
 
     public function cuadrilla(): BelongsTo
     {
-        return $this->belongsTo(Cuadrilla::class);
+        return $this->belongsTo(PersonaCampo::class);
     }
 
     public function detalles(): HasMany
@@ -137,14 +137,14 @@ class Cotizacion extends Model
      * duplicado, y acá se reintenta una vez para que el segundo usuario
      * simplemente reciba el siguiente correlativo en vez de un error 500.
      */
-    public static function emitir(Cuadrilla $cuadrilla, array $items, string $fecha, ?self $cotizacion = null): self
+    public static function emitir(PersonaCampo $cuadrilla, array $items, string $fecha, ?self $cotizacion = null): self
     {
         $reintentado = false;
 
         do {
             try {
                 return DB::transaction(function () use ($cuadrilla, $items, $fecha, $cotizacion) {
-                    $esVale = $cuadrilla->tipo === Cuadrilla::TIPO_PERSONAL_DIRECTO;
+                    $esVale = $cuadrilla->tipo === PersonaCampo::TIPO_PERSONAL_DIRECTO;
                     $parametros = ParametroControlMaterial::actual();
 
                     $lineas = [];

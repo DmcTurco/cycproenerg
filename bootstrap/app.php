@@ -35,5 +35,26 @@ return Application::configure(basePath: dirname(__DIR__))
             'password',
             'password_confirmation',
         ]);
+
+        // Sesión vencida: el token CSRF ya no vale y Laravel mostraría
+        // "419 Page Expired" (p. ej. al pulsar "Cerrar sesión" o enviar un
+        // formulario después de SESSION_LIFETIME). En vez de eso se manda
+        // al login del panel correspondiente (/employee, /company, /admin).
+        // Laravel ya convirtió el TokenMismatchException en un HttpException
+        // 419 antes de llegar acá, por eso se filtra por código.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, \Illuminate\Http\Request $request) {
+            if ($e->getStatusCode() !== 419) {
+                return null;
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'La sesión expiró. Vuelve a iniciar sesión.'], 419);
+            }
+
+            $routeType = $request->routeType();
+            $login = $routeType ? '/' . $routeType . '/login' : '/' . \App\MyApp::EMPLOYEE_SUBDIR . '/login';
+
+            return redirect($login)->with('status', 'Tu sesión expiró. Vuelve a iniciar sesión.');
+        });
     })
     ->create();

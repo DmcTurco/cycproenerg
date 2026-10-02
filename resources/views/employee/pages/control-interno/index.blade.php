@@ -18,8 +18,8 @@
     $fullBleed = true;
 
     $etiquetasFase = [
-        'GENERAL' => 'General',
-        'CONSTRUIDO' => 'Construido',
+        'GENERAL' => 'Pend. construir',
+        'CONSTRUIDO' => 'Construido · Pend. TC',
         'TC' => 'TC',
         'PEND_ANULACION' => 'Pend. anulación',
     ];

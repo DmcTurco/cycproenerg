@@ -58,6 +58,7 @@ class ControlInternoDashboard
                     'trimestre' => "T{$trimestre}",
                     'meta_ind2' => $puntaje['meta_ind2'],
                     'empresas' => $porEmpresa,
+                    'puntaje' => $puntaje['empresas'],
                     'ultima_carga' => self::ultimaCarga(),
                     'generado_en' => now()->toDateTimeString(),
                 ];
@@ -145,6 +146,8 @@ class ControlInternoDashboard
             'movidas_construido_tc' => $resumenCi['movidas_construido_tc'] ?? null,
             'movidas_a_pend_anulacion' => $resumenCi['movidas_a_pend_anulacion'] ?? null,
             'filas_omitidas_validacion' => $resumenCi['filas_omitidas_validacion'] ?? null,
+            'ignoradas_no_aprobadas' => $resumenCi['ignoradas_no_aprobadas'] ?? null,
+            'ignoradas_anuladas' => $resumenCi['ignoradas_anuladas'] ?? null,
         ];
     }
 }

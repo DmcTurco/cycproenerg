@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tecnico;
+use App\Models\PersonaCampo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,12 +16,18 @@ class ApiTecnicoController extends Controller
             'password' => 'required'
         ]);
 
-        $tecnico = Tecnico::where('email', $request->email)->first();
+        $tecnico = PersonaCampo::where('email', $request->email)->first();
 
-        if (!$tecnico || !Hash::check($request->password, $tecnico->password)) {
+        if (!$tecnico || !$tecnico->password || !Hash::check($request->password, $tecnico->password)) {
             return response()->json([
                 'message' => 'Credenciales inválidas'
             ], 401);
+        }
+
+        if ($tecnico->estado !== PersonaCampo::ESTADO_ACTIVO) {
+            return response()->json([
+                'message' => 'Usuario inactivo'
+            ], 403);
         }
 
         $token = $tecnico->createToken('auth_token')->plainTextToken;

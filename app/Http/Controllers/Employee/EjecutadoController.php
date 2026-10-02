@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Ejecutado;
 use App\Models\Material;
 use Illuminate\Http\Request;
@@ -37,7 +37,7 @@ class EjecutadoController extends Controller
 
         return view('employee.pages.materiales.ejecutados.index', [
             'ejecutados' => $ejecutados,
-            'cuadrillas' => Cuadrilla::where('tipo', Cuadrilla::TIPO_PERSONAL_DIRECTO)->orderBy('nombre')->get(),
+            'cuadrillas' => PersonaCampo::where('tipo', PersonaCampo::TIPO_PERSONAL_DIRECTO)->orderBy('nombre')->get(),
             'materiales' => Material::orderBy('codigo')->get(),
             'cuadrillaId' => $cuadrillaId,
             'materialId' => $materialId,
@@ -47,7 +47,7 @@ class EjecutadoController extends Controller
 
     public function create(Request $request)
     {
-        $cuadrillas = Cuadrilla::where('tipo', Cuadrilla::TIPO_PERSONAL_DIRECTO)
+        $cuadrillas = PersonaCampo::where('tipo', PersonaCampo::TIPO_PERSONAL_DIRECTO)
             ->where('estado', 'ACTIVO')
             ->orderBy('nombre')
             ->get();
@@ -67,7 +67,7 @@ class EjecutadoController extends Controller
     {
         $data = $request->validate([
             'fecha' => 'required|date',
-            'cuadrilla_id' => 'required|exists:cuadrillas,id',
+            'cuadrilla_id' => 'required|exists:personas_campo,id',
             'tipo_trabajo' => 'nullable|string|max:60',
             'n_suministro' => 'nullable|string|max:40',
             'movimiento' => ['required', Rule::in([Ejecutado::MOVIMIENTO_SALIDA, Ejecutado::MOVIMIENTO_DEVOLUCION])],
@@ -79,9 +79,9 @@ class EjecutadoController extends Controller
             'items.min' => 'Agrega al menos una cantidad.',
         ]);
 
-        $cuadrilla = Cuadrilla::findOrFail($data['cuadrilla_id']);
+        $cuadrilla = PersonaCampo::findOrFail($data['cuadrilla_id']);
 
-        if ($cuadrilla->tipo !== Cuadrilla::TIPO_PERSONAL_DIRECTO) {
+        if ($cuadrilla->tipo !== PersonaCampo::TIPO_PERSONAL_DIRECTO) {
             return back()->withErrors([
                 'cuadrilla_id' => $cuadrilla->nombre . ' es CONTRATISTA. Esta pantalla es solo para PERSONAL DIRECTO (los contratistas descuentan su material por cotización, ver CM-4).',
             ])->withInput();

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\CotizacionDetalle;
 use App\Models\Cotizacion;
-use App\Models\Cuadrilla;
+use App\Models\PersonaCampo;
 use App\Models\Ejecutado;
 use App\Models\Entrega;
 use App\Models\Herramienta;
@@ -121,10 +121,10 @@ class ControlMaterialesResumen
      */
     public static function registroCuadrillas(): \Illuminate\Support\Collection
     {
-        return Cuadrilla::where('estado', 'ACTIVO')
+        return PersonaCampo::where('estado', 'ACTIVO')
             ->orderBy('nombre')
             ->get()
-            ->map(fn (Cuadrilla $c) => [
+            ->map(fn (PersonaCampo $c) => [
                 'cuadrilla' => $c,
                 'num_retiros' => $c->numRetiros(),
                 'total_valorizado' => $c->totalValorizado(),
@@ -148,16 +148,16 @@ class ControlMaterialesResumen
      * cuenta a favor: su valor es 0, aunque el saldo se muestra igual
      * para que se revise. Solo se listan materiales con algún movimiento.
      */
-    public static function corteCuadrilla(Cuadrilla $cuadrilla, Carbon $hasta): array
+    public static function corteCuadrilla(PersonaCampo $cuadrilla, Carbon $hasta): array
     {
-        if ($cuadrilla->tipo === Cuadrilla::TIPO_PERSONAL_DIRECTO) {
+        if ($cuadrilla->tipo === PersonaCampo::TIPO_PERSONAL_DIRECTO) {
             return self::corteLiquidacion($cuadrilla, $hasta);
         }
 
         return self::corteCotizacionesPendientes($cuadrilla, $hasta);
     }
 
-    private static function corteLiquidacion(Cuadrilla $cuadrilla, Carbon $hasta): array
+    private static function corteLiquidacion(PersonaCampo $cuadrilla, Carbon $hasta): array
     {
         $items = [];
         $valorTotal = 0.0;
@@ -216,7 +216,7 @@ class ControlMaterialesResumen
         ];
     }
 
-    private static function corteCotizacionesPendientes(Cuadrilla $cuadrilla, Carbon $hasta): array
+    private static function corteCotizacionesPendientes(PersonaCampo $cuadrilla, Carbon $hasta): array
     {
         $cotizaciones = Cotizacion::where('cuadrilla_id', $cuadrilla->id)
             ->where('estado', Cotizacion::ESTADO_PENDIENTE)
@@ -246,7 +246,7 @@ class ControlMaterialesResumen
      *
      * Devuelve cuántas cotizaciones se marcaron.
      */
-    public static function cerrarCorteContratista(Cuadrilla $cuadrilla, Carbon $hasta, string $nValorizacion, ?Carbon $desde = null): int
+    public static function cerrarCorteContratista(PersonaCampo $cuadrilla, Carbon $hasta, string $nValorizacion, ?Carbon $desde = null): int
     {
         $cotizaciones = Cotizacion::where('cuadrilla_id', $cuadrilla->id)
             ->where('estado', Cotizacion::ESTADO_PENDIENTE)

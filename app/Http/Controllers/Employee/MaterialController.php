@@ -85,6 +85,9 @@ class MaterialController extends Controller
                 'unidad' => $item->unidad,
                 'precio_base' => $item->precio_base,
                 'margen_pct' => $item->margen_pct !== null ? round($item->margen_pct * 100, 2) : null,
+                // Solo para la vista previa del precio de venta en el
+                // formulario (el vigente puede estar por encima del base).
+                'ultimo_precio_ingresos' => $item->ultimoPrecioIngresos(),
                 'stock_inicial' => $item->stock_inicial,
                 'stock_minimo' => $item->stock_minimo,
                 'factor_metros_por_unidad' => $item->factor_metros_por_unidad,

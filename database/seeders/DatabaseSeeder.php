@@ -15,10 +15,9 @@ class DatabaseSeeder extends Seeder
         $this->call(CompanySeeder::class);
         $this->call(EmployeeSeeder::class);
         $this->call(ControlInternoParametrosSeeder::class);
-        $this->call(TecnicoSeeder::class);
+        $this->call(PersonaCampoSeeder::class);
         $this->call(MaterialSeeder::class);
         $this->call(HerramientaSeeder::class);
-        $this->call(CuadrillaSeeder::class);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([
