@@ -4,5 +4,6 @@ import './sidebar';
 import './crud-modal';
 import './solicitud-detail';
 import './control-interno-detail';
+import './datepicker';
 
 window.Swal = Swal;

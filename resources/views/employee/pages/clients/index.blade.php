@@ -14,12 +14,12 @@
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 <div>
                     <label class="mb-1 block text-xs font-medium text-gray-600">Fecha Inicio</label>
-                    <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio', $fechas['fecha_inicio']) }}"
+                    <x-date-input name="fecha_inicio" value="{{ request('fecha_inicio', $fechas['fecha_inicio']) }}"
                         class="w-full rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
                 </div>
                 <div>
                     <label class="mb-1 block text-xs font-medium text-gray-600">Fecha Fin</label>
-                    <input type="date" name="fecha_fin" value="{{ request('fecha_fin', $fechas['fecha_fin']) }}"
+                    <x-date-input name="fecha_fin" value="{{ request('fecha_fin', $fechas['fecha_fin']) }}"
                         class="w-full rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
                 </div>
                 <div class="col-span-2">

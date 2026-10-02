@@ -173,7 +173,7 @@
                         <div class="space-y-2">
                             <div>
                                 <label class="form-label" for="fecha">Fecha</label>
-                                <input id="fecha" name="fecha" type="date" value="{{ old('fecha', optional($cotizacion->fecha ?? now())->format('Y-m-d')) }}" class="form-input" />
+                                <x-date-input id="fecha" name="fecha" value="{{ old('fecha', optional($cotizacion->fecha ?? now())->format('Y-m-d')) }}" />
                                 <p class="form-error">{{ $errors->first('fecha') }}</p>
                             </div>
                             <div>

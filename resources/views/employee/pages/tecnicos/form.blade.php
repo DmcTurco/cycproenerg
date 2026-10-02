@@ -47,7 +47,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div x-show="form.tipo !== 'CONTRATISTA'">
         <label class="form-label" for="fecha_nacimiento">Fecha de nacimiento</label>
-        <input id="fecha_nacimiento" type="date" x-model="form.fecha_nacimiento" class="form-input" />
+        <x-date-input id="fecha_nacimiento" x-model="form.fecha_nacimiento" />
         <p class="form-error" x-show="errors.fecha_nacimiento" x-text="errors.fecha_nacimiento"></p>
     </div>
     <div>

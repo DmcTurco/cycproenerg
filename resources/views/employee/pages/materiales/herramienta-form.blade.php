@@ -26,7 +26,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <label class="form-label" for="h_fecha_compra">Fecha de compra</label>
-        <input id="h_fecha_compra" type="date" x-model="form.fecha_compra" class="form-input" />
+        <x-date-input id="h_fecha_compra" x-model="form.fecha_compra" />
         <p class="form-error" x-show="errors.fecha_compra" x-text="errors.fecha_compra"></p>
     </div>
     <div>

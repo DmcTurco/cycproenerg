@@ -98,7 +98,7 @@
                                     <td class="px-3 py-2 text-right {{ $fila['pendiente_descuento'] > 0 ? 'text-amber-600 font-medium' : 'text-gray-600' }}">S/ {{ number_format($fila['pendiente_descuento'], 2) }}</td>
                                     <td class="px-3 py-2">
                                         <form method="GET" action="{{ route('employee.materiales.resumen.corte', $fila['cuadrilla']) }}" class="flex items-center gap-1">
-                                            <input type="date" name="hasta" value="{{ $hastaDefault }}"
+                                            <x-date-input name="hasta" value="{{ $hastaDefault }}"
                                                 class="w-36 rounded-lg border border-gray-300 px-2 py-1 text-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
                                             <button type="submit" class="rounded-lg bg-brand-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-brand-700">
                                                 Ver corte

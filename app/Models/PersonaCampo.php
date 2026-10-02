@@ -76,6 +76,11 @@ class PersonaCampo extends Authenticatable
         return $this->tipo === self::TIPO_CONTRATISTA;
     }
 
+    public function estaActivo(): bool
+    {
+        return $this->estado === self::ESTADO_ACTIVO;
+    }
+
     /**
      * Tiene credenciales para la app móvil.
      */

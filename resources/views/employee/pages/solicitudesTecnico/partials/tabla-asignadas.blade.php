@@ -3,7 +3,7 @@
         <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
                 <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    <th class="sticky top-0 z-10 bg-white px-4 py-3">
+                    <th class="sticky top-0 z-10 bg-white px-4 py-2.5">
                         <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
                             title="Seleccionar todos (página actual)"
                             :checked="pageIds.length > 0 && pageIds.every((id) => selectedAssigned.includes(id))"
@@ -11,26 +11,27 @@
                                 ? [...new Set([...selectedAssigned, ...pageIds])]
                                 : selectedAssigned.filter((id) => !pageIds.includes(id))">
                     </th>
-                    <th class="sticky top-0 z-10 bg-white px-4 py-3">N° Soli.</th>
-                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Solicitante</th>
-                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Ubicación</th>
-                    <th class="sticky top-0 z-10 bg-white px-4 py-3">Estado</th>
-                    <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Acciones</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-2.5">N° Soli.</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-2.5">Solicitante</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-2.5">Ubicación</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-2.5">Estado</th>
+                    <th class="sticky top-0 z-10 bg-white px-4 py-2.5 text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($solicitudesAsignadas as $solicitud)
                     <tr>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-2">
                             <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
                                 value="{{ $solicitud->id }}" x-model="selectedAssigned">
                         </td>
-                        <td class="px-4 py-3 font-medium text-gray-900">{{ $solicitud->numero_solicitud }}</td>
-                        <td class="px-4 py-3 text-gray-600">{{ $solicitud->solicitante_nombre }}</td>
-                        <td class="px-4 py-3">
+                        <td class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ $solicitud->numero_solicitud }}</td>
+                        <td class="px-4 py-2 text-gray-600"><span class="block max-w-56 truncate" title="{{ $solicitud->solicitante_nombre }}">{{ $solicitud->solicitante_nombre }}</span></td>
+                        <td class="px-4 py-2">
+                            <div class="flex items-center gap-1">
                             <button type="button"
                                 @class([
-                                    'btn-icon',
+                                    'btn-icon h-7 w-7 shrink-0',
                                     'text-brand-600 hover:bg-brand-50 hover:text-brand-700' => !empty($solicitud->ubicacion),
                                 ])
                                 title="Ver ubicación"
@@ -41,15 +42,16 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                                 </svg>
                             </button>
-                            <span class="text-xs text-gray-500">{{ $solicitud->departamento }} - {{ $solicitud->distrito }}</span>
+                            <span class="whitespace-nowrap text-xs text-gray-500">{{ $solicitud->departamento }} - {{ $solicitud->distrito }}</span>
+                            </div>
                         </td>
-                        <td class="px-4 py-3">
-                            <span class="badge {{ $solicitud->estado_badge }}">
+                        <td class="px-4 py-2">
+                            <span class="badge whitespace-nowrap {{ $solicitud->estado_badge }}">
                                 {{ $solicitud->estado_nombre }}@if($solicitud->abreviatura) - {{ $solicitud->abreviatura }}@endif
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-center">
-                            <button type="button" class="btn-icon text-red-500 hover:bg-red-50" title="Quitar del técnico"
+                        <td class="px-4 py-2 text-center">
+                            <button type="button" class="btn-icon h-7 w-7 text-red-500 hover:bg-red-50" title="Quitar del técnico"
                                 :disabled="busyRowId === {{ $solicitud->id }}"
                                 @click="deleteOne({{ $solicitud->id }})">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">

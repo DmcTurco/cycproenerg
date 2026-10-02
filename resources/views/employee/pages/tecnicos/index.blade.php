@@ -118,8 +118,19 @@
                                     </a>
                                 </td>
                                 <td class="px-4 py-3 text-center">
+                                    {{-- Personal no ACTIVO: en vez de entrar a asignar, modal informativo --}}
                                     <a href="{{ route('employee.technicals.requests.index', $persona->id) }}"
-                                        class="btn-icon relative" title="Asignar solicitudes">
+                                        @if ($persona->estaActivo())
+                                            class="btn-icon relative" title="Asignar solicitudes"
+                                        @else
+                                            class="btn-icon relative opacity-50" title="{{ $persona->estado }}: no se le pueden asignar solicitudes"
+                                            @click.prevent="window.Swal?.fire({
+                                                icon: 'info',
+                                                title: 'Personal inactivo',
+                                                text: @js($persona->nombre . ' está ' . $persona->estado . ', por eso no se le pueden asignar solicitudes. Cámbielo a ACTIVO para poder asignarle.'),
+                                                confirmButtonText: 'Entendido',
+                                            })"
+                                        @endif>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h6" />
                                         </svg>

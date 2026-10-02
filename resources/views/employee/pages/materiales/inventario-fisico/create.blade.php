@@ -34,7 +34,7 @@
                 <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                         <label class="form-label" for="fecha">Fecha del inventario</label>
-                        <input type="date" id="fecha" name="fecha" value="{{ old('fecha', now()->toDateString()) }}" class="form-input" required />
+                        <x-date-input id="fecha" name="fecha" value="{{ old('fecha', now()->toDateString()) }}" required />
                     </div>
                     <div>
                         <label class="form-label" for="realizado_por">Realizado por</label>

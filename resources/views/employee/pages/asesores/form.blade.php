@@ -45,7 +45,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
     <div>
         <label class="form-label" for="fecha_contratacion">Fecha de contratación</label>
-        <input id="fecha_contratacion" type="date" x-model="form.fecha_contratacion" class="form-input" />
+        <x-date-input id="fecha_contratacion" x-model="form.fecha_contratacion" />
         <p class="form-error" x-show="errors.fecha_contratacion" x-text="errors.fecha_contratacion"></p>
     </div>
     <div>

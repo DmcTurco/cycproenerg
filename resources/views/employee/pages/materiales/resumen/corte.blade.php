@@ -24,12 +24,12 @@
             <form method="GET" action="{{ route('employee.materiales.resumen.corte', $cuadrilla) }}" class="flex flex-wrap items-end gap-3">
                 <div>
                     <label class="mb-1 block text-xs font-medium text-gray-600">Desde (solo referencia, no filtra)</label>
-                    <input type="date" name="desde" value="{{ $desde?->toDateString() }}"
+                    <x-date-input name="desde" value="{{ $desde?->toDateString() }}"
                         class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
                 </div>
                 <div>
                     <label class="mb-1 block text-xs font-medium text-gray-600">Hasta (fecha de corte)</label>
-                    <input type="date" name="hasta" value="{{ $corte['hasta']->toDateString() }}"
+                    <x-date-input name="hasta" value="{{ $corte['hasta']->toDateString() }}"
                         class="rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
                 </div>
                 <button type="submit" class="btn-brand px-3 py-1.5 text-sm">Actualizar</button>

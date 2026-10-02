@@ -12,7 +12,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <label class="form-label" for="fecha">Fecha</label>
-        <input id="fecha" type="date" x-model="form.fecha" class="form-input" />
+        <x-date-input id="fecha" x-model="form.fecha" />
         <p class="form-error" x-show="errors.fecha" x-text="errors.fecha"></p>
     </div>
     <div>

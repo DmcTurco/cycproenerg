@@ -37,7 +37,22 @@ document.addEventListener('alpine:init', () => {
             return true;
         },
 
+        // Solo se asigna a personal ACTIVO (el servidor también lo valida):
+        // si no lo está, se muestra un modal informativo en vez de asignar.
+        avisoInactivo() {
+            if (config.tecnicoActivo) return false;
+            const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+            window.Swal?.fire({
+                icon: 'info',
+                title: 'Personal inactivo',
+                html: `<b>${esc(config.tecnicoNombre)}</b> está <b>${esc(config.tecnicoEstado)}</b>, por eso no se le pueden asignar solicitudes.<br><br>Cámbielo a <b>ACTIVO</b> desde la lista de personal para poder asignarle.`,
+                confirmButtonText: 'Entendido',
+            });
+            return true;
+        },
+
         async assignOne(id) {
+            if (this.avisoInactivo()) return;
             this.busyRowId = id;
             try {
                 const response = await fetch(config.assignUrl, {
@@ -59,6 +74,7 @@ document.addEventListener('alpine:init', () => {
 
         async assignSelected() {
             if (this.selectedAvailable.length === 0) return;
+            if (this.avisoInactivo()) return;
 
             const result = await window.Swal.fire({
                 title: `¿Asignar ${this.selectedAvailable.length} solicitud(es) al técnico?`,

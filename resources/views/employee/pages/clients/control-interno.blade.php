@@ -102,7 +102,7 @@
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="form-label" for="ci_fecha_construccion">F. Construcción (control)</label>
-                            <input id="ci_fecha_construccion" type="date" x-model="ci.fecha_construccion_control" class="form-input" />
+                            <x-date-input id="ci_fecha_construccion" x-model="ci.fecha_construccion_control" />
                             <p class="form-error" x-show="errors.fecha_construccion_control" x-text="errors.fecha_construccion_control"></p>
                         </div>
                         <div class="flex items-end pb-2">

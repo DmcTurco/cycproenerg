@@ -62,20 +62,38 @@ class SolicitudTecnicoController extends Controller
         $solicitudesDisponibles->whereIn('ei.estado_const_id', [$estados['pendiente'], $estados['reasignado']]);
 
         // Búsqueda mejorada
-        if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $searchWords = preg_split('/\s+/', trim($searchTerm));
+        // Términos de texto: los chips del buscador (terminos[]) más lo que
+        // venga en "search" (enlaces viejos). Cada término debe coincidir con
+        // algún campo (AND entre términos).
+        $terminos = array_values(array_filter(array_map(
+            fn ($t) => trim((string) $t),
+            (array) $request->input('terminos', [])
+        ), fn ($t) => $t !== ''));
+        $searchWords = array_merge(
+            $terminos,
+            $request->filled('search') ? preg_split('/\s+/', trim($request->search)) : []
+        );
 
-            $solicitudesDisponibles->where(function ($query) use ($searchWords) {
+        // El ESTADO se muestra calculado (pendiente/reasignado…), así que un
+        // término que sea un nombre de estado filtra por su id.
+        $estadosPorNombre = collect(Config::get('const.tipo_estado'))
+            ->mapWithKeys(fn ($e) => [mb_strtolower($e['name'], 'UTF-8') => $e['id']]);
+
+        if (!empty($searchWords)) {
+            $solicitudesDisponibles->where(function ($query) use ($searchWords, $estadosPorNombre) {
                 foreach ($searchWords as $word) {
-                    $query->where(function ($subQuery) use ($word) {
-                        $subQuery->where(function ($innerQuery) use ($word) {
-                            $innerQuery->whereRaw('LOWER(s.numero_solicitud) LIKE ?', ['%' . strtolower($word) . '%'])
-                                ->orWhereRaw('LOWER(u.distrito) LIKE ?', ['%' . strtolower($word) . '%'])
-                                ->orWhereRaw('LOWER(p.categoria_proyecto) LIKE ?', ['%' . strtolower($word) . '%'])
-                                ->orWhereRaw('LOWER(sol.nombre) LIKE ?', ['%' . strtolower($word) . '%'])
-                                ->orWhereRaw('LOWER(u.departamento) LIKE ?', ['%' . strtolower($word) . '%'])
-                                ->orWhereRaw('LOWER(u.provincia) LIKE ?', ['%' . strtolower($word) . '%']);
+                    $query->where(function ($subQuery) use ($word, $estadosPorNombre) {
+                        $subQuery->where(function ($innerQuery) use ($word, $estadosPorNombre) {
+                            $estadoId = $estadosPorNombre[mb_strtolower($word, 'UTF-8')] ?? null;
+                            if ($estadoId !== null) {
+                                $innerQuery->orWhere('ei.estado_const_id', $estadoId);
+                            }
+                            $innerQuery->orWhereRaw('LOWER(s.numero_solicitud) LIKE ?', ['%' . mb_strtolower($word, 'UTF-8') . '%'])
+                                ->orWhereRaw('LOWER(u.distrito) LIKE ?', ['%' . mb_strtolower($word, 'UTF-8') . '%'])
+                                ->orWhereRaw('LOWER(p.categoria_proyecto) LIKE ?', ['%' . mb_strtolower($word, 'UTF-8') . '%'])
+                                ->orWhereRaw('LOWER(sol.nombre) LIKE ?', ['%' . mb_strtolower($word, 'UTF-8') . '%'])
+                                ->orWhereRaw('LOWER(u.departamento) LIKE ?', ['%' . mb_strtolower($word, 'UTF-8') . '%'])
+                                ->orWhereRaw('LOWER(u.provincia) LIKE ?', ['%' . mb_strtolower($word, 'UTF-8') . '%']);
                             // $innerQuery->where('s.numero_solicitud', 'ilike', '%' . $word . '%')
                             //     ->orWhere('u.distrito', 'ilike', '%' . $word . '%')
                             //     ->orWhere('p.categoria_proyecto', 'ilike', '%' . $word . '%')
@@ -86,6 +104,27 @@ class SolicitudTecnicoController extends Controller
                     });
                 }
             });
+        }
+
+        // Lista de distritos para el selector de chips (solo los que tienen
+        // solicitudes disponibles, sin tener en cuenta los filtros actuales).
+        $distritosDisponibles = (clone $baseQuery)
+            ->whereIn('ei.estado_const_id', [$estados['pendiente'], $estados['reasignado']])
+            ->whereNotNull('u.distrito')
+            ->where('u.distrito', '<>', '')
+            ->select('u.distrito')
+            ->distinct()
+            ->orderBy('u.distrito')
+            ->pluck('u.distrito');
+
+        // Filtro por distritos (chips): muestra las de CUALQUIERA de los
+        // distritos elegidos, y se combina con la búsqueda de texto.
+        $distritos = array_values(array_filter((array) $request->input('distritos', []), fn ($d) => trim((string) $d) !== ''));
+        if (!empty($distritos)) {
+            $solicitudesDisponibles->whereIn(
+                DB::raw('UPPER(u.distrito)'),
+                array_map(fn ($d) => mb_strtoupper(trim($d), 'UTF-8'), $distritos)
+            );
         }
 
         $solicitudesDisponibles = $solicitudesDisponibles
@@ -105,7 +144,7 @@ class SolicitudTecnicoController extends Controller
 
         return view(
             'employee.pages.solicitudesTecnico.index',
-            compact('tecnico', 'solicitudesAsignadas', 'solicitudesDisponibles')
+            compact('tecnico', 'solicitudesAsignadas', 'solicitudesDisponibles', 'distritosDisponibles', 'distritos', 'searchWords')
         );
     }
 
@@ -118,10 +157,17 @@ class SolicitudTecnicoController extends Controller
 
         $empleadoID = Auth::id();
 
+        // Solo se asignan solicitudes a personal ACTIVO.
+        $tecnico = PersonaCampo::findOrFail($tecnicoId);
+        if (!$tecnico->estaActivo()) {
+            return response()->json([
+                'success' => false,
+                'message' => "{$tecnico->nombre} está {$tecnico->estado}: no se le pueden asignar solicitudes.",
+            ], 422);
+        }
+
         try {
             DB::beginTransaction();
-
-            $tecnico = PersonaCampo::findOrFail($tecnicoId);
 
             // Verificar si es una asignación múltiple o individual
             $solicitudIds = $request->has('solicitudes') ? $request->solicitudes : [$request->solicitud_id];

@@ -64,7 +64,7 @@
                     </div>
                     <div>
                         <label class="form-label" for="fecha_cierre">Fecha de corte</label>
-                        <input type="date" id="fecha_cierre" name="fecha_cierre" value="{{ old('fecha_cierre', $fechaSugerida) }}" class="form-input" required />
+                        <x-date-input id="fecha_cierre" name="fecha_cierre" value="{{ old('fecha_cierre', $fechaSugerida) }}" required />
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="btn-brand w-full px-4 py-2 text-sm" onclick="return confirm('¿Cerrar el mes? El stock se consolida y los movimientos hasta la fecha de corte quedan archivados. Esta acción no se puede deshacer (solo se puede consultar el historial).');">
