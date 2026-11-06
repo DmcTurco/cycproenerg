@@ -66,7 +66,7 @@ class ControlGeneralController extends Controller
             ->when($filtro, fn ($q) => $this->aplicarFiltro($q, $etapa, $filtro, $diasLimite))
             ->with(['solicitud.empresa', 'solicitud.solicitante', 'solicitud.ubicacion', 'solicitud.proyecto', 'solicitud.instalacion', 'solicitud.estadoPortal'])
             ->tap(fn ($q) => $this->ordenar($q, $etapa))
-            ->paginate(50)
+            ->paginate(20)
             ->appends($request->query());
 
         return view('employee.pages.control-general.index', [
@@ -187,19 +187,21 @@ class ControlGeneralController extends Controller
     {
         $editables = self::EDITABLES[$controlGeneral->etapa] ?? [];
 
-        $datos = $request->validate([
-            'campo' => ['required', Rule::in($editables)],
-            'valor' => ['nullable'],
-        ]);
+        if ($request->has('campos')) {
+            $this->actualizarVarios($request, $controlGeneral, $editables);
+        } else {
+            $datos = $request->validate([
+                'campo' => ['required', Rule::in($editables)],
+                'valor' => ['nullable'],
+            ]);
 
-        $campo = $datos['campo'];
-        $valor = $this->validarValor($request, $campo);
+            $campo = $datos['campo'];
+            $valor = $this->normalizar($campo, $request->input('valor'));
 
-        $controlGeneral->{$campo} = $valor;
-        if ($campo === 'observacion' && $controlGeneral->etapa === ControlGeneral::TC_CONSTRUIDA && $valor && !$controlGeneral->fecha_observacion) {
-            $controlGeneral->fecha_observacion = now()->toDateString();
+            $controlGeneral->{$campo} = $valor;
+            $this->marcarFechaObservacion($controlGeneral, $campo, $valor);
+            $controlGeneral->save();
         }
-        $controlGeneral->save();
 
         $nueva = ControlGeneralClasificador::aplicarMovimientos($controlGeneral);
 
@@ -277,9 +279,40 @@ class ControlGeneralController extends Controller
         ]);
     }
 
-    private function validarValor(Request $request, string $campo)
+    /**
+     * Guarda varias celdas de una sola vez (modal de Asesor / Cuadrilla /
+     * Observaciones): las 3 deben ser editables en la etapa actual. Ninguna
+     * mueve de etapa, así que basta un solo save().
+     */
+    private function actualizarVarios(Request $request, ControlGeneral $controlGeneral, array $editables): void
     {
-        $reglas = match ($campo) {
+        $campos = $request->validate(['campos' => ['required', 'array', 'min:1']])['campos'];
+
+        foreach (array_keys($campos) as $campo) {
+            if (!in_array($campo, $editables, true)) {
+                abort(422, "No se puede editar \"{$campo}\" en esta etapa.");
+            }
+        }
+
+        foreach ($campos as $campo => $valor) {
+            $valor = $this->normalizar($campo, $valor);
+            $controlGeneral->{$campo} = $valor;
+            $this->marcarFechaObservacion($controlGeneral, $campo, $valor);
+        }
+
+        $controlGeneral->save();
+    }
+
+    private function marcarFechaObservacion(ControlGeneral $controlGeneral, string $campo, $valor): void
+    {
+        if ($campo === 'observacion' && $controlGeneral->etapa === ControlGeneral::TC_CONSTRUIDA && $valor && !$controlGeneral->fecha_observacion) {
+            $controlGeneral->fecha_observacion = now()->toDateString();
+        }
+    }
+
+    private function reglas(string $campo): array
+    {
+        return match ($campo) {
             'construida', 'observado', 'habilitado' => ['nullable', 'boolean'],
             'fecha_observacion', 'fecha_programacion', 'fecha_habilitacion' => ['nullable', 'date'],
             'accion' => ['nullable', Rule::in(ControlGeneral::ACCIONES)],
@@ -288,8 +321,11 @@ class ControlGeneralController extends Controller
             'observacion' => ['nullable', 'string', 'max:2000'],
             default => ['nullable', 'string', 'max:255'],
         };
+    }
 
-        $valor = $request->validate(['valor' => $reglas])['valor'] ?? null;
+    private function normalizar(string $campo, $valor)
+    {
+        $valor = validator(['valor' => $valor], ['valor' => $this->reglas($campo)])->validate()['valor'] ?? null;
 
         if (in_array($campo, ['construida', 'observado', 'habilitado'], true)) {
             return (bool) $valor;

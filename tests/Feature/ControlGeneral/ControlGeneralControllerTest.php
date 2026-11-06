@@ -199,6 +199,36 @@ class ControlGeneralControllerTest extends TestCase
             ->assertDontSee($b->solicitud->numero_solicitud);
     }
 
+    public function test_guardar_asesor_cuadrilla_y_observacion_juntos_desde_el_modal(): void
+    {
+        $cg = $this->registro(ControlGeneral::APROBADA, $this->clb);
+        $usuaria = $this->empleado(['control_general.ver', 'control_general.editar']);
+
+        $this->actingAs($usuaria, 'employee')
+            ->patchJson(route('employee.control-general.update', $cg), [
+                'campos' => ['asesor' => ' ANA PÉREZ ', 'cuadrilla' => 'CUADRILLA 1', 'observacion' => 'Pendiente de visita'],
+            ])
+            ->assertOk()
+            ->assertJson(['movida' => false]);
+
+        $cg->refresh();
+        $this->assertSame('ANA PÉREZ', $cg->asesor);
+        $this->assertSame('CUADRILLA 1', $cg->cuadrilla);
+        $this->assertSame('Pendiente de visita', $cg->observacion);
+    }
+
+    public function test_el_modal_no_deja_guardar_un_campo_que_no_es_editable_en_la_etapa(): void
+    {
+        $cg = $this->registro(ControlGeneral::HABILITACION, $this->clb);
+        $usuaria = $this->empleado(['control_general.ver', 'control_general.editar']);
+
+        $this->actingAs($usuaria, 'employee')
+            ->patchJson(route('employee.control-general.update', $cg), [
+                'campos' => ['asesor' => 'ALGUIEN'],
+            ])
+            ->assertStatus(422);
+    }
+
     public function test_parametros_se_guardan_y_requieren_permiso(): void
     {
         $admin = $this->empleado(['control_general.ver', 'control_general.parametros']);

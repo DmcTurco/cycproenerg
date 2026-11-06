@@ -28,6 +28,14 @@
     $puedeEditar = \App\Support\Permisos::puedeRuta('employee.control-general.update');
     $editable = fn (string $campo) => $puedeEditar && in_array($campo, $editables, true);
 
+    // Qué campos trae el modal de Asesor/Cuadrilla/Observaciones en cada
+    // etapa (coincide con lo que antes se podía editar en la fila).
+    $camposModal = match ($etapa) {
+        ControlGeneral::APROBADA => ['asesor', 'cuadrilla', 'observacion'],
+        ControlGeneral::TC_CONSTRUIDA => ['cuadrilla', 'observacion'],
+        default => ['observacion'],
+    };
+
     // Celdas que llena la usuaria: fondo amarillo suave, como en su Excel.
     $celdaManual = 'bg-amber-50/60';
     $input = 'w-full min-w-[7rem] rounded border border-gray-300 bg-white px-1.5 py-1 text-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500';
@@ -364,8 +372,8 @@
                                         <td class="whitespace-nowrap px-2 py-1.5 text-right font-medium {{ $plazo === ControlGeneral::PLAZO_DESFASE ? 'text-red-600' : 'text-gray-700' }}">{{ $cg->diasDesdeAprobacion() ?? '—' }}</td>
                                         <td class="whitespace-nowrap px-2 py-1.5"><span class="badge {{ $coloresPlazo[$plazo] }}">{{ $plazo }}</span></td>
                                         @include('employee.pages.control-general.partials.celda-si-no', ['campo' => 'construida', 'confirmarEn' => ['1'], 'confirmar' => 'La solicitud pasará a 2. TC Construidas.'])
-                                        @include('employee.pages.control-general.partials.celda-texto', ['campo' => 'asesor', 'lista' => 'asesor'])
-                                        @include('employee.pages.control-general.partials.celda-texto', ['campo' => 'cuadrilla', 'lista' => 'cuadrilla'])
+                                        @include('employee.pages.control-general.partials.celda-dato-modal', ['campo' => 'asesor'])
+                                        @include('employee.pages.control-general.partials.celda-dato-modal', ['campo' => 'cuadrilla'])
                                         @include('employee.pages.control-general.partials.celda-select', ['campo' => 'accion', 'opciones' => ControlGeneral::ACCIONES, 'vacio' => '—', 'confirmarEn' => ControlGeneral::ACCIONES, 'confirmar' => 'La solicitud pasará a 4. Anulaciones y reingresos.'])
                                         @break
 
@@ -375,7 +383,7 @@
                                         <td class="whitespace-nowrap px-2 py-1.5 text-gray-600" x-text="formatoFecha(f.fecha_observacion)">{{ $cg->fecha_observacion?->format('d/m/Y') ?? '—' }}</td>
                                         @include('employee.pages.control-general.partials.celda-texto', ['campo' => 'contratista', 'lista' => 'contratista'])
                                         <td x-show="masDatos" class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->asesor ?? '—' }}</td>
-                                        @include('employee.pages.control-general.partials.celda-texto', ['campo' => 'cuadrilla', 'lista' => 'cuadrilla'])
+                                        @include('employee.pages.control-general.partials.celda-dato-modal', ['campo' => 'cuadrilla'])
                                         @break
 
                                     @case(ControlGeneral::HABILITACION)
@@ -403,7 +411,7 @@
                                         @break
                                 @endswitch
 
-                                @include('employee.pages.control-general.partials.celda-texto', ['campo' => 'observacion', 'lista' => null, 'ancho' => 'min-w-[12rem]'])
+                                @include('employee.pages.control-general.partials.celda-observacion-modal')
 
                                 <td class="whitespace-nowrap px-2 py-1.5">
                                     <div class="flex items-center justify-center gap-0.5">
