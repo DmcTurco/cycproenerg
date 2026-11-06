@@ -17,9 +17,10 @@
                 class="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium text-white">
                 N° <span x-text="field('numero_solicitud')"></span>
             </span>
-            <a href="{{ route('employee.solicitudes.control-interno', $id) }}"
+            <a x-show="!loading && !loadError" x-cloak
+                :href="'{{ route('employee.control-general.index') }}?search=' + encodeURIComponent(field('numero_solicitud'))"
                 class="ml-auto rounded-md bg-white/15 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/25">
-                Ver Control Interno
+                Ver en Control General
             </a>
         </div>
 
@@ -140,10 +141,6 @@
                 </div>
 
             </div>
-        </div>
-
-        <div class="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-400 sm:px-6">
-            &copy; {{ date('Y') }} CYC PROENERG. Todos los derechos reservados.
         </div>
     </div>
 @endsection

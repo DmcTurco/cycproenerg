@@ -53,27 +53,19 @@ return [
         ]
     ],
 
-    // Control Interno (migración de CONTROL INTERNAS - CYC CLB v5.4.xlsm).
-    // Mapeo de "Categoría de proyecto" del portal a su código corto
-    // (PARAM!B28:C31). Los plazos y feriados NO van aquí: viven en las
-    // tablas parametros_control_internos y feriados porque el negocio los
-    // ajusta seguido.
-    'control_interno' => [
-        'categorias' => [
-            'Residencial' => 'RES',
-            'Multifamiliar' => 'MULTI',
-            'Comercio' => 'COM',
-        ],
-        'categoria_por_defecto' => 'RES',
+    // "Categoría de proyecto" del portal normalizada al cargar el Excel
+    // (ProcessExcelJob::normalizarCategoria): texto conocido => código corto.
+    'categorias_proyecto' => [
+        'Residencial' => 'RES',
+        'Multifamiliar' => 'MULTI',
+        'Comercio' => 'COM',
+    ],
 
-        // Código corto de empresa (CYC/CLB), igual que PARAM!B6:B7 del Excel.
-        // Turco hizo notar (13/09/2026) que tener esto en un seeder aparte
-        // era redundante: la carga del Excel ya identifica a cada Empresa
-        // por RUC, así que ProcessExcelJob::asignarCodigoEmpresa() usa este
-        // mapeo para completar el código en el momento, en vez de depender
-        // de correr un comando aparte (y en el orden correcto). Si se suma
-        // una empresa nueva al sistema, agregar su RUC acá.
-        'codigos_empresa_por_ruc' => [
+    // Código corto de empresa (CYC/CLB) por RUC: la carga del Excel lo
+    // completa sola (ProcessExcelJob::asignarCodigoEmpresa). Lo usa el filtro
+    // de empresa de Control General. Si se suma una empresa, agregar su RUC.
+    'empresas' => [
+        'codigos_por_ruc' => [
             '20604329397' => 'CYC', // C&C PROYECTOS INTEGRALES EN ENERGÍA S.A.C.
             '20610320032' => 'CLB', // CLB INGENIERIA Y PROYECTOS EN ENERGIA SOSTENIBLE S.A.C.
         ],

@@ -20,13 +20,11 @@ use App\Events\RowProcessed;
 use App\Helpers\TipoDocumentoHelper;
 use App\Models\EstadoInterno;
 use App\Models\EstadoPortal;
-use App\Models\FaseControlInterno;
 use App\Models\Instalacion;
 use App\Models\Logs;
 use App\Models\Auditoria;
 use App\Models\Employee;
-use App\Services\ControlInternoClasificador;
-use App\Services\ControlInternoIndicadores;
+use App\Services\ControlGeneralClasificador;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -39,27 +37,26 @@ class ProcessExcelJob implements ShouldQueue
     protected $filePath;
     public $processId;
 
-    // CI-8: id de la fila en `logs` (bitácora persistente) creada por
+    // Id de la fila en `logs` (bitácora persistente) creada por
     // ClientController::change() antes de despachar el job. Nullable por si
     // algún día se dispara este job sin pasar por esa acción (ej. un comando
     // artisan de carga manual) — en ese caso simplemente no se escribe bitácora.
     protected $logId;
 
     /**
-     * CI-8: contadores de Control Interno de esta carga, para la bitácora
-     * (equivalente al resumen de la hoja INICIO del Excel original).
+     * Control General (Internas · TC · Habilitación): cuántas solicitudes
+     * entraron nuevas a cada etapa y cuántas cambiaron de etapa en esta carga
+     * (equivalente al mensaje final de la macro ActualizarControl).
      */
-    protected array $ciCounters = [
-        'nuevas_general' => 0,
-        'actualizadas' => 0,
-        'movidas_general_construido' => 0,
-        'movidas_general_tc' => 0,
-        'movidas_construido_tc' => 0,
-        'movidas_a_pend_anulacion' => 0,
+    protected array $cgCounters = [
         'filas_omitidas_validacion' => 0,
-        'ignoradas_no_aprobadas' => 0,
-        'ignoradas_anuladas' => 0,
+        'nuevas' => [],
+        'movidas' => 0,
+        'actualizadas' => 0,
     ];
+
+    // Provincias que entran a Control General (se resuelve una vez por carga).
+    protected ?array $cgAmbito = null;
 
     // Añadir estas propiedades:
     public $timeout = 1800;    // 30 minutos máximo para ejecutar el job
@@ -113,7 +110,7 @@ class ProcessExcelJob implements ShouldQueue
                 'updated' => 0
             ], now()->addHours(1));
 
-            // CI-8: la bitácora ya se creó en ClientController::change() con
+            // La bitácora ya se creó en ClientController::change() con
             // total_filas=0 (todavía no se había leído el archivo); acá se
             // completa apenas se sabe cuántas filas trae.
             $this->log()?->update(['total_filas' => $totalFilas]);
@@ -127,7 +124,7 @@ class ProcessExcelJob implements ShouldQueue
                 "Cargó el Excel del portal ({$totalFilas} filas): {$result['created']} solicitudes nuevas, {$result['updated']} actualizadas, {$result['failed']} con error",
                 $this->log(),
                 null,
-                ['resultado' => $result, 'control_interno' => $this->ciCounters],
+                ['resultado' => $result, 'control_general' => $this->cgCounters],
                 'Carga Excel del portal',
                 $this->log()?->employee_id ? Employee::find($this->log()->employee_id) : null,
             );
@@ -143,21 +140,15 @@ class ProcessExcelJob implements ShouldQueue
                 'completed' => true
             ], now()->addHours(1));
 
-            // CI-8: bitácora final — contadores de filas + resumen de
-            // Control Interno de esta carga (nuevas a GENERAL, movidas entre
+            // Bitácora final — contadores de filas + resumen de
+            // Control General de esta carga (nuevas por etapa, movidas entre
             // fases, filas omitidas por no pasar la validación mínima).
             $this->log()?->update([
                 'filas_procesadas' => $result['total'],
                 'filas_con_error' => $result['failed'],
                 'estado' => 'completado',
-                'resumen_control_interno' => $this->ciCounters,
+                'resumen_carga' => $this->cgCounters,
             ]);
-
-            // CI-10: ControlInternoDashboard::resumen() cachea 5 minutos (el
-            // desglose de GENERAL recorre cada solicitud para calcular su
-            // semáforo). Sin este forget, una carga de Excel recién terminada
-            // no se vería reflejada en el Resumen hasta que venciera ese caché.
-            Cache::forget('control_interno_dashboard_' . now()->year . '_' . (int) ceil(now()->month / 3));
 
             // Aquí podrías emitir un evento para notificar que el proceso terminó
             event(new ExcelProcessed($result));
@@ -175,7 +166,7 @@ class ProcessExcelJob implements ShouldQueue
             $this->log()?->update([
                 'estado' => 'error',
                 'errores' => $e->getMessage(),
-                'resumen_control_interno' => $this->ciCounters,
+                'resumen_carga' => $this->cgCounters,
             ]);
 
             event(new ExcelProcessingFailed($e->getMessage()));
@@ -185,7 +176,7 @@ class ProcessExcelJob implements ShouldQueue
     }
 
     /**
-     * CI-8: la fila de bitácora (`logs`) de esta carga, si se pasó un
+     * La fila de bitácora (`logs`) de esta carga, si se pasó un
      * `$logId` al construir el job (ver ClientController::change()).
      */
     private function log(): ?Logs
@@ -248,7 +239,7 @@ class ProcessExcelJob implements ShouldQueue
             if ($index == 1) continue; // Ignorar el header
 
             if (!$this->validateRow($row)) {
-                $this->ciCounters['filas_omitidas_validacion']++;
+                $this->cgCounters['filas_omitidas_validacion']++;
                 continue;
             }
 
@@ -263,15 +254,7 @@ class ProcessExcelJob implements ShouldQueue
                     $this->processUbicacion($row, $solicitud);
                     $this->processProyecto($row, $solicitud);
                     $this->processInstalacion($row, $solicitud);
-                    $this->processFaseControlInterno($row, $solicitud);
-
-                    // CI-5 (13/09/2026): recalcula y guarda el caché de
-                    // indicadores (semáforo, desface, días hábiles, fuera de
-                    // plazo) de esta solicitud ahora que ya quedaron
-                    // guardados fase/instalación/proyecto — así el listado y
-                    // el Resumen (que leen el caché, no calculan al vuelo)
-                    // ya muestran esta carga sin esperar al comando diario.
-                    ControlInternoIndicadores::calcularYGuardar($solicitud);
+                    $this->processControlGeneral($row, $solicitud, $estadoPortal);
 
                     return $solicitud->wasRecentlyCreated;
                 });
@@ -382,7 +365,7 @@ class ProcessExcelJob implements ShouldQueue
     }
 
     /**
-     * CI-1/CI-10: código corto de empresa (CYC/CLB) para Control Interno.
+     * Código corto de empresa (CYC/CLB), usado por el filtro de empresa.
      * Se resuelve acá, por RUC, en cada carga de Excel — no en un seeder
      * aparte — porque esta misma función ya identifica a la Empresa por RUC
      * (`processEmpresa` de arriba); duplicar esa comparación en un seeder
@@ -397,7 +380,7 @@ class ProcessExcelJob implements ShouldQueue
             return;
         }
 
-        $codigo = config("const.control_interno.codigos_empresa_por_ruc.{$numeroDocumento}");
+        $codigo = config("const.empresas.codigos_por_ruc.{$numeroDocumento}");
 
         if ($codigo) {
             $empresa->update(['codigo' => $codigo]);
@@ -483,7 +466,7 @@ class ProcessExcelJob implements ShouldQueue
                 'numero_contrato_suministro' => trim($this->col($row, 'Número de Contrato de Suministro')) ?: null,
                 // OJO: el nombre de la columna del portal es "Fecha de suscripción
                 // de contrato" (confirmado con una descarga real del portal el
-                // 12/09/2026 al construir CI-5) — "Fecha de aprobación del
+                // 12/09/2026) — "Fecha de aprobación del
                 // contrato" no existe en el archivo y nunca se encontraba, así
                 // que este campo quedaba siempre null. Se mantiene el nombre de
                 // columna `fecha_aprobacion_contrato` en la base de datos (ya se
@@ -518,102 +501,36 @@ class ProcessExcelJob implements ShouldQueue
     }
 
     /**
-     * CI-4: motor de clasificación y movimientos entre fases.
-     *
-     * Reversa-ingenierizado del VBA original (Modulo_Internas.bas, macro
-     * `Procesar` + funciones `EsTC`/`PortalAnulada`) para reproducir exactamente
-     * las mismas reglas del Excel — el detalle completo de las reglas vive en
-     * `ControlInternoClasificador::clasificar()`, que es el que de verdad las
-     * aplica; este método solo traduce la fila del Excel a los dos datos que
-     * ese servicio necesita. Se compartió como servicio porque
-     * `ControlInternoManualController` también lo usa (para reclasificar al
-     * toque cuando el staff edita F. CONSTRUCCIÓN/ANULAR a mano, sin esperar
-     * la próxima carga de Excel).
+     * Control General (Internas · TC · Habilitación): ubica la solicitud en
+     * su etapa según lo que dice el portal. Las reglas están en
+     * ControlGeneralClasificador::aplicarPortal() (traducción de la macro
+     * ActualizarControl del Excel "Control General CLB - C&C.xlsm").
      */
-    private function processFaseControlInterno($row, $solicitud)
+    private function processControlGeneral($row, Solicitud $solicitud, EstadoPortal $estadoPortal): void
     {
-        $tcConcluida = strtoupper(trim((string) $this->col($row, 'Resultado de la Instalación de TC'))) === 'CONCLUIDA';
-        // "F. TC (portal)" del Excel: la fecha que queda registrada al pasar a
-        // TC. CI-5 la usa para el indicador CICLO (suscripción -> TC).
-        $fechaTc = $tcConcluida
-            ? $this->parseDate(trim((string) $this->col($row, 'Fecha de Registro de resultado de TC')))
-            : null;
+        $this->cgAmbito ??= ControlGeneralClasificador::ambito();
 
-        // CI-8: se lee la fase ANTES de clasificar (una sola consulta extra)
-        // para poder contar en la bitácora si la solicitud es nueva en
-        // Control Interno o si esta carga la movió de fase. `null` significa
-        // que todavía no tenía fila en fase_control_internos (es nueva).
-        $faseAntes = FaseControlInterno::where('solicitud_id', $solicitud->id)->value('fase');
+        $resultado = ControlGeneralClasificador::aplicarPortal($solicitud, [
+            'provincia' => $this->col($row, 'Provincia'),
+            'estado' => $estadoPortal->codigo,
+            'resultado_tc' => $this->col($row, 'Resultado de la Instalación de TC'),
+            'fecha_suscripcion' => $this->parseDate(trim((string) $this->col($row, 'Fecha de suscripción de contrato'))),
+            'fecha_entrega_documentos' => $this->parseDate(trim((string) $this->col($row, 'Fecha de entrega de documentos al Concesionario'))),
+            'anulada' => $this->esSi($this->col($row, 'Anulada')),
+            'rechazada' => $this->esSi($this->col($row, 'Rechazada')),
+        ], $this->cgAmbito);
 
-        // Mismos filtros del VBA para filas NUEVAS en Control Interno:
-        //  - sin suministro o sin contrato (ni número ni fecha) = todavía no
-        //    aprobada, no entra al control;
-        //  - Rechazada/Anulada en el portal y nunca estuvo en el control: no
-        //    se agrega. (Las que YA estaban siguen el flujo manual de CI-6.)
-        if ($faseAntes === null) {
-            $sinSuministro = trim((string) $this->col($row, 'Número de Suministro')) === '';
-            $sinContrato = trim((string) $this->col($row, 'Número de Contrato de Suministro')) === ''
-                && $this->parseDate(trim((string) $this->col($row, 'Fecha de suscripción de contrato'))) === null;
-
-            if ($sinSuministro || $sinContrato) {
-                $this->ciCounters['ignoradas_no_aprobadas']++;
-                return;
-            }
-
-            if ($this->esSi($this->col($row, 'Rechazada')) || $this->esSi($this->col($row, 'Anulada'))) {
-                $this->ciCounters['ignoradas_anuladas']++;
-                return;
-            }
-        }
-
-        $fechaFinInterna = $this->parseDate(trim((string) $this->col($row, 'Fecha de finalización de la Instalación Interna')));
-
-        $fase = ControlInternoClasificador::clasificar($solicitud, $tcConcluida, $fechaTc, $fechaFinInterna);
-
-        $this->registrarMovimientoControlInterno($faseAntes, $fase->fase);
-    }
-
-    /**
-     * CI-8: acumula en $ciCounters el tipo de movimiento de fase que produjo
-     * esta fila, para el resumen de Control Interno de la bitácora.
-     */
-    private function registrarMovimientoControlInterno(?string $antes, string $despues): void
-    {
-        // Se cuenta igual que la bitácora del VBA (st(2)/st(4)/st(5)) para
-        // que los números cuadren con el Excel: una NUEVA que entra ya
-        // construida también suma en GENERAL -> CONSTRUIDO, y una que entra
-        // en TC suma en CONSTRUIDO -> TC; GENERAL -> TC suma en ambas.
-        if ($antes === null) {
-            $this->ciCounters['nuevas_general']++;
-            if ($despues === FaseControlInterno::CONSTRUIDO) {
-                $this->ciCounters['movidas_general_construido']++;
-            } elseif ($despues === FaseControlInterno::TC) {
-                $this->ciCounters['movidas_construido_tc']++;
-            }
+        if (!$resultado) {
             return;
         }
 
-        // "Actualizadas (GENERAL + CONSTRUIDO + PEND...)" del VBA: solo las
-        // que ya estaban en Control Interno, no las que estaban en TC (el VBA
-        // no toca TC) ni las solicitudes que existen fuera del control.
-        if ($antes !== FaseControlInterno::TC) {
-            $this->ciCounters['actualizadas']++;
-        }
-
-        if ($antes === $despues) {
-            return;
-        }
-
-        if ($despues === FaseControlInterno::PEND_ANULACION) {
-            $this->ciCounters['movidas_a_pend_anulacion']++;
-        } elseif ($antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::CONSTRUIDO) {
-            $this->ciCounters['movidas_general_construido']++;
-        } elseif ($antes === FaseControlInterno::GENERAL && $despues === FaseControlInterno::TC) {
-            $this->ciCounters['movidas_general_tc']++;
-            $this->ciCounters['movidas_general_construido']++;
-            $this->ciCounters['movidas_construido_tc']++;
-        } elseif ($antes === FaseControlInterno::CONSTRUIDO && $despues === FaseControlInterno::TC) {
-            $this->ciCounters['movidas_construido_tc']++;
+        if ($resultado['antes'] === null) {
+            $etapa = $resultado['despues'];
+            $this->cgCounters['nuevas'][$etapa] = ($this->cgCounters['nuevas'][$etapa] ?? 0) + 1;
+        } elseif ($resultado['antes'] !== $resultado['despues']) {
+            $this->cgCounters['movidas']++;
+        } else {
+            $this->cgCounters['actualizadas']++;
         }
     }
 
@@ -652,8 +569,8 @@ class ProcessExcelJob implements ShouldQueue
     }
 
     /**
-     * CI-1/CI-9/CI-7: el mapeo de categoría a su código corto (RES/MULTI/COM,
-     * `config('const.control_interno.categorias')`) compara el texto tal
+     * El mapeo de categoría a su código corto (RES/MULTI/COM,
+     * `config('const.categorias_proyecto')`) compara el texto tal
      * cual viene del portal contra "Residencial"/"Multifamiliar"/"Comercio"
      * exactos — a pedido de Turco (13/09/2026), acá se normalizan mayúsculas/
      * minúsculas y espacios antes de guardar, para que ese mapeo no falle
@@ -668,7 +585,7 @@ class ProcessExcelJob implements ShouldQueue
             return null;
         }
 
-        foreach (array_keys(config('const.control_interno.categorias', [])) as $categoriaConocida) {
+        foreach (array_keys(config('const.categorias_proyecto', [])) as $categoriaConocida) {
             if (mb_strtoupper($valor, 'UTF-8') === mb_strtoupper($categoriaConocida, 'UTF-8')) {
                 return $categoriaConocida;
             }
@@ -689,11 +606,8 @@ class ProcessExcelJob implements ShouldQueue
                 'fecha_finalizacion_instalacion_acometida' => $this->parseDate(trim($this->col($row, 'Fecha de finalización de la Instalación de Acometida'))) ?: null,
                 'resultado_instalacion_tc' => trim($this->col($row, 'Resultado de la Instalación de TC')) ?: null,
                 'fecha_programacion_habilitacion' => $this->parseDate(trim($this->col($row, 'Fecha de programación de Habilitación'))) ?: null,
-                // CI-6 (parte segura): se capturan tal cual del portal, pero
-                // a propósito NO disparan ninguna regla de eliminación o
-                // archivado de la Solicitud — ver la nota de la migración
-                // add_anulacion_columns_to_instalacions_table y
-                // docs/modulos/control-interno.md (CI-6).
+                // Se capturan tal cual del portal. Control General ignora las
+                // filas con Anulada/Rechazada = Sí (ver ControlGeneralClasificador).
                 'rechazada' => $this->esSi($this->col($row, 'Rechazada')),
                 'anulada' => $this->esSi($this->col($row, 'Anulada')),
                 'motivo_anulacion' => trim((string) $this->col($row, 'Motivo de anulación')) ?: null,

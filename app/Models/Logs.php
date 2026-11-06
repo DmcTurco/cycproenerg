@@ -23,13 +23,12 @@ class Logs extends Model
         'errores',
         'estado',
         'employee_id',
-        // CI-8: contadores de Control Interno de esta carga (ver migración
-        // add_control_interno_columns_to_logs_table).
-        'resumen_control_interno',
+        // Contadores de Control General de esta carga.
+        'resumen_carga',
     ];
 
     protected $casts = [
-        'resumen_control_interno' => 'array',
+        'resumen_carga' => 'array',
     ];
 
     public function Empleado()

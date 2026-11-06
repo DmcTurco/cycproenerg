@@ -216,10 +216,6 @@
                 </div>
             @endif
         </div>
-
-        <div class="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-400 sm:px-6">
-            &copy; {{ date('Y') }} CYC PROENERG. Todos los derechos reservados.
-        </div>
     </div>
 @endsection
 

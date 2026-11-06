@@ -209,8 +209,8 @@ class Material extends Model
     /**
      * CATALOGO!E — el precio vigente solo SUBE: si el último precio de
      * INGRESOS es mayor al precio base, ese es el vigente; si no, se queda
-     * en el precio base (decisión manual de Turco, ver control-interno.md
-     * y ahora control-materiales.md: nunca baja solo).
+     * en el precio base (decisión manual de Turco, ver
+     * control-materiales.md: nunca baja solo).
      */
     public function precioVigente(): float
     {

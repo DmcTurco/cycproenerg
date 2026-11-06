@@ -27,9 +27,8 @@ class Instalacion extends Model
         'resultado_instalacion_tc',
         'fecha_programacion_habilitacion',
         'solicitud_id',
-        // CI-6 (parte segura): solo se capturan, no disparan ninguna regla de
-        // eliminación/archivado todavía — ver la migración
-        // add_anulacion_columns_to_instalacions_table y control-interno.md.
+        // Se capturan del portal; Control General ignora las filas que vienen
+        // Anulada/Rechazada = Sí (ver ControlGeneralClasificador).
         'rechazada',
         'anulada',
         'motivo_anulacion',

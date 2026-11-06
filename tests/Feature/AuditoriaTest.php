@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Auditoria;
 use App\Models\Employee;
-use App\Models\Feriado;
 use App\Models\Material;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -39,18 +38,19 @@ class AuditoriaTest extends TestCase
     {
         $this->actingAs($this->empleado(), 'employee');
 
-        $feriado = Feriado::create(['fecha' => '2026-12-25', 'descripcion' => 'Navidad']);
-        $feriado->update(['descripcion' => 'Navidad (feriado)']);
-        $feriado->delete();
+        // Usuario del panel: modelo sin soft delete (se borra de verdad).
+        $pedro = Employee::create(['name' => 'Pedro Prueba', 'email' => 'pedro@cycproenerg.com', 'password' => Hash::make('secreto123')]);
+        $pedro->update(['name' => 'Pedro P.']);
+        $pedro->delete();
 
-        $registros = Auditoria::where('modulo', 'Feriado')->orderBy('id')->get();
+        $registros = Auditoria::where('auditable_type', Employee::class)->where('auditable_id', $pedro->id)->orderBy('id')->get();
         $this->assertSame(['creado', 'actualizado', 'eliminado_definitivo'], $registros->pluck('accion')->all());
         $this->assertTrue($registros->every(fn ($a) => $a->usuario_nombre === 'Ana Auditora'));
-        $this->assertSame('Feriado', $registros[0]->modulo);
+        $this->assertSame('Usuario', $registros[0]->modulo);
 
         // Solo el campo que cambió, con antes y después.
-        $this->assertSame(['descripcion' => 'Navidad'], $registros[1]->antes);
-        $this->assertSame(['descripcion' => 'Navidad (feriado)'], $registros[1]->despues);
+        $this->assertSame(['name' => 'Pedro Prueba'], $registros[1]->antes);
+        $this->assertSame(['name' => 'Pedro P.'], $registros[1]->despues);
     }
 
     public function test_soft_delete_se_registra_como_eliminado(): void
@@ -99,12 +99,12 @@ class AuditoriaTest extends TestCase
     public function test_pantalla_de_auditoria_lista_y_filtra(): void
     {
         $this->actingAs($this->empleado(), 'employee');
-        Feriado::create(['fecha' => '2026-12-25', 'descripcion' => 'Navidad']);
+        Employee::create(['name' => 'Pedro Prueba', 'email' => 'pedro@cycproenerg.com', 'password' => Hash::make('secreto123')]);
         $this->material();
 
-        $this->get(route('employee.auditoria.index', ['modulo' => 'Feriado']))
+        $this->get(route('employee.auditoria.index', ['modulo' => 'Usuario']))
             ->assertOk()
-            ->assertSee('Feriado Navidad')
+            ->assertSee('Usuario Pedro Prueba')
             ->assertDontSee('Material MAT-001');
     }
 }

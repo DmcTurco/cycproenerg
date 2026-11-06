@@ -13,8 +13,7 @@ use Illuminate\Support\Facades\Log;
  * el scheduler de routes/console.php), si quedó algún Excel pendiente sin
  * procesar — por si el lanzamiento inmediato que hace
  * ClientController::change() al subir el archivo falló por algún motivo — y
- * si hay uno, lo procesa. Ver docs/modulos/control-interno.md para la
- * explicación completa del flujo (subida → cola → este comando).
+ * si hay uno, lo procesa (flujo: subida → cola → este comando).
  */
 class RevisarColaPendienteCommand extends Command
 {

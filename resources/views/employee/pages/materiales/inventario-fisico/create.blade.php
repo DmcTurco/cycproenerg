@@ -137,9 +137,5 @@
                 <button type="submit" class="btn-brand px-4 py-2 text-sm">Guardar inventario</button>
             </div>
         </form>
-
-        <div class="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-400 sm:px-6">
-            &copy; {{ date('Y') }} CYC PROENERG. Todos los derechos reservados.
-        </div>
     </div>
 @endsection

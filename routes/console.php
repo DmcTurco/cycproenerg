@@ -45,13 +45,6 @@ Schedule::command('queue:revisar-pendientes')
 Schedule::command('queue:prune-failed --hours=24')->hourly();
 Schedule::command('queue:restart')->everyFourHours();
 
-// CI-5 (13/09/2026): refresca el caché de indicadores (DESFACE/SEMÁFORO/DÍAS
-// HÁBILES/FUERA DE PLAZO) de todas las solicitudes — ver el docblock de
-// RecalcularIndicadoresControlInterno para por qué hace falta corrarlo aparte
-// de cada carga/edición individual. Fuera de horario de oficina para no
-// competir con las cargas de Excel del día.
-Schedule::command('control-interno:recalcular-indicadores')->dailyAt('01:00');
-
 Schedule::call(function () {
     Log::info('Memoria usada por Laravel:', [
         'memory' => round(memory_get_usage(true) / 1024 / 1024, 2) . 'MB',

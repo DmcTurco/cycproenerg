@@ -23,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => RedirectIfAuthenticated::class,
             // Roles y permisos del panel de empleados (config/permisos.php).
             'permiso' => \App\Http\Middleware\VerificarPermiso::class,
+            // App móvil: solo personal de campo ACTIVO con acceso (routes/api.php).
+            'persona.campo' => \App\Http\Middleware\PersonaCampoActiva::class,
         ]);
 
         // El resto (TrustProxies, TrimStrings, VerifyCsrfToken, EncryptCookies,

@@ -38,6 +38,8 @@ class ApiTecnicoController extends Controller
         Auditoria::registrar('login', 'App móvil: ' . $tecnico->nombre . ' inició sesión', $tecnico, modulo: 'Acceso', usuario: $tecnico);
 
         return response()->json([
+            'usuario' => $this->usuarioApp($tecnico),
+            // Se mantiene para builds viejos de la app que leen tecnico.nombre.
             'tecnico' => $tecnico,
             'token' => $token,
             'token_type' => 'Bearer'
@@ -53,9 +55,29 @@ class ApiTecnicoController extends Controller
     }
 
     
-    public function profile()
+    public function profile(Request $request)
     {
-        return response()->json(auth()->user());
+        return response()->json($this->usuarioApp($request->user()));
+    }
+
+    /**
+     * Lo que la app necesita saber del personal de campo logueado. El TIPO
+     * decide qué podrá hacer en la app (PERSONAL DIRECTO reporta ejecutado,
+     * CONTRATISTA no), así que viaja siempre.
+     */
+    private function usuarioApp(PersonaCampo $persona): array
+    {
+        return [
+            'id' => $persona->id,
+            'nombre' => $persona->nombre,
+            'tipo' => $persona->tipo,
+            'estado' => $persona->estado,
+            'email' => $persona->email,
+            'celular' => $persona->celular,
+            'empresas' => $persona->empresas()->get(['empresas.id', 'empresas.codigo', 'empresas.nombre'])
+                ->map(fn ($e) => ['id' => $e->id, 'codigo' => $e->codigo, 'nombre' => $e->nombre])
+                ->values(),
+        ];
     }
 
     

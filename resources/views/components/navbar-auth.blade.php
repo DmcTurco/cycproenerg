@@ -1,4 +1,4 @@
-@props(['titlePage' => null, 'backUrl' => null, 'titleVariant' => 'default'])
+@props(['titlePage' => null, 'backUrl' => null, 'titleVariant' => 'default', 'subtitle' => null, 'actions' => null])
 
 <header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 sm:px-6">
     <button
@@ -22,10 +22,22 @@
         </a>
     @endif
 
-    <h1 @class([
-        'flex-1 text-base font-semibold text-gray-900' => $titleVariant === 'default',
-        'flex-1 rounded-lg bg-amber-50 px-3 py-1.5 text-sm text-amber-800' => $titleVariant === 'warning',
-    ])>{{ $titlePage }}</h1>
+    <div class="flex min-w-0 flex-1 items-center gap-3">
+        <div class="min-w-0">
+            <h1 @class([
+                'truncate text-base font-semibold text-gray-900' => $titleVariant === 'default',
+                'rounded-lg bg-amber-50 px-3 py-1.5 text-sm text-amber-800' => $titleVariant === 'warning',
+            ])>{{ $titlePage }}</h1>
+            @if ($subtitle)
+                <p class="truncate text-xs text-gray-500">{{ $subtitle }}</p>
+            @endif
+        </div>
+
+        {{-- Botones propios de la pantalla (sección "nav_actions" de la vista) --}}
+        @if ($actions)
+            <div class="ml-auto flex shrink-0 items-center gap-2">{!! $actions !!}</div>
+        @endif
+    </div>
 
     <div x-data="{ open: false }" class="relative">
         <button @click="open = !open" class="btn-icon" aria-label="Notificaciones">

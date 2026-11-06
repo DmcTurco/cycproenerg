@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CompanySeeder::class);
         $this->call(EmployeeSeeder::class);
         $this->call(RolesPermisosSeeder::class);
-        $this->call(ControlInternoParametrosSeeder::class);
+        $this->call(RolInternasAlmacenSeeder::class);
         $this->call(PersonaCampoSeeder::class);
         $this->call(MaterialSeeder::class);
         $this->call(HerramientaSeeder::class);

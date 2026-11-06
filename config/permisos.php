@@ -29,7 +29,7 @@ return [
         'clientes' => ['label' => 'Clientes (solicitudes)', 'acciones' => ['ver' => 'Ver', 'cargar_excel' => 'Cargar Excel del portal']],
         'personal' => ['label' => 'Personal de campo', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar', 'asignar' => 'Asignar solicitudes']],
         'asesores' => ['label' => 'Asesores', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar']],
-        'control_interno' => ['label' => 'Control Interno', 'acciones' => ['ver' => 'Ver', 'editar' => 'Editar datos manuales', 'parametros' => 'Parámetros y feriados']],
+        'control_general' => ['label' => 'Control General (Internas, TC, Habilitación)', 'acciones' => ['ver' => 'Ver', 'editar' => 'Editar', 'parametros' => 'Parámetros']],
         'catalogo' => ['label' => 'Materiales: catálogo', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar', 'parametros' => 'Parámetros']],
         'ingresos' => ['label' => 'Materiales: ingresos', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar']],
         'cotizaciones' => ['label' => 'Materiales: cotizaciones y vales', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar', 'descontar' => 'Marcar descontado']],
@@ -67,12 +67,10 @@ return [
         'employee.advisers.destroy' => 'asesores.eliminar',
         'employee.advisers.*' => 'asesores.ver',
 
-        // Control Interno
-        'employee.control-interno.solicitudes.manual.update' => 'control_interno.editar',
-        'employee.control-interno.parametros.*' => 'control_interno.parametros',
-        'employee.control-interno.feriados.*' => 'control_interno.parametros',
-        'employee.control-interno.*' => 'control_interno.ver',
-        'employee.solicitudes.control-interno' => 'control_interno.ver',
+        // Control General (Internas, TC, Habilitación)
+        'employee.control-general.update' => 'control_general.editar',
+        'employee.control-general.parametros.*' => 'control_general.parametros',
+        'employee.control-general.*' => 'control_general.ver',
 
         // Materiales: catálogo
         'employee.materiales.parametros.*' => 'catalogo.parametros',

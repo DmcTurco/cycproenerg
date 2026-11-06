@@ -63,30 +63,16 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware(['auth:employee', 'permiso'])-
     Route::get('/solicitudes/{id}/detalle', function ($id) {
         return view('employee.pages.clients.detail', compact('id'));
     })->name('solicitudes.detalle');
-    // Vista propia de Control Interno por solicitud (separada del Detalle de
-    // Solicitud para que ese detalle siga siendo una vista rápida de solo
-    // lectura, sin pagar el costo de cargar/editar Control Interno).
-    Route::get('/solicitudes/{id}/control-interno', function ($id) {
-        return view('employee.pages.clients.control-interno', compact('id'));
-    })->name('solicitudes.control-interno');
     Route::get('/check-progress/{fileId}', [Employee\ClientController::class, 'checkProgress'])->name('check-progress');
 
-    // Control Interno (migración de CONTROL INTERNAS - CYC CLB v5.4.xlsm).
-    Route::prefix('control-interno')->name('control-interno.')->group(function () {
-        // CI-9: listado de solicitudes con su fase/semáforo de Control Interno.
-        Route::get('/', [Employee\ControlInternoController::class, 'index'])->name('index');
-        // CI-10: dashboard / resumen ejecutivo (conteo por fase/empresa, bitácora de la última carga, IND2/puntaje de CI-7).
-        Route::get('/resumen', [Employee\ControlInternoDashboardController::class, 'index'])->name('resumen');
-        Route::get('/parametros', [Employee\ParametroControlInternoController::class, 'edit'])->name('parametros.edit');
-        Route::put('/parametros', [Employee\ParametroControlInternoController::class, 'update'])->name('parametros.update');
-        Route::resource('feriados', Employee\FeriadoController::class)
-            ->only(['index', 'store', 'edit', 'destroy'])
-            ->names('feriados');
-
-        // CI-3: columnas manuales (F. CONSTRUCCIÓN control, OBSERVACIÓN, ANULAR)
-        // editables desde el detalle de la solicitud.
-        Route::get('/solicitudes/{solicitud}/manual', [Employee\ControlInternoManualController::class, 'show'])->name('solicitudes.manual.show');
-        Route::put('/solicitudes/{solicitud}/manual', [Employee\ControlInternoManualController::class, 'update'])->name('solicitudes.manual.update');
+    // Control General: Internas · TC · Habilitación (migración del Excel
+    // "Control General CLB - C&C.xlsm", ver docs/modulos/control-general.md).
+    Route::prefix('control-general')->name('control-general.')->group(function () {
+        Route::get('/', [Employee\ControlGeneralController::class, 'index'])->name('index');
+        Route::get('/resumen', [Employee\ControlGeneralController::class, 'resumen'])->name('resumen');
+        Route::get('/parametros', [Employee\ParametroControlGeneralController::class, 'edit'])->name('parametros.edit');
+        Route::put('/parametros', [Employee\ParametroControlGeneralController::class, 'update'])->name('parametros.update');
+        Route::patch('/{controlGeneral}', [Employee\ControlGeneralController::class, 'update'])->name('update');
     });
 
     // Control de Materiales (migración de CONTROL_MATERIALES_CC_08-2026 rev 02.xlsm).
@@ -100,7 +86,7 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware(['auth:employee', 'permiso'])-
     Route::delete('usuarios/{usuario}', [Employee\UsuarioController::class, 'destroy'])->name('usuarios.destroy');
     Route::resource('roles', Employee\RolController::class)->except('show')->parameters(['roles' => 'rol']);
 
-    // Módulo nuevo e independiente de Control Interno (ver docs/modulos/control-materiales.md).
+    // Control de Materiales (ver docs/modulos/control-materiales.md).
     Route::prefix('materiales')->name('materiales.')->group(function () {
         // CM-1: pantalla de Catálogo (pestañas Materiales / Herramientas).
         Route::get('/', [Employee\CatalogoController::class, 'index'])->name('index');

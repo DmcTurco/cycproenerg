@@ -262,8 +262,7 @@ class MaterialController extends Controller
             'stock_inicial', 'stock_minimo', 'factor_metros_por_unidad',
         ]);
         // El formulario trabaja el margen en porcentaje (0-100); en base de
-        // datos se guarda como fracción (0-1), igual que el resto del
-        // sistema (ver ParametroControlInterno::meta_ind2).
+        // datos se guarda como fracción (0-1).
         $data['margen_pct'] = $request->filled('margen_pct') ? round($request->margen_pct / 100, 4) : null;
 
         if ($materialId) {

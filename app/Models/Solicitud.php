@@ -75,13 +75,11 @@ class Solicitud extends Model
     }
 
     /**
-     * Fase de Control Interno (GENERAL / CONSTRUIDO / TC / PEND_ANULACION).
-     * Independiente de estadoSolicitud(), que es el estado de asignación a
-     * técnico de campo.
+     * Control General (Internas · TC · Habilitación) — ver ControlGeneral.
      */
-    public function faseControlInterno()
+    public function controlGeneral()
     {
-        return $this->hasOne(FaseControlInterno::class, 'solicitud_id');
+        return $this->hasOne(ControlGeneral::class);
     }
 
 

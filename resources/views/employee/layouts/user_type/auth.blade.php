@@ -22,9 +22,5 @@
             <x-flash-alert />
             @yield('content')
         </main>
-
-        @empty($fullBleed)
-            @include('employee.layouts.footers.auth.footer')
-        @endempty
     </div>
 @endsection

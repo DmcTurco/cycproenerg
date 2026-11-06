@@ -57,12 +57,14 @@
                             {!! $link['icon'] ?? '' !!}
                         </svg>
                         <span class="flex-1 text-left">{{ $link['label'] }}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 transition-transform duration-150" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 transition-transform duration-150 {{ $childActive ? 'rotate-180' : '' }}" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                         </svg>
                     </button>
 
-                    <div x-show="open" x-transition x-cloak class="mt-1 space-y-1 pl-4">
+                    {{-- El grupo activo ya viene abierto desde el servidor (sin x-cloak): si se
+                         esperara a Alpine para mostrarlo, el menú "saltaba" al cargar cada página. --}}
+                    <div x-show="open" x-transition @unless ($childActive) x-cloak @endunless class="mt-1 space-y-1 pl-4">
                         @foreach ($link['children'] as $child)
                             <a
                                 href="{{ route($child['route']) }}"
@@ -97,6 +99,10 @@
             @endif
         @endforeach
     </nav>
+
+    <div class="shrink-0 border-t border-white/10 px-6 py-3 text-[11px] leading-4 text-gray-500">
+        &copy; {{ date('Y') }} {{ $brand }}<br>Todos los derechos reservados.
+    </div>
 </aside>
 
 <div

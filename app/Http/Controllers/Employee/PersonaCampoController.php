@@ -119,8 +119,9 @@ class PersonaCampoController extends Controller
             );
         }
 
-        // Si se quitó el acceso a la app, se cierran sus sesiones abiertas.
-        if (!$persona->usaApp()) {
+        // Si se quitó el acceso a la app o se la pasó a INACTIVO, se cierran
+        // sus sesiones abiertas (el middleware persona.campo igual lo frena).
+        if (!$persona->usaApp() || !$persona->estaActivo()) {
             $persona->tokens()->delete();
         }
 

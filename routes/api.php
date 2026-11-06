@@ -20,7 +20,7 @@ Route::get('/check-connection', function () {
     return response()->json(['status' => 'ok']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'persona.campo'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
