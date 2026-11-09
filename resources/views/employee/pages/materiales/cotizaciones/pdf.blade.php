@@ -87,7 +87,7 @@
 
     <div class="footer-note">
         @if ($cotizacion->es_vale)
-            Registrado como USO INTERNO (no se cobra). El stock baja cuando se registre lo ejecutado.
+            Registrado como USO INTERNO (no se cobra). El stock bajó al emitir este vale; lo no usado se devuelve y vuelve al stock.
         @else
             Registrada como PENDIENTE de descuento en valorización. El stock quedó descontado automáticamente al emitir este documento.
         @endif

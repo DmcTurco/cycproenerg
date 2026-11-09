@@ -1,0 +1,4818 @@
+{
+ "parametros": {
+  "igv": 0.18,
+  "margen_general": 0.1,
+  "umbral_alarma_precio": 0.05
+ },
+ "personas": [
+  {
+   "nombre": "DIEGO ARMANDO MORENO COSINGA",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": "70898518",
+   "fecha_nacimiento": null,
+   "celular": "952031340",
+   "empresas": [
+    "CLB"
+   ]
+  },
+  {
+   "nombre": "JAIME PAYANO PONCE",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": "43060266",
+   "fecha_nacimiento": null,
+   "celular": "941807035",
+   "empresas": [
+    "CLB",
+    "CYC"
+   ]
+  },
+  {
+   "nombre": "JESUS ENRIQUE GUTIERREZ BRICEÑO",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": "77016780",
+   "fecha_nacimiento": null,
+   "celular": "941807035",
+   "empresas": []
+  },
+  {
+   "nombre": "CESAR CRISTHIAN CASTRO REYES",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": "43141857",
+   "fecha_nacimiento": null,
+   "celular": "941391432",
+   "empresas": []
+  },
+  {
+   "nombre": "LUIS JAVIER MENDOZA LIÑAN",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": "44045675",
+   "fecha_nacimiento": "1986-12-20",
+   "celular": "912098204",
+   "empresas": [
+    "CYC"
+   ]
+  },
+  {
+   "nombre": "CLARA RAMIREZ ORDOÑEZ",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": "10776813",
+   "fecha_nacimiento": null,
+   "celular": "942330199",
+   "empresas": []
+  },
+  {
+   "nombre": "JAIRO JEANPIERS ESPINOZA ZAPATA",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": "76478459",
+   "fecha_nacimiento": "1994-10-29",
+   "celular": "906197759",
+   "empresas": [
+    "CLB",
+    "CYC"
+   ]
+  },
+  {
+   "nombre": "FREDY SOCOLA CORNEJO",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": "03881773",
+   "fecha_nacimiento": "1972-07-18",
+   "celular": "942926198",
+   "empresas": [
+    "CYC"
+   ]
+  },
+  {
+   "nombre": "SALINAS MARIANO MILLA MILLA",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": "43694840",
+   "fecha_nacimiento": "1986-08-11",
+   "celular": "933224991",
+   "empresas": [
+    "CLB"
+   ]
+  },
+  {
+   "nombre": "RONALDO ERIL CAJAS GUILLEN",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": "76351073",
+   "fecha_nacimiento": "1998-10-24",
+   "celular": "935823671",
+   "empresas": [
+    "CLB"
+   ]
+  },
+  {
+   "nombre": "RUSELL JARISON LAZO BAILON",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": "77920345",
+   "fecha_nacimiento": "1997-05-22",
+   "celular": "930824453",
+   "empresas": [
+    "CYC"
+   ]
+  },
+  {
+   "nombre": "TONY MICHAEL QUICHUA SOSA",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": "47650005",
+   "fecha_nacimiento": "1992-03-18",
+   "celular": "944081316",
+   "empresas": [
+    "CYC"
+   ]
+  },
+  {
+   "nombre": "EMILIO OLIVEROS AVALOS",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": null,
+   "fecha_nacimiento": null,
+   "celular": null,
+   "empresas": []
+  },
+  {
+   "nombre": "JIAN CARLO CASTRO LAIME",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": "45304747",
+   "fecha_nacimiento": null,
+   "celular": null,
+   "empresas": []
+  },
+  {
+   "nombre": "JAIRO GERSON SANDOVAL LLONTO",
+   "tipo": "PERSONAL DIRECTO",
+   "estado": "ACTIVO",
+   "dni": "75324340",
+   "fecha_nacimiento": null,
+   "celular": null,
+   "empresas": []
+  },
+  {
+   "nombre": "LEONEL CESAR NAMOC",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": null,
+   "fecha_nacimiento": null,
+   "celular": null,
+   "empresas": []
+  },
+  {
+   "nombre": "STEFANY BRICEÑO",
+   "tipo": "CONTRATISTA",
+   "estado": "ACTIVO",
+   "dni": null,
+   "fecha_nacimiento": null,
+   "celular": null,
+   "empresas": []
+  }
+ ],
+ "materiales": [
+  {
+   "codigo": "20251001",
+   "descripcion": "TUBERIA PEALPE P/GAS 1216 AMARILLO ROLLO 200 MTS.",
+   "unidad": "RLL",
+   "margen_pct": 0.05,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 294.26,
+   "factor_metros_por_unidad": 200
+  },
+  {
+   "codigo": "20251002",
+   "descripcion": "TUBERIA PEALPE P/GAS 2025 AMARILLO ROLLO 100 MTS.",
+   "unidad": "RLL",
+   "margen_pct": 0.05,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 310.07,
+   "factor_metros_por_unidad": 100
+  },
+  {
+   "codigo": "20251003",
+   "descripcion": "VALVULA BOLA PEALPE P/GAS 1216 C/MANGO MARIPOSA",
+   "unidad": "UNID",
+   "margen_pct": 0.06,
+   "stock_inicial": 66,
+   "stock_minimo": 5,
+   "precio_base": 8.51,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251004",
+   "descripcion": "VALVULA BOLA PEALPE P/GAS 2025 C/MANGO MARIPOSA",
+   "unidad": "UNID",
+   "margen_pct": 0.06,
+   "stock_inicial": 63,
+   "stock_minimo": 5,
+   "precio_base": 19.46,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251005",
+   "descripcion": "CONEC MEDID PEALPE P/GAS HEMBRA G3/4 X 2025 GRAFADO",
+   "unidad": "UNID",
+   "margen_pct": 0.06,
+   "stock_inicial": 60,
+   "stock_minimo": 5,
+   "precio_base": 7.9,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251006",
+   "descripcion": "UNION SIMPLE PEALPE P/GAS 1216 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.06,
+   "stock_inicial": 31,
+   "stock_minimo": 5,
+   "precio_base": 2.6,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251007",
+   "descripcion": "UNION SIMPLE PEALPE P/GAS 2025 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 37,
+   "stock_minimo": 5,
+   "precio_base": 6.69,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251008",
+   "descripcion": "UNION REDUCTORA PEALPE P/GAS 2025 X 1216 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 62,
+   "stock_minimo": 5,
+   "precio_base": 4.86,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251009",
+   "descripcion": "TEE PEALPE P/GAS 1216 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 32,
+   "stock_minimo": 5,
+   "precio_base": 6.69,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251010",
+   "descripcion": "TEE PEALPE P/GAS 2025 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 16,
+   "stock_minimo": 5,
+   "precio_base": 12.77,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251011",
+   "descripcion": "TEE RED.PEALPE P/GAS 25 X 16X 16 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 44,
+   "stock_minimo": 5,
+   "precio_base": 8.51,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251012",
+   "descripcion": "TEE RED.PEALPE P/GAS 25 X 25 X 16 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 16,
+   "stock_minimo": 5,
+   "precio_base": 8.51,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251013",
+   "descripcion": "CODO PEALPE P/GAS MACHO 1/2 NPT X 1216 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 71,
+   "stock_minimo": 5,
+   "precio_base": 3.34,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251014",
+   "descripcion": "CODO PEALPE P/GAS MACHO 1/2 NPT X 2025 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 39,
+   "stock_minimo": 5,
+   "precio_base": 8.51,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251015",
+   "descripcion": "CODO PEALPE P/GAS 1216 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 3.34,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251016",
+   "descripcion": "CODO PEALPE P/GAS 2025 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 9.42,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251017",
+   "descripcion": "CONECTOR MANGUERA GLP/GN 1/2 X 1.50 MTS.",
+   "unidad": "UNID",
+   "margen_pct": 0.13,
+   "stock_inicial": 45,
+   "stock_minimo": 5,
+   "precio_base": 6.99,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251018",
+   "descripcion": "CONECTOR MANGUERA GLP/GN 1/2 X 0.60 MTS.",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 40,
+   "stock_minimo": 5,
+   "precio_base": 6.69,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251019",
+   "descripcion": "TAPAVALVULAS",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 611,
+   "stock_minimo": 5,
+   "precio_base": 2.95,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251020",
+   "descripcion": "REJLLAS 280",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 123,
+   "stock_minimo": 5,
+   "precio_base": 1.5,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251021",
+   "descripcion": "REJILLAS 645",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 2,
+   "stock_minimo": 5,
+   "precio_base": 11,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251022",
+   "descripcion": "CHAPAS COMPLETAS",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 526,
+   "stock_minimo": 5,
+   "precio_base": 1.7,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251023",
+   "descripcion": "COCINA SEMINDUSTRIAL 2 HORNILLA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 2,
+   "stock_minimo": 5,
+   "precio_base": 80,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251024",
+   "descripcion": "COCINETA 2 HORNILLA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 33,
+   "stock_minimo": 5,
+   "precio_base": 27,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251025",
+   "descripcion": "FORMATO DE PLANO ISOMETRICO C&C",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 25,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251026",
+   "descripcion": "FORMATO DE PLANO DE VISTA EN PLANTA C&C",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 25,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251027",
+   "descripcion": "FORMATO DE PLANO ISOMETRICO CLB",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 25,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251028",
+   "descripcion": "FORMATO DE PLANO DE VISTA EN PLANTA CLB",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 25,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251029",
+   "descripcion": "GABINETE SIMPLE C&C",
+   "unidad": "UNID",
+   "margen_pct": 0.12,
+   "stock_inicial": 50,
+   "stock_minimo": 5,
+   "precio_base": 38,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251030",
+   "descripcion": "GABINETE DOBLE C&C",
+   "unidad": "UNID",
+   "margen_pct": 0.12,
+   "stock_inicial": 10,
+   "stock_minimo": 5,
+   "precio_base": 76,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251031",
+   "descripcion": "GABINETE TRIPLE C&C",
+   "unidad": "UNID",
+   "margen_pct": 0.12,
+   "stock_inicial": 7,
+   "stock_minimo": 5,
+   "precio_base": 105,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251032",
+   "descripcion": "GABINETE CUADRUPLE C&C",
+   "unidad": "UNID",
+   "margen_pct": 0.12,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 125,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251033",
+   "descripcion": "GABINETES G6",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 3,
+   "stock_minimo": 5,
+   "precio_base": 125,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251034",
+   "descripcion": "GABINETES S22",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 39,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251035",
+   "descripcion": "CODO MABE JUNIOR",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 28,
+   "stock_minimo": 5,
+   "precio_base": 4.1,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251036",
+   "descripcion": "CODO MABE 3/8",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 32,
+   "stock_minimo": 5,
+   "precio_base": 4.32,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251037",
+   "descripcion": "CODO CLIMATIC",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 23,
+   "stock_minimo": 5,
+   "precio_base": 4.86,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251038",
+   "descripcion": "CODO BOSCH",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 126,
+   "stock_minimo": 5,
+   "precio_base": 7,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251039",
+   "descripcion": "CODO CALLE GALVANIZADO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 8,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251040",
+   "descripcion": "BUSHING 1/8 X 1/2",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 6,
+   "stock_minimo": 5,
+   "precio_base": 3,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251041",
+   "descripcion": "BUSHING 1/2 X 1/2",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 16,
+   "stock_minimo": 5,
+   "precio_base": 6,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251042",
+   "descripcion": "BUSHING 3/8 X 1/2",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 11,
+   "stock_minimo": 5,
+   "precio_base": 4,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251043",
+   "descripcion": "BUSHING 3/4 X 1/2",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 7,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251044",
+   "descripcion": "TEFLON",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 22,
+   "stock_minimo": 5,
+   "precio_base": 2,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251045",
+   "descripcion": "CORRUGADO 1216 (100 MTS.)",
+   "unidad": "Rll.",
+   "margen_pct": 0.1,
+   "stock_inicial": 1,
+   "stock_minimo": 5,
+   "precio_base": 55,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251046",
+   "descripcion": "CORRUGADO 2025 (50 MTS.)",
+   "unidad": "Rll.",
+   "margen_pct": 0.1,
+   "stock_inicial": 1,
+   "stock_minimo": 5,
+   "precio_base": 60,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251047",
+   "descripcion": "REGULADOR HUNCAR",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 3,
+   "stock_minimo": 5,
+   "precio_base": 180,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251048",
+   "descripcion": "REGULADOR ALIANCA GLP",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251049",
+   "descripcion": "REGULADOR B10 / B6",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251050",
+   "descripcion": "FUERZA MEDIA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 23,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251051",
+   "descripcion": "NIPLES 1/2 BRONCE",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 4,
+   "stock_minimo": 5,
+   "precio_base": 4,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251052",
+   "descripcion": "NIPLES 3/4 BRONCE",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 3,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251053",
+   "descripcion": "Grapas Depson 1216",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251054",
+   "descripcion": "Grapas Depson 2025",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251055",
+   "descripcion": "BORAX",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 1,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251056",
+   "descripcion": "LLAVE DE GABINETE",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251057",
+   "descripcion": "TRANSCISION G10",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251058",
+   "descripcion": "BUTANO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 1,
+   "stock_minimo": 5,
+   "precio_base": 28,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251059",
+   "descripcion": "BROQUERO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251060",
+   "descripcion": "DISCO MADERA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251061",
+   "descripcion": "DISCO ASAKI 4 1/2\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 4,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251062",
+   "descripcion": "ADAPTADOR 3/4",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251063",
+   "descripcion": "DISCO DE CONCRETO \"NOA\" 7\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 3,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251064",
+   "descripcion": "TIJERA CORTA TUBO PEALPE",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251065",
+   "descripcion": "PONCHADORA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251066",
+   "descripcion": "RESORTE INTERNO 1216",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251067",
+   "descripcion": "RESORTE EXTERNO 1216",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251068",
+   "descripcion": "RESORTE INTERNO 2025",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251069",
+   "descripcion": "RESORTE EXTERNO 2025",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251070",
+   "descripcion": "ABOSINADOR 3 EN 1",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251071",
+   "descripcion": "DISCO DE CONCRETO 9\" MAKITA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 6,
+   "stock_minimo": 5,
+   "precio_base": 70,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251072",
+   "descripcion": "DISCO DE CONCRETO 9\" INUNSUR",
+   "unidad": "UNID",
+   "margen_pct": 0.05,
+   "stock_inicial": 6,
+   "stock_minimo": 5,
+   "precio_base": 175,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251073",
+   "descripcion": "VARILLAS COBRE",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 78,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251074",
+   "descripcion": "CHALECO C&C TALLA \"S\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251075",
+   "descripcion": "CHALECO C&C TALLA \"M\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251076",
+   "descripcion": "CHALECO C&C TALLA \"L\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251077",
+   "descripcion": "CHALECO C&C TALLA \"XL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251078",
+   "descripcion": "CHALECO C&C TALLA \"XXL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251079",
+   "descripcion": "CHALECO CLB TALLA \"S\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251080",
+   "descripcion": "CHALECO CLB TALLA \"M\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 3,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251081",
+   "descripcion": "CHALECO CLB TALLA \"L\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 6,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251082",
+   "descripcion": "CHALECO CLB TALLA \"XL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 4,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251083",
+   "descripcion": "CHALECO CLB TALLA \"XXL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251084",
+   "descripcion": "ZAPATO TALLA 38",
+   "unidad": "PAR",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251085",
+   "descripcion": "ZAPATO TALLA 39",
+   "unidad": "PAR",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251086",
+   "descripcion": "ZAPATO TALLA 40",
+   "unidad": "PAR",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251087",
+   "descripcion": "ZAPATO TALLA 41",
+   "unidad": "PAR",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251088",
+   "descripcion": "ZAPATO TALLA 42",
+   "unidad": "PAR",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251089",
+   "descripcion": "ZAPATO TALLA 43",
+   "unidad": "PAR",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251090",
+   "descripcion": "ZAPATO TALLA 44",
+   "unidad": "PAR",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251091",
+   "descripcion": "PANTALON TALLA 28",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 33,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251092",
+   "descripcion": "PANTALON TALLA 30",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 5,
+   "stock_minimo": 5,
+   "precio_base": 35,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251093",
+   "descripcion": "PANTALON TALLA 32",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 3,
+   "stock_minimo": 5,
+   "precio_base": 35,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251094",
+   "descripcion": "PANTALON TALLA 34",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 35,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251095",
+   "descripcion": "PANTALON TALLA 36",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 3,
+   "stock_minimo": 5,
+   "precio_base": 37,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251096",
+   "descripcion": "POLO C&C TALLA \"S\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 22,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251097",
+   "descripcion": "POLO C&C TALLA \"M\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 24,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251098",
+   "descripcion": "POLO C&C TALLA \"L\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 1,
+   "stock_minimo": 5,
+   "precio_base": 24,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251099",
+   "descripcion": "POLO C&C TALLA \"XL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 26,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251100",
+   "descripcion": "POLO C&C TALLA \"XXL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251101",
+   "descripcion": "POLO CLB TALLA \"S\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 22,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251102",
+   "descripcion": "POLO CLB TALLA \"M\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 24,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251103",
+   "descripcion": "POLO CLB TALLA \"L\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 9,
+   "stock_minimo": 5,
+   "precio_base": 24,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251104",
+   "descripcion": "POLO CLB TALLA \"XL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 26,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251105",
+   "descripcion": "POLO CLB TALLA \"XXL\"",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 5,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251106",
+   "descripcion": "RESPIRADOR CON FILTRO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 10,
+   "stock_minimo": 5,
+   "precio_base": 29,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251107",
+   "descripcion": "GAFAS DE SEGURIDAD",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 24,
+   "stock_minimo": 6,
+   "precio_base": 2.92,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251108",
+   "descripcion": "GUANTES SUPERFLEX",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 10,
+   "stock_minimo": 0,
+   "precio_base": 3.2,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251109",
+   "descripcion": "GUANTES TRX CAL 25",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 10,
+   "stock_minimo": 0,
+   "precio_base": 8,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251110",
+   "descripcion": "GUANTES BADANA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 10,
+   "stock_minimo": 0,
+   "precio_base": 5.3,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251111",
+   "descripcion": "BARBIQUEJO DE SEGURIDAD",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 16,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251112",
+   "descripcion": "LINTERNA MINERO TRUPPER",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 10,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251113",
+   "descripcion": "MANOMETRO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 4,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251114",
+   "descripcion": "VALVULA DECORATIVA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 4,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251115",
+   "descripcion": "VALVULA DE SERVICIO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 1,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251116",
+   "descripcion": "TAMPONES DE OIDO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 60,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251117",
+   "descripcion": "TUBERIA PEALPE INUNSUR 1216 AMARILLO ROLLO 200 MTS.",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251118",
+   "descripcion": "TUBERIA PEALPE INUNSUR 2025 AMARILLO ROLLO 100 MTS.",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251119",
+   "descripcion": "VALVULA BOLA PEALPE INUNSUR 1216 C/MANGO MARIPOSA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251120",
+   "descripcion": "VALVULA BOLA PEALPE INUNSUR 2025 C/MANGO MARIPOSA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251121",
+   "descripcion": "CONEC MEDID PEALPE INUNSUR HEMBRA G3/4 X 2025 GRAFADO",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251122",
+   "descripcion": "UNION REDUCTORA PEALPE INUNSUR 2025 X 1216 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  },
+  {
+   "codigo": "20251123",
+   "descripcion": "CODO PEALPE INUNSUR MACHO 1/2 NPT X 1216 GRAFADA",
+   "unidad": "UNID",
+   "margen_pct": 0.1,
+   "stock_inicial": 0,
+   "stock_minimo": 0,
+   "precio_base": 0,
+   "factor_metros_por_unidad": 1
+  }
+ ],
+ "herramientas": [
+  {
+   "codigo": "HER-001",
+   "descripcion": "TALADRO PERCUTOR",
+   "marca_modelo": "BOSCH GSB 550",
+   "numero_serie": "SN-448812",
+   "fecha_compra": "2026-07-10",
+   "precio": 380,
+   "estado": "OPERATIVA",
+   "observacion": "Fila de EJEMPLO, puedes borrarla"
+  },
+  {
+   "codigo": "HER-002",
+   "descripcion": "AMOLADORA 4 1/2\"",
+   "marca_modelo": "DEWALT DWE4010",
+   "numero_serie": "SN-993321",
+   "fecha_compra": "2026-07-10",
+   "precio": 245,
+   "estado": "OPERATIVA",
+   "observacion": null
+  }
+ ],
+ "ingresos": [
+  {
+   "fecha": "2026-09-25",
+   "codigo": "20251034",
+   "cantidad": 4,
+   "proveedor": "GABINETES PERÚ",
+   "guia_factura": null,
+   "precio_compra": 39,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251001",
+   "cantidad": 4,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 298.39,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251002",
+   "cantidad": 4,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 314.42,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251003",
+   "cantidad": 40,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 8.63,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251004",
+   "cantidad": 50,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 19.73,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251005",
+   "cantidad": 40,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 8.01,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251008",
+   "cantidad": 40,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 4.93,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251013",
+   "cantidad": 40,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 3.39,
+   "observacion": null
+  },
+  {
+   "fecha": "2026-09-30",
+   "codigo": "20251017",
+   "cantidad": 40,
+   "proveedor": "DINCORSA",
+   "guia_factura": null,
+   "precio_compra": 7.09,
+   "observacion": null
+  }
+ ],
+ "cotizaciones": [
+  {
+   "numero": "C&C-260716-01",
+   "fecha": "2026-08-26",
+   "persona": "JAIME PAYANO PONCE",
+   "monto_sin_igv": 59.96,
+   "igv": 10.79,
+   "total_con_igv": 70.75,
+   "estado": "SIN REGISTRO - CONFIRMAR",
+   "n_valorizacion": null,
+   "observacion": "Estaba en el detalle y descontaba stock, pero no figuraba en esta lista",
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251009",
+     "cantidad": 4,
+     "precio_unitario": 5.45,
+     "total": 21.8
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 2,
+     "precio_unitario": 17.97,
+     "total": 35.94
+    },
+    {
+     "codigo": "20251006",
+     "cantidad": 1,
+     "precio_unitario": 2.22,
+     "total": 2.22
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260826-01",
+   "fecha": "2026-08-26",
+   "persona": "DIEGO ARMANDO MORENO COSINGA",
+   "monto_sin_igv": 17.55,
+   "igv": 3.16,
+   "total_con_igv": 20.71,
+   "estado": "SIN REGISTRO - CONFIRMAR",
+   "n_valorizacion": null,
+   "observacion": "Estaba en el detalle y descontaba stock, pero no figuraba en esta lista",
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 10.51,
+     "total": 10.51
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.04,
+     "total": 7.04
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260826-02",
+   "fecha": "2026-08-26",
+   "persona": "DIEGO ARMANDO MORENO COSINGA",
+   "monto_sin_igv": 335.01,
+   "igv": 60.3,
+   "total_con_igv": 395.31,
+   "estado": "SIN REGISTRO - CONFIRMAR",
+   "n_valorizacion": null,
+   "observacion": "Estaba en el detalle y descontaba stock, pero no figuraba en esta lista",
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 324.5,
+     "total": 324.5
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 10.51,
+     "total": 10.51
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260826-03",
+   "fecha": "2026-08-26",
+   "persona": "CESAR CRISTHIAN CASTRO REYES",
+   "monto_sin_igv": 28.48,
+   "igv": 5.13,
+   "total_con_igv": 33.61,
+   "estado": "SIN REGISTRO - CONFIRMAR",
+   "n_valorizacion": null,
+   "observacion": "Estaba en el detalle y descontaba stock, pero no figuraba en esta lista",
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 10.51,
+     "total": 10.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 17.97,
+     "total": 17.97
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260901-01",
+   "fecha": "2026-09-01",
+   "persona": "CLARA RAMIREZ ORDOÑEZ",
+   "monto_sin_igv": 384.56,
+   "igv": 69.22,
+   "total_con_igv": 453.78,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 325.57,
+     "total": 325.57
+    },
+    {
+     "codigo": "20251014",
+     "cantidad": 1,
+     "precio_unitario": 9.36,
+     "total": 9.36
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 2,
+     "precio_unitario": 20.63,
+     "total": 41.26
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 8.37,
+     "total": 8.37
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260903-01",
+   "fecha": "2026-09-03",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 263.75,
+   "igv": 47.48,
+   "total_con_igv": 311.23,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 2,
+     "precio_unitario": 38,
+     "total": 76
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 5,
+     "precio_unitario": 2.95,
+     "total": 14.75
+    },
+    {
+     "codigo": "20251021",
+     "cantidad": 8,
+     "precio_unitario": 11,
+     "total": 88
+    },
+    {
+     "codigo": "20251020",
+     "cantidad": 10,
+     "precio_unitario": 1.5,
+     "total": 15
+    },
+    {
+     "codigo": "20251071",
+     "cantidad": 1,
+     "precio_unitario": 70,
+     "total": 70
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260903-02",
+   "fecha": "2026-09-03",
+   "persona": "JIAN CARLO CASTRO LAIME",
+   "monto_sin_igv": 111.2,
+   "igv": 20.02,
+   "total_con_igv": 131.22,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251017",
+     "cantidad": 10,
+     "precio_unitario": 6.99,
+     "total": 69.9
+    },
+    {
+     "codigo": "20251022",
+     "cantidad": 10,
+     "precio_unitario": 1.7,
+     "total": 17
+    },
+    {
+     "codigo": "20251037",
+     "cantidad": 5,
+     "precio_unitario": 4.86,
+     "total": 24.3
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260904-01",
+   "fecha": "2026-09-04",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 557.91,
+   "igv": 100.42,
+   "total_con_igv": 658.3299999999999,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251033",
+     "cantidad": 1,
+     "precio_unitario": 125,
+     "total": 125
+    },
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 310.07,
+     "total": 310.07
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 5,
+     "precio_unitario": 19.46,
+     "total": 97.3
+    },
+    {
+     "codigo": "20251010",
+     "cantidad": 2,
+     "precio_unitario": 12.77,
+     "total": 25.54
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260907-01",
+   "fecha": "2026-09-07",
+   "persona": "JESUS ENRIQUE GUTIERREZ BRICEÑO",
+   "monto_sin_igv": 289.14,
+   "igv": 52.05,
+   "total_con_igv": 341.19,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251031",
+     "cantidad": 2,
+     "precio_unitario": 115.5,
+     "total": 231
+    },
+    {
+     "codigo": "20251006",
+     "cantidad": 6,
+     "precio_unitario": 2.76,
+     "total": 16.56
+    },
+    {
+     "codigo": "20251007",
+     "cantidad": 3,
+     "precio_unitario": 7.36,
+     "total": 22.08
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 6,
+     "precio_unitario": 3.25,
+     "total": 19.5
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260907-01",
+   "fecha": "2026-09-07",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "monto_sin_igv": 179,
+   "igv": 32.22,
+   "total_con_igv": 211.22,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251020",
+     "cantidad": 10,
+     "precio_unitario": 1.5,
+     "total": 15
+    },
+    {
+     "codigo": "20251021",
+     "cantidad": 10,
+     "precio_unitario": 11,
+     "total": 110
+    },
+    {
+     "codigo": "20251024",
+     "cantidad": 2,
+     "precio_unitario": 27,
+     "total": 54
+    },
+    {
+     "codigo": "20251086",
+     "cantidad": 1,
+     "precio_unitario": 0,
+     "total": 0
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260908-01",
+   "fecha": "2026-09-08",
+   "persona": "DIEGO ARMANDO MORENO COSINGA",
+   "monto_sin_igv": 599.54,
+   "igv": 107.92,
+   "total_con_igv": 707.4599999999999,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 4,
+     "precio_unitario": 9.02,
+     "total": 36.08
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 4,
+     "precio_unitario": 20.63,
+     "total": 82.52
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 4,
+     "precio_unitario": 8.37,
+     "total": 33.48
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 4,
+     "precio_unitario": 5.35,
+     "total": 21.4
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 4,
+     "precio_unitario": 3.67,
+     "total": 14.68
+    },
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 83.6,
+     "total": 83.6
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 2,
+     "precio_unitario": 41.8,
+     "total": 83.6
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260908-01",
+   "fecha": "2026-09-08",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 398.55999999999995,
+   "igv": 71.74,
+   "total_con_igv": 470.29999999999995,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 295,
+     "total": 295
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 2,
+     "precio_unitario": 8.51,
+     "total": 17.02
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 2,
+     "precio_unitario": 3.34,
+     "total": 6.68
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 1,
+     "precio_unitario": 6.69,
+     "total": 6.69
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260909-01",
+   "fecha": "2026-09-09",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 68.58,
+   "igv": 12.34,
+   "total_con_igv": 80.92,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251017",
+     "cantidad": 3,
+     "precio_unitario": 6.99,
+     "total": 20.97
+    },
+    {
+     "codigo": "20251018",
+     "cantidad": 3,
+     "precio_unitario": 6.69,
+     "total": 20.07
+    },
+    {
+     "codigo": "20251037",
+     "cantidad": 3,
+     "precio_unitario": 4.86,
+     "total": 14.58
+    },
+    {
+     "codigo": "20251036",
+     "cantidad": 3,
+     "precio_unitario": 4.32,
+     "total": 12.96
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260910-01",
+   "fecha": "2026-09-10",
+   "persona": "LUIS JAVIER MENDOZA LIÑAN",
+   "monto_sin_igv": 722.9,
+   "igv": 130.12,
+   "total_con_igv": 853.02,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251032",
+     "cantidad": 1,
+     "precio_unitario": 137.5,
+     "total": 137.5
+    },
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 83.6,
+     "total": 83.6
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 5,
+     "precio_unitario": 9.02,
+     "total": 45.1
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 5,
+     "precio_unitario": 20.63,
+     "total": 103.15
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 5,
+     "precio_unitario": 8.37,
+     "total": 41.85
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 5,
+     "precio_unitario": 5.35,
+     "total": 26.75
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 5,
+     "precio_unitario": 3.67,
+     "total": 18.35
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 5,
+     "precio_unitario": 3.25,
+     "total": 16.25
+    },
+    {
+     "codigo": "20251072",
+     "cantidad": 1,
+     "precio_unitario": 183.75,
+     "total": 183.75
+    },
+    {
+     "codigo": "20251102",
+     "cantidad": 2,
+     "precio_unitario": 26.4,
+     "total": 52.8
+    },
+    {
+     "codigo": "20251006",
+     "cantidad": 5,
+     "precio_unitario": 2.76,
+     "total": 13.8
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260910-02",
+   "fecha": "2026-09-10",
+   "persona": "CLARA RAMIREZ ORDOÑEZ",
+   "monto_sin_igv": 201.26999999999998,
+   "igv": 36.23,
+   "total_con_igv": 237.49999999999997,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 3,
+     "precio_unitario": 9.02,
+     "total": 27.06
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 3,
+     "precio_unitario": 20.63,
+     "total": 61.89
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 3,
+     "precio_unitario": 8.37,
+     "total": 25.11
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 3,
+     "precio_unitario": 5.35,
+     "total": 16.05
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 3,
+     "precio_unitario": 3.67,
+     "total": 11.01
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 3,
+     "precio_unitario": 7.36,
+     "total": 22.08
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 3,
+     "precio_unitario": 9.02,
+     "total": 27.06
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 3,
+     "precio_unitario": 3.67,
+     "total": 11.01
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260910-03",
+   "fecha": "2026-09-10",
+   "persona": "JESUS ENRIQUE GUTIERREZ BRICEÑO",
+   "monto_sin_igv": 701.4499999999999,
+   "igv": 126.26,
+   "total_con_igv": 827.7099999999999,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251030",
+     "cantidad": 2,
+     "precio_unitario": 83.6,
+     "total": 167.2
+    },
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 309.75,
+     "total": 309.75
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 5,
+     "precio_unitario": 9.02,
+     "total": 45.1
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 5,
+     "precio_unitario": 20.63,
+     "total": 103.15
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 5,
+     "precio_unitario": 8.37,
+     "total": 41.85
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 3,
+     "precio_unitario": 5.35,
+     "total": 16.05
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 5,
+     "precio_unitario": 3.67,
+     "total": 18.35
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260911-01",
+   "fecha": "2026-09-11",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 0,
+   "igv": 0,
+   "total_con_igv": 0,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251088",
+     "cantidad": 1,
+     "precio_unitario": 0,
+     "total": 0
+    },
+    {
+     "codigo": "20251086",
+     "cantidad": 1,
+     "precio_unitario": 0,
+     "total": 0
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260912-01",
+   "fecha": "2026-09-12",
+   "persona": "JAIRO GERSON SANDOVAL LLONTO",
+   "monto_sin_igv": 204.9,
+   "igv": 36.88,
+   "total_con_igv": 241.78,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251024",
+     "cantidad": 5,
+     "precio_unitario": 27,
+     "total": 135
+    },
+    {
+     "codigo": "20251017",
+     "cantidad": 10,
+     "precio_unitario": 6.99,
+     "total": 69.9
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260914-01",
+   "fecha": "2026-09-14",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 529.1899999999999,
+   "igv": 95.25,
+   "total_con_igv": 624.4399999999999,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": "MODIFICADA 17/09/2026",
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 310.07,
+     "total": 310.07
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 2,
+     "precio_unitario": 8.51,
+     "total": 17.02
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 2,
+     "precio_unitario": 19.46,
+     "total": 38.92
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 2,
+     "precio_unitario": 7.9,
+     "total": 15.8
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 2,
+     "precio_unitario": 4.86,
+     "total": 9.72
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 2,
+     "precio_unitario": 3.34,
+     "total": 6.68
+    },
+    {
+     "codigo": "20251020",
+     "cantidad": 8,
+     "precio_unitario": 1.5,
+     "total": 12
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 2,
+     "precio_unitario": 2.95,
+     "total": 5.9
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 2,
+     "precio_unitario": 38,
+     "total": 76
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 2,
+     "precio_unitario": 6.69,
+     "total": 13.38
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 2,
+     "precio_unitario": 3.34,
+     "total": 6.68
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 2,
+     "precio_unitario": 8.51,
+     "total": 17.02
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260915-01",
+   "fecha": "2026-09-15",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "monto_sin_igv": 60.2,
+   "igv": 10.84,
+   "total_con_igv": 71.04,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251022",
+     "cantidad": 10,
+     "precio_unitario": 1.7,
+     "total": 17
+    },
+    {
+     "codigo": "20251036",
+     "cantidad": 10,
+     "precio_unitario": 4.32,
+     "total": 43.2
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260916-01",
+   "fecha": "2026-09-16",
+   "persona": "CLARA RAMIREZ ORDOÑEZ",
+   "monto_sin_igv": 79.8,
+   "igv": 14.36,
+   "total_con_igv": 94.16,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 79.8,
+     "total": 79.8
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260917-01",
+   "fecha": "2026-09-17",
+   "persona": "DIEGO ARMANDO MORENO COSINGA",
+   "monto_sin_igv": 83.6,
+   "igv": 15.05,
+   "total_con_igv": 98.64999999999999,
+   "estado": "SIN REGISTRO - CONFIRMAR",
+   "n_valorizacion": null,
+   "observacion": "Estaba en el detalle y descontaba stock, pero no figuraba en esta lista",
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 2,
+     "precio_unitario": 41.8,
+     "total": 83.6
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260917-01",
+   "fecha": "2026-09-17",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 96.52,
+   "igv": 17.37,
+   "total_con_igv": 113.89,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260917-02",
+   "fecha": "2026-09-17",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 76,
+   "igv": 13.68,
+   "total_con_igv": 89.68,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 2,
+     "precio_unitario": 38,
+     "total": 76
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260917-03",
+   "fecha": "2026-09-17",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 38,
+   "igv": 6.84,
+   "total_con_igv": 44.84,
+   "estado": "SIN REGISTRO - CONFIRMAR",
+   "n_valorizacion": null,
+   "observacion": "Estaba en el detalle y descontaba stock, pero no figuraba en esta lista",
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260918-01",
+   "fecha": "2026-09-18",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 96.52,
+   "igv": 17.37,
+   "total_con_igv": 113.89,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260919-01",
+   "fecha": "2026-09-19",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 96.52,
+   "igv": 17.37,
+   "total_con_igv": 113.89,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260921-01",
+   "fecha": "2026-09-21",
+   "persona": "LUIS JAVIER MENDOZA LIÑAN",
+   "monto_sin_igv": 1175.57,
+   "igv": 211.6,
+   "total_con_igv": 1387.1699999999998,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 309.75,
+     "total": 309.75
+    },
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 325.57,
+     "total": 325.57
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 5,
+     "precio_unitario": 9.02,
+     "total": 45.1
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 5,
+     "precio_unitario": 20.63,
+     "total": 103.15
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 5,
+     "precio_unitario": 8.37,
+     "total": 41.85
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 5,
+     "precio_unitario": 5.35,
+     "total": 26.75
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 5,
+     "precio_unitario": 3.67,
+     "total": 18.35
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 5,
+     "precio_unitario": 3.25,
+     "total": 16.25
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 5,
+     "precio_unitario": 41.8,
+     "total": 209
+    },
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 79.8,
+     "total": 79.8
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260921-01",
+   "fecha": "2026-09-21",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "monto_sin_igv": 120.96000000000001,
+   "igv": 21.77,
+   "total_con_igv": 142.73000000000002,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251017",
+     "cantidad": 10,
+     "precio_unitario": 6.99,
+     "total": 69.9
+    },
+    {
+     "codigo": "20251018",
+     "cantidad": 4,
+     "precio_unitario": 6.69,
+     "total": 26.76
+    },
+    {
+     "codigo": "20251037",
+     "cantidad": 5,
+     "precio_unitario": 4.86,
+     "total": 24.3
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260921-02",
+   "fecha": "2026-09-21",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 97.11,
+   "igv": 17.48,
+   "total_con_igv": 114.59,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251004",
+     "cantidad": 2,
+     "precio_unitario": 19.46,
+     "total": 38.92
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260922-01",
+   "fecha": "2026-09-22",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 85.02,
+   "igv": 15.3,
+   "total_con_igv": 100.32,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260923-01",
+   "fecha": "2026-09-23",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 85.02,
+   "igv": 15.3,
+   "total_con_igv": 100.32,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260924-01",
+   "fecha": "2026-09-24",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 124.02,
+   "igv": 22.32,
+   "total_con_igv": 146.34,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    },
+    {
+     "codigo": "20251034",
+     "cantidad": 1,
+     "precio_unitario": 39,
+     "total": 39
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260926-01",
+   "fecha": "2026-09-26",
+   "persona": "LEONEL CESAR NAMOC",
+   "monto_sin_igv": 858.82,
+   "igv": 154.59,
+   "total_con_igv": 1013.4100000000001,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 308.97,
+     "total": 308.97
+    },
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 325.57,
+     "total": 325.57
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 4,
+     "precio_unitario": 9.02,
+     "total": 36.08
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 2,
+     "precio_unitario": 20.63,
+     "total": 41.26
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 2,
+     "precio_unitario": 8.37,
+     "total": 16.74
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 2,
+     "precio_unitario": 5.35,
+     "total": 10.7
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 4,
+     "precio_unitario": 3.67,
+     "total": 14.68
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 2,
+     "precio_unitario": 7.36,
+     "total": 14.72
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 2,
+     "precio_unitario": 41.8,
+     "total": 83.6
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 2,
+     "precio_unitario": 3.25,
+     "total": 6.5
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260926-01",
+   "fecha": "2026-09-26",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 85.02,
+   "igv": 15.3,
+   "total_con_igv": 100.32,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260928-01",
+   "fecha": "2026-09-28",
+   "persona": "DIEGO ARMANDO MORENO COSINGA",
+   "monto_sin_igv": 242.84,
+   "igv": 43.71,
+   "total_con_igv": 286.55,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251006",
+     "cantidad": 3,
+     "precio_unitario": 2.76,
+     "total": 8.28
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 3,
+     "precio_unitario": 5.42,
+     "total": 16.26
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 41.8,
+     "total": 41.8
+    },
+    {
+     "codigo": "20251033",
+     "cantidad": 1,
+     "precio_unitario": 137.5,
+     "total": 137.5
+    },
+    {
+     "codigo": "20251017",
+     "cantidad": 5,
+     "precio_unitario": 7.8,
+     "total": 39
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260928-01",
+   "fecha": "2026-09-28",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 362.48,
+   "igv": 65.25,
+   "total_con_igv": 427.73,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": "MODIFICADA 28/09/2026",
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 5,
+     "precio_unitario": 8.51,
+     "total": 42.55
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 5,
+     "precio_unitario": 19.46,
+     "total": 97.3
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 5,
+     "precio_unitario": 7.9,
+     "total": 39.5
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 5,
+     "precio_unitario": 4.86,
+     "total": 24.3
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 5,
+     "precio_unitario": 3.34,
+     "total": 16.7
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 2,
+     "precio_unitario": 6.69,
+     "total": 13.38
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 3,
+     "precio_unitario": 38,
+     "total": 114
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 5,
+     "precio_unitario": 2.95,
+     "total": 14.75
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260928-02",
+   "fecha": "2026-09-28",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 85.02,
+   "igv": 15.3,
+   "total_con_igv": 100.32,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.51,
+     "total": 8.51
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.46,
+     "total": 19.46
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 7.9,
+     "total": 7.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.86,
+     "total": 4.86
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.34,
+     "total": 3.34
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260928-03",
+   "fecha": "2026-09-28",
+   "persona": "JIAN CARLO CASTRO LAIME",
+   "monto_sin_igv": 237.5,
+   "igv": 42.75,
+   "total_con_igv": 280.25,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251024",
+     "cantidad": 5,
+     "precio_unitario": 27,
+     "total": 135
+    },
+    {
+     "codigo": "20251036",
+     "cantidad": 10,
+     "precio_unitario": 4.32,
+     "total": 43.2
+    },
+    {
+     "codigo": "20251037",
+     "cantidad": 5,
+     "precio_unitario": 4.86,
+     "total": 24.3
+    },
+    {
+     "codigo": "20251038",
+     "cantidad": 5,
+     "precio_unitario": 7,
+     "total": 35
+    }
+   ]
+  },
+  {
+   "numero": "C&C-260929-01",
+   "fecha": "2026-09-29",
+   "persona": "LUIS JAVIER MENDOZA LIÑAN",
+   "monto_sin_igv": 79.8,
+   "igv": 14.36,
+   "total_con_igv": 94.16,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 79.8,
+     "total": 79.8
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260930-01",
+   "fecha": "2026-09-30",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 225.64,
+   "igv": 40.62,
+   "total_con_igv": 266.26,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 3,
+     "precio_unitario": 38,
+     "total": 114
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 4,
+     "precio_unitario": 2.95,
+     "total": 11.8
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 4,
+     "precio_unitario": 8.63,
+     "total": 34.52
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 4,
+     "precio_unitario": 8.01,
+     "total": 32.04
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 4,
+     "precio_unitario": 4.93,
+     "total": 19.72
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 4,
+     "precio_unitario": 3.39,
+     "total": 13.56
+    }
+   ]
+  },
+  {
+   "numero": "VALE-260930-02",
+   "fecha": "2026-09-30",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 90.62,
+   "igv": 16.31,
+   "total_con_igv": 106.93,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 2,
+     "precio_unitario": 8.63,
+     "total": 17.26
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 2,
+     "precio_unitario": 3.39,
+     "total": 6.78
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 1,
+     "precio_unitario": 6.69,
+     "total": 6.69
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.93,
+     "total": 4.93
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 8.01,
+     "total": 8.01
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261001-01",
+   "fecha": "2026-10-01",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 462.53999999999996,
+   "igv": 83.26,
+   "total_con_igv": 545.8,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 314.42,
+     "total": 314.42
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.63,
+     "total": 8.63
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 3,
+     "precio_unitario": 19.73,
+     "total": 59.19
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 8.01,
+     "total": 8.01
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.93,
+     "total": 4.93
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.39,
+     "total": 3.39
+    },
+    {
+     "codigo": "20251014",
+     "cantidad": 2,
+     "precio_unitario": 8.51,
+     "total": 17.02
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261001-02",
+   "fecha": "2026-10-01",
+   "persona": "JIAN CARLO CASTRO LAIME",
+   "monto_sin_igv": 112.9,
+   "igv": 20.32,
+   "total_con_igv": 133.22,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251017",
+     "cantidad": 10,
+     "precio_unitario": 7.09,
+     "total": 70.9
+    },
+    {
+     "codigo": "20251022",
+     "cantidad": 10,
+     "precio_unitario": 1.7,
+     "total": 17
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261003-01",
+   "fecha": "2026-10-03",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 590.96,
+   "igv": 106.37,
+   "total_con_igv": 697.33,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251020",
+     "cantidad": 10,
+     "precio_unitario": 1.5,
+     "total": 15
+    },
+    {
+     "codigo": "20251021",
+     "cantidad": 1,
+     "precio_unitario": 11,
+     "total": 11
+    },
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 298.39,
+     "total": 298.39
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 5,
+     "precio_unitario": 8.63,
+     "total": 43.15
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 5,
+     "precio_unitario": 19.73,
+     "total": 98.65
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 5,
+     "precio_unitario": 8.01,
+     "total": 40.05
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 5,
+     "precio_unitario": 4.93,
+     "total": 24.65
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 5,
+     "precio_unitario": 3.39,
+     "total": 16.95
+    },
+    {
+     "codigo": "20251006",
+     "cantidad": 3,
+     "precio_unitario": 2.6,
+     "total": 7.8
+    },
+    {
+     "codigo": "20251007",
+     "cantidad": 3,
+     "precio_unitario": 6.69,
+     "total": 20.07
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 3,
+     "precio_unitario": 2.95,
+     "total": 8.85
+    },
+    {
+     "codigo": "20251108",
+     "cantidad": 2,
+     "precio_unitario": 3.2,
+     "total": 6.4
+    },
+    {
+     "codigo": "20251116",
+     "cantidad": 4,
+     "precio_unitario": 0,
+     "total": 0
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261003-02",
+   "fecha": "2026-10-03",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "monto_sin_igv": 390.03,
+   "igv": 70.21,
+   "total_con_igv": 460.23999999999995,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 8.63,
+     "total": 8.63
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 1,
+     "precio_unitario": 19.73,
+     "total": 19.73
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 1,
+     "precio_unitario": 8.01,
+     "total": 8.01
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 4.93,
+     "total": 4.93
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.39,
+     "total": 3.39
+    },
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 298.39,
+     "total": 298.39
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 1,
+     "precio_unitario": 2.95,
+     "total": 2.95
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 1,
+     "precio_unitario": 38,
+     "total": 38
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261005-01",
+   "fecha": "2026-10-05",
+   "persona": "LUIS JAVIER MENDOZA LIÑAN",
+   "monto_sin_igv": 684.62,
+   "igv": 123.23,
+   "total_con_igv": 807.85,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 10,
+     "precio_unitario": 9.15,
+     "total": 91.5
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 10,
+     "precio_unitario": 20.91,
+     "total": 209.1
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 10,
+     "precio_unitario": 8.49,
+     "total": 84.9
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 10,
+     "precio_unitario": 5.42,
+     "total": 54.2
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 10,
+     "precio_unitario": 3.73,
+     "total": 37.3
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 4,
+     "precio_unitario": 41.8,
+     "total": 167.2
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 10,
+     "precio_unitario": 3.25,
+     "total": 32.5
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261005-01",
+   "fecha": "2026-10-05",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 722.86,
+   "igv": 130.11,
+   "total_con_igv": 852.97,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251033",
+     "cantidad": 1,
+     "precio_unitario": 125,
+     "total": 125
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 3,
+     "precio_unitario": 38,
+     "total": 114
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 6,
+     "precio_unitario": 19.73,
+     "total": 118.38
+    },
+    {
+     "codigo": "20251014",
+     "cantidad": 6,
+     "precio_unitario": 8.51,
+     "total": 51.06
+    },
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 314.42,
+     "total": 314.42
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261007-01",
+   "fecha": "2026-10-07",
+   "persona": "DIEGO ARMANDO MORENO COSINGA",
+   "monto_sin_igv": 89.09,
+   "igv": 16.04,
+   "total_con_igv": 105.13,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251017",
+     "cantidad": 10,
+     "precio_unitario": 7.8,
+     "total": 78
+    },
+    {
+     "codigo": "20251018",
+     "cantidad": 1,
+     "precio_unitario": 7.36,
+     "total": 7.36
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 1,
+     "precio_unitario": 3.73,
+     "total": 3.73
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261007-02",
+   "fecha": "2026-10-07",
+   "persona": "STEFANY BRICEÑO",
+   "monto_sin_igv": 55,
+   "igv": 9.9,
+   "total_con_igv": 64.9,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251027",
+     "cantidad": 1,
+     "precio_unitario": 27.5,
+     "total": 27.5
+    },
+    {
+     "codigo": "20251028",
+     "cantidad": 1,
+     "precio_unitario": 27.5,
+     "total": 27.5
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261007-01",
+   "fecha": "2026-10-07",
+   "persona": "JAIRO GERSON SANDOVAL LLONTO",
+   "monto_sin_igv": 932.04,
+   "igv": 167.77,
+   "total_con_igv": 1099.81,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251001",
+     "cantidad": 1,
+     "precio_unitario": 298.39,
+     "total": 298.39
+    },
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 314.42,
+     "total": 314.42
+    },
+    {
+     "codigo": "20251017",
+     "cantidad": 17,
+     "precio_unitario": 7.09,
+     "total": 120.53
+    },
+    {
+     "codigo": "20251036",
+     "cantidad": 10,
+     "precio_unitario": 4.32,
+     "total": 43.2
+    },
+    {
+     "codigo": "20251035",
+     "cantidad": 5,
+     "precio_unitario": 4.1,
+     "total": 20.5
+    },
+    {
+     "codigo": "20251024",
+     "cantidad": 5,
+     "precio_unitario": 27,
+     "total": 135
+    },
+    {
+     "codigo": "20251119",
+     "cantidad": 10,
+     "precio_unitario": 0,
+     "total": 0
+    },
+    {
+     "codigo": "20251120",
+     "cantidad": 10,
+     "precio_unitario": 0,
+     "total": 0
+    },
+    {
+     "codigo": "20251121",
+     "cantidad": 10,
+     "precio_unitario": 0,
+     "total": 0
+    },
+    {
+     "codigo": "20251122",
+     "cantidad": 10,
+     "precio_unitario": 0,
+     "total": 0
+    },
+    {
+     "codigo": "20251123",
+     "cantidad": 10,
+     "precio_unitario": 0,
+     "total": 0
+    },
+    {
+     "codigo": "20251117",
+     "cantidad": 1,
+     "precio_unitario": 0,
+     "total": 0
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261009-01",
+   "fecha": "2026-10-09",
+   "persona": "CLARA RAMIREZ ORDOÑEZ",
+   "monto_sin_igv": 236.90000000000003,
+   "igv": 42.64,
+   "total_con_igv": 279.54,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 4,
+     "precio_unitario": 9.15,
+     "total": 36.6
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 2,
+     "precio_unitario": 20.91,
+     "total": 41.82
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 2,
+     "precio_unitario": 8.49,
+     "total": 16.98
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 2,
+     "precio_unitario": 5.42,
+     "total": 10.84
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 4,
+     "precio_unitario": 3.73,
+     "total": 14.92
+    },
+    {
+     "codigo": "20251007",
+     "cantidad": 2,
+     "precio_unitario": 7.36,
+     "total": 14.72
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 2,
+     "precio_unitario": 7.36,
+     "total": 14.72
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 2,
+     "precio_unitario": 3.25,
+     "total": 6.5
+    },
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 79.8,
+     "total": 79.8
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261012-01",
+   "fecha": "2026-10-12",
+   "persona": "JIAN CARLO CASTRO LAIME",
+   "monto_sin_igv": 147.55,
+   "igv": 26.56,
+   "total_con_igv": 174.11,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251017",
+     "cantidad": 10,
+     "precio_unitario": 7.09,
+     "total": 70.9
+    },
+    {
+     "codigo": "20251018",
+     "cantidad": 5,
+     "precio_unitario": 6.69,
+     "total": 33.45
+    },
+    {
+     "codigo": "20251036",
+     "cantidad": 10,
+     "precio_unitario": 4.32,
+     "total": 43.2
+    }
+   ]
+  },
+  {
+   "numero": "VALE-261014-01",
+   "fecha": "2026-10-14",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "monto_sin_igv": 157.9,
+   "igv": 28.42,
+   "total_con_igv": 186.32,
+   "estado": "VALE - USO INTERNO",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": true,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 4,
+     "precio_unitario": 38,
+     "total": 152
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 2,
+     "precio_unitario": 2.95,
+     "total": 5.9
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261015-01",
+   "fecha": "2026-10-15",
+   "persona": "LUIS JAVIER MENDOZA LIÑAN",
+   "monto_sin_igv": 79.8,
+   "igv": 14.36,
+   "total_con_igv": 94.16,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 79.8,
+     "total": 79.8
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261020-01",
+   "fecha": "2026-10-20",
+   "persona": "CLARA RAMIREZ ORDOÑEZ",
+   "monto_sin_igv": 281.82,
+   "igv": 50.73,
+   "total_con_igv": 332.55,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251006",
+     "cantidad": 4,
+     "precio_unitario": 2.76,
+     "total": 11.04
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 3,
+     "precio_unitario": 9.15,
+     "total": 27.45
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 3,
+     "precio_unitario": 20.91,
+     "total": 62.73
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 3,
+     "precio_unitario": 8.49,
+     "total": 25.47
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 3,
+     "precio_unitario": 5.42,
+     "total": 16.26
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 3,
+     "precio_unitario": 3.73,
+     "total": 11.19
+    },
+    {
+     "codigo": "20251029",
+     "cantidad": 3,
+     "precio_unitario": 42.56,
+     "total": 127.68
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261022-01",
+   "fecha": "2026-10-22",
+   "persona": "DIEGO ARMANDO MORENO COSINGA",
+   "monto_sin_igv": 712.12,
+   "igv": 128.18,
+   "total_con_igv": 840.3,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251003",
+     "cantidad": 1,
+     "precio_unitario": 9.15,
+     "total": 9.15
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 5,
+     "precio_unitario": 20.91,
+     "total": 104.55
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 5,
+     "precio_unitario": 8.49,
+     "total": 42.45
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 1,
+     "precio_unitario": 5.42,
+     "total": 5.42
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 3,
+     "precio_unitario": 3.73,
+     "total": 11.19
+    },
+    {
+     "codigo": "20251031",
+     "cantidad": 1,
+     "precio_unitario": 117.6,
+     "total": 117.6
+    },
+    {
+     "codigo": "20251030",
+     "cantidad": 1,
+     "precio_unitario": 85.12,
+     "total": 85.12
+    },
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 330.14,
+     "total": 330.14
+    },
+    {
+     "codigo": "20251019",
+     "cantidad": 2,
+     "precio_unitario": 3.25,
+     "total": 6.5
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261023-01",
+   "fecha": "2026-10-23",
+   "persona": "JESUS ENRIQUE GUTIERREZ BRICEÑO",
+   "monto_sin_igv": 1176.16,
+   "igv": 211.71,
+   "total_con_igv": 1387.8700000000001,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251032",
+     "cantidad": 2,
+     "precio_unitario": 140,
+     "total": 280
+    },
+    {
+     "codigo": "20251003",
+     "cantidad": 17,
+     "precio_unitario": 9.15,
+     "total": 155.55
+    },
+    {
+     "codigo": "20251004",
+     "cantidad": 9,
+     "precio_unitario": 20.91,
+     "total": 188.19
+    },
+    {
+     "codigo": "20251005",
+     "cantidad": 8,
+     "precio_unitario": 8.49,
+     "total": 67.92
+    },
+    {
+     "codigo": "20251008",
+     "cantidad": 8,
+     "precio_unitario": 5.42,
+     "total": 43.36
+    },
+    {
+     "codigo": "20251013",
+     "cantidad": 12,
+     "precio_unitario": 3.73,
+     "total": 44.76
+    },
+    {
+     "codigo": "20251002",
+     "cantidad": 1,
+     "precio_unitario": 330.14,
+     "total": 330.14
+    },
+    {
+     "codigo": "20251009",
+     "cantidad": 9,
+     "precio_unitario": 7.36,
+     "total": 66.24
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261028-01",
+   "fecha": "2026-10-28",
+   "persona": "JAIME PAYANO PONCE",
+   "monto_sin_igv": 801.11,
+   "igv": 144.2,
+   "total_con_igv": 945.31,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251029",
+     "cantidad": 10,
+     "precio_unitario": 42.56,
+     "total": 425.6
+    },
+    {
+     "codigo": "20251030",
+     "cantidad": 3,
+     "precio_unitario": 85.12,
+     "total": 255.36
+    },
+    {
+     "codigo": "20251017",
+     "cantidad": 15,
+     "precio_unitario": 8.01,
+     "total": 120.15
+    }
+   ]
+  },
+  {
+   "numero": "C&C-261029-01",
+   "fecha": "2026-10-29",
+   "persona": "JAIME PAYANO PONCE",
+   "monto_sin_igv": 140,
+   "igv": 25.2,
+   "total_con_igv": 165.2,
+   "estado": "PENDIENTE",
+   "n_valorizacion": null,
+   "observacion": null,
+   "es_vale": false,
+   "detalles": [
+    {
+     "codigo": "20251032",
+     "cantidad": 1,
+     "precio_unitario": 140,
+     "total": 140
+    }
+   ]
+  }
+ ],
+ "ejecutados": [
+  {
+   "fecha": "2026-08-26",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "codigo": "20251001",
+   "cantidad": 1,
+   "n_suministro": "2548675",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-08-26",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "codigo": "20251002",
+   "cantidad": 1,
+   "n_suministro": "2548675",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-08-26",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "codigo": "20251003",
+   "cantidad": 1,
+   "n_suministro": "2548675",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-08-26",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251020",
+   "cantidad": 4,
+   "n_suministro": null,
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251001",
+   "cantidad": 29,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251002",
+   "cantidad": 14,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251003",
+   "cantidad": 1,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251004",
+   "cantidad": 1,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251005",
+   "cantidad": 1,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251008",
+   "cantidad": 1,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251009",
+   "cantidad": 1,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251013",
+   "cantidad": 2,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251019",
+   "cantidad": 1,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251029",
+   "cantidad": 1,
+   "n_suministro": "6246856",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251001",
+   "cantidad": 8,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251002",
+   "cantidad": 4,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251003",
+   "cantidad": 1,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251004",
+   "cantidad": 1,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251005",
+   "cantidad": 1,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251008",
+   "cantidad": 1,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251013",
+   "cantidad": 1,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251019",
+   "cantidad": 1,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251029",
+   "cantidad": 1,
+   "n_suministro": "6239966",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251001",
+   "cantidad": 25,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251002",
+   "cantidad": 8,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251003",
+   "cantidad": 2,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251004",
+   "cantidad": 1,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251005",
+   "cantidad": 1,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251008",
+   "cantidad": 1,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251009",
+   "cantidad": 1,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251013",
+   "cantidad": 2,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251019",
+   "cantidad": 1,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251021",
+   "cantidad": 2,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-18",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251029",
+   "cantidad": 1,
+   "n_suministro": "6246857",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251001",
+   "cantidad": 18,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251002",
+   "cantidad": 6,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251003",
+   "cantidad": 1,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251004",
+   "cantidad": 1,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251005",
+   "cantidad": 1,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251008",
+   "cantidad": 1,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251013",
+   "cantidad": 1,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251019",
+   "cantidad": 1,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251020",
+   "cantidad": 2,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-22",
+   "tipo_trabajo": "INSTALACION NUEVA",
+   "persona": "RONALDO ERIL CAJAS GUILLEN",
+   "codigo": "20251029",
+   "cantidad": 1,
+   "n_suministro": "6251692",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251017",
+   "cantidad": 2,
+   "n_suministro": "6233906 - 6100163",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251018",
+   "cantidad": 1,
+   "n_suministro": "6233906 - 6100163",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251022",
+   "cantidad": 2,
+   "n_suministro": "6233906 - 6100163",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251036",
+   "cantidad": 3,
+   "n_suministro": "6233906 - 6100163",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-15",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251037",
+   "cantidad": 1,
+   "n_suministro": "6233906 - 6100163",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251017",
+   "cantidad": 2,
+   "n_suministro": "6233908 - 6233907",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251022",
+   "cantidad": 2,
+   "n_suministro": "6233908 - 6233907",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  },
+  {
+   "fecha": "2026-09-17",
+   "tipo_trabajo": "HABILITACION",
+   "persona": "SALINAS MARIANO MILLA MILLA",
+   "codigo": "20251036",
+   "cantidad": 2,
+   "n_suministro": "6233908 - 6233907",
+   "observacion": null,
+   "movimiento": "SALIDA"
+  }
+ ],
+ "entregas": [
+  {
+   "fecha": "2026-09-28",
+   "herramienta": "ESCALERA TELESCOPICA",
+   "tipo": "ENTREGA",
+   "persona": "FREDY SOCOLA CORNEJO",
+   "observacion": null
+  }
+ ]
+}

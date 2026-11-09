@@ -34,6 +34,13 @@ class Cotizacion extends Model
     public const ESTADO_DESCONTADO = 'DESCONTADO EN VALORIZACION';
 
     /**
+     * Documento que está en el detalle pero no se había registrado en la
+     * lista (rev 03 del Excel). Descuenta stock (como cualquier documento
+     * vigente) pero NO suma al pendiente de descuento hasta confirmarlo.
+     */
+    public const ESTADO_SIN_REGISTRO = 'SIN REGISTRO - CONFIRMAR';
+
+    /**
      * Series del correlativo interno de 8 dígitos — una por tipo de
      * documento, igual criterio que el prefijo de `numero`.
      */
@@ -219,6 +226,17 @@ class Cotizacion extends Model
                 $reintentado = true;
             }
         } while (true);
+    }
+
+    /**
+     * Confirma un documento SIN REGISTRO: una cotización pasa a PENDIENTE
+     * de descuento; un vale pasa a USO INTERNO.
+     */
+    public function confirmar(): void
+    {
+        $this->update([
+            'estado' => $this->es_vale ? self::ESTADO_VALE : self::ESTADO_PENDIENTE,
+        ]);
     }
 
     /**

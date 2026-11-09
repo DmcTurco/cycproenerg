@@ -27,7 +27,8 @@ class CatalogoController extends Controller
                 });
             })
             ->orderBy('codigo')
-            ->get();
+            ->paginate(25)
+            ->withQueryString();
 
         $herramientas = Herramienta::when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
@@ -36,7 +37,8 @@ class CatalogoController extends Controller
                 });
             })
             ->orderBy('codigo')
-            ->get();
+            ->paginate(25)
+            ->withQueryString();
 
         $parametros = ParametroControlMaterial::actual();
 

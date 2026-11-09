@@ -22,9 +22,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * que alimentan el kardex:
  *   - ingresos()/ultimoPrecioIngresos()/alertaPrecio() -> CM-3 (tabla
  *                        `ingresos`) — ✅ implementado el 18/09/2026.
- *   - salidas()       -> CM-4 (cotizaciones a contratistas, tabla
- *                        `cotiz_detalles`) + CM-6 (tabla `ejecutados`).
- *                        Todavía pendiente.
+ *   - salidas()       -> CM-4 (cotizaciones y vales, tabla
+ *                        `cotizacion_detalles`) + devoluciones de CM-6
+ *                        (tabla `ejecutados`). Lógica de la rev 03 del
+ *                        Excel: el vale descuenta al emitirse.
  * Hasta que esas tablas existan, estos métodos devuelven el valor base
  * (stock_inicial) sin tocar nada que todavía no existe.
  */
@@ -144,26 +145,72 @@ class Material extends Model
     }
 
     /**
-     * CATALOGO!K — total de salidas:
-     *   - CONTRATISTA (cotización): descuenta ya, al emitir (CM-4) — ✅.
-     *   - PERSONAL DIRECTO (vale): descuenta recién cuando se reporta lo
-     *     EJECUTADO (CM-6) — ✅. EJECUTADO se reporta en METROS para
-     *     tuberías; se divide por factor_metros_por_unidad para volver a
-     *     la unidad de stock (rollos), igual que CATALOGO!K del Excel.
-     *     Una DEVOLUCION resta (vuelve al stock).
+     * CATALOGO!K (rev 03 del Excel) — total de salidas:
+     *
+     *   SALIDAS = cotizaciones a contratistas + vales de personal directo
+     *             − devoluciones.
+     *
+     *   - CONTRATISTA (cotización): descuenta al emitir (CM-4).
+     *   - PERSONAL DIRECTO (vale): descuenta TAMBIÉN al emitir el vale
+     *     (antes, rev 02, esperaba a que se reportara lo EJECUTADO y el
+     *     material retirado con vale no se descontaba: el stock salía
+     *     inflado).
+     *   - EJECUTADO ya NO mueve el stock: solo informa qué se usó y cuánto
+     *     queda EN SU PODER. La única fila de EJECUTADO que toca el stock
+     *     es la DEVOLUCION (lo no usado vuelve al almacén). Se reporta en
+     *     METROS para tuberías, por eso se divide por
+     *     factor_metros_por_unidad para volver a la unidad de stock.
      */
     public function salidas(): float
     {
-        $salidasContratistas = (float) $this->cotizacionDetalles()
-            ->whereHas('cotizacion', fn ($query) => $query->where('es_vale', false))
-            ->sum('cantidad');
+        $salidasContratistas = $this->cantidadEnDocumentos(false);
+        $salidasVales = $this->cantidadEnDocumentos(true);
 
+        return $salidasContratistas + $salidasVales - $this->devueltoEnUnidadStock();
+    }
+
+    /**
+     * CATALOGO!S — "EJECUTADO SIN VALE": avisa si se reportó como usado más
+     * de lo que se entregó con vale (falta emitir un vale).
+     *
+     *   = MAX(0, ejecutado no devuelto
+     *              − MAX(0, vales − devoluciones))
+     *
+     * Todo en unidad de stock. Devuelve 0 cuando no hay nada que revisar.
+     */
+    public function ejecutadoSinVale(): float
+    {
         $factor = max(1.0, (float) $this->factor_metros_por_unidad);
-        $salidaEjecutada = (float) $this->ejecutados()->where('movimiento', Ejecutado::MOVIMIENTO_SALIDA)->sum('cantidad');
-        $devueltoEjecutado = (float) $this->ejecutados()->where('movimiento', Ejecutado::MOVIMIENTO_DEVOLUCION)->sum('cantidad');
-        $salidasPersonalDirecto = ($salidaEjecutada - $devueltoEjecutado) / $factor;
+        $usado = (float) $this->ejecutados()
+            ->where('movimiento', '<>', Ejecutado::MOVIMIENTO_DEVOLUCION)
+            ->sum('cantidad') / $factor;
+        $cubierto = max(0.0, $this->cantidadEnDocumentos(true) - $this->devueltoEnUnidadStock());
 
-        return $salidasContratistas + $salidasPersonalDirecto;
+        return max(0.0, $usado - $cubierto);
+    }
+
+    /**
+     * Suma de cantidades en cotizaciones (es_vale = false) o vales
+     * (es_vale = true) vigentes, en unidad de stock.
+     */
+    private function cantidadEnDocumentos(bool $esVale): float
+    {
+        return (float) $this->cotizacionDetalles()
+            ->whereHas('cotizacion', fn ($query) => $query->where('es_vale', $esVale))
+            ->sum('cantidad');
+    }
+
+    /**
+     * Total devuelto al almacén (EJECUTADO con MOVIMIENTO = DEVOLUCION),
+     * convertido de la unidad reportada (metros) a la unidad de stock.
+     */
+    private function devueltoEnUnidadStock(): float
+    {
+        $factor = max(1.0, (float) $this->factor_metros_por_unidad);
+
+        return (float) $this->ejecutados()
+            ->where('movimiento', Ejecutado::MOVIMIENTO_DEVOLUCION)
+            ->sum('cantidad') / $factor;
     }
 
     /**

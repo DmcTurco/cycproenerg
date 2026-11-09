@@ -129,6 +129,7 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware(['auth:employee', 'permiso'])-
         Route::put('cotizaciones/{cotizacion}', [Employee\CotizacionController::class, 'update'])->name('cotizaciones.update');
         Route::get('cotizaciones/{cotizacion}/pdf', [Employee\CotizacionController::class, 'pdf'])->name('cotizaciones.pdf');
         Route::post('cotizaciones/{cotizacion}/descontar', [Employee\CotizacionController::class, 'marcarDescontado'])->name('cotizaciones.descontar');
+        Route::post('cotizaciones/{cotizacion}/confirmar', [Employee\CotizacionController::class, 'confirmar'])->name('cotizaciones.confirmar');
         Route::delete('cotizaciones/{cotizacion}', [Employee\CotizacionController::class, 'destroy'])->name('cotizaciones.destroy');
 
         // CM-6: registro rápido + ejecutado (solo personal directo).

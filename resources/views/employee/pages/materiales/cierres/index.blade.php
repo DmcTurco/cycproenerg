@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
-        <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
+        <div class="flex items-center justify-between bg-brand-600 px-4 py-2 sm:px-4">
             <h2 class="text-base font-semibold text-white">Cierre de Mes</h2>
             <a href="{{ route('employee.materiales.index') }}"
                 class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
@@ -87,22 +87,22 @@
             <div>
                 <h3 class="mb-2 text-sm font-semibold text-gray-700">Historial de cierres</h3>
                 <div class="overflow-auto rounded-lg border border-gray-100">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-xs">
                         <thead>
                             <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                <th class="sticky top-0 z-10 bg-white px-3 py-2">Etiqueta</th>
-                                <th class="sticky top-0 z-10 bg-white px-3 py-2">Fecha de corte</th>
-                                <th class="sticky top-0 z-10 bg-white px-3 py-2">Cerrado el</th>
-                                <th class="sticky top-0 z-10 bg-white px-3 py-2 text-center">Detalle</th>
+                                <th class="sticky top-0 z-10 bg-white px-2 py-2">Etiqueta</th>
+                                <th class="sticky top-0 z-10 bg-white px-2 py-2">Fecha de corte</th>
+                                <th class="sticky top-0 z-10 bg-white px-2 py-2">Cerrado el</th>
+                                <th class="sticky top-0 z-10 bg-white px-2 py-2 text-center">Detalle</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($cierres as $cierre)
                                 <tr>
-                                    <td class="px-3 py-2 font-medium text-gray-900">{{ $cierre->etiqueta }}</td>
-                                    <td class="px-3 py-2 text-gray-600">{{ $cierre->fecha_cierre->format('d/m/Y') }}</td>
-                                    <td class="px-3 py-2 text-gray-500">{{ $cierre->created_at->format('d/m/Y H:i') }}</td>
-                                    <td class="px-3 py-2 text-center">
+                                    <td class="px-2 py-1.5 font-medium text-gray-900">{{ $cierre->etiqueta }}</td>
+                                    <td class="px-2 py-1.5 text-gray-600">{{ $cierre->fecha_cierre->format('d/m/Y') }}</td>
+                                    <td class="px-2 py-1.5 text-gray-500">{{ $cierre->created_at->format('d/m/Y H:i') }}</td>
+                                    <td class="px-2 py-1.5 text-center">
                                         <a href="{{ route('employee.materiales.cierres.show', $cierre) }}" class="text-sm font-medium text-brand-600 hover:underline">Ver</a>
                                     </td>
                                 </tr>

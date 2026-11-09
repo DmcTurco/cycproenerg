@@ -34,20 +34,25 @@ class ControlMaterialesCierre
      *      cuadrillas + catálogo completo) ANTES de tocar nada — queda
      *      guardado en `resumen` aunque después se archiven los
      *      movimientos que lo alimentaron.
-     *   2. Por cada Material: stock_inicial = stockActual() (equivalente a
-     *      CATALOGO!I = CATALOGO!L de la macro); precio_base = MAX(precio_base,
-     *      precioVigente()) (consolidar solo si sube, igual que la macro).
+     *   2. Por cada Material: el stock actual y el precio vigente se
+     *      fotografían ANTES de archivar. Después de archivar se fija
+     *      stock_inicial = stock fotografiado − ingresos() + salidas() de lo
+     *      que NO se archivó (cotizaciones PENDIENTE o SIN REGISTRO,
+     *      documentos posteriores a la fecha de cierre). Así lo que sigue
+     *      vigente se vuelve a restar una sola vez y el stock actual no
+     *      cambia por cerrar el mes. precio_base = MAX(precio_base,
+     *      precio vigente fotografiado) (consolidar solo si sube).
      *   3. Archivar (marcar cierre_materiales_id + soft-delete):
      *      - Ingreso con fecha <= fecha_cierre, todavía sin cierre.
      *      - Ejecutado con fecha <= fecha_cierre, todavía sin cierre.
-     *      - Cotizacion con estado <> PENDIENTE (o sea, TODOS los vales de
-     *        personal directo — nunca quedan PENDIENTE — y las cotizaciones
+     *      - Cotizacion con estado distinto de PENDIENTE y de SIN REGISTRO
+     *        (o sea, TODOS los vales de personal directo y las cotizaciones
      *        de contratista ya DESCONTADAS) con fecha <= fecha_cierre,
      *        todavía sin cierre.
-     *   A diferencia de la macro, NO se toca CotizacionDetalle ni se
-     *   "compensa" nada: como las cotizaciones PENDIENTES no se tocan,
-     *   Material::salidas() sigue contándolas exactamente igual que antes
-     *   del cierre — no hay doble descuento que corregir.
+     *   Las PENDIENTE y las SIN REGISTRO no se archivan (siguen visibles
+     *   para cobrar/confirmar) y siguen restando en Material::salidas();
+     *   por eso el stock_inicial del paso 2 las vuelve a sumar una vez,
+     *   evitando el doble descuento.
      */
     public static function cerrar(string $etiqueta, Carbon $fechaCierre, ?int $employeeId): CierreMaterial
     {
@@ -61,20 +66,34 @@ class ControlMaterialesCierre
                 'resumen' => $resumen,
             ]);
 
-            foreach (Material::all() as $material) {
-                $material->update([
-                    'stock_inicial' => $material->stockActual(),
-                    'precio_base' => max((float) $material->precio_base, $material->precioVigente()),
-                ]);
-            }
+            // Foto previa: el precio vigente depende de los ingresos, que se
+            // archivan abajo.
+            $materiales = Material::all();
+            $antes = $materiales->mapWithKeys(fn (Material $m) => [$m->id => [
+                'stock' => $m->stockActual(),
+                'precio_vigente' => $m->precioVigente(),
+            ]]);
 
             self::archivar(Ingreso::query(), $fechaCierre, $cierre->id);
             self::archivar(Ejecutado::query(), $fechaCierre, $cierre->id);
             self::archivar(
-                Cotizacion::query()->where('estado', '<>', Cotizacion::ESTADO_PENDIENTE),
+                Cotizacion::query()->whereNotIn('estado', [
+                    Cotizacion::ESTADO_PENDIENTE,
+                    Cotizacion::ESTADO_SIN_REGISTRO,
+                ]),
                 $fechaCierre,
                 $cierre->id
             );
+
+            foreach ($materiales as $material) {
+                // Lo que quedó vigente tras archivar (PENDIENTE, SIN REGISTRO
+                // o posterior al cierre) sigue sumando/restando: se compensa
+                // para que stockActual() quede igual que antes de cerrar.
+                $material->update([
+                    'stock_inicial' => $antes[$material->id]['stock'] - $material->ingresos() + $material->salidas(),
+                    'precio_base' => max((float) $material->precio_base, $antes[$material->id]['precio_vigente']),
+                ]);
+            }
 
             return $cierre;
         });

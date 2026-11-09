@@ -21,7 +21,7 @@
          sigue viendo "modal", "f", etc. de esta fila con normalidad. --}}
     <template x-teleport="body">
         <div x-show="modal.abierto" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4" @keydown.escape.window="cerrarModal()">
-            <div class="w-full max-w-md rounded-lg bg-white p-5 shadow-xl" @click.outside="cerrarModal()">
+            <div class="w-full max-w-md rounded-lg bg-white p-5 shadow-xl">
                 <h3 class="text-sm font-semibold text-gray-900">Editar datos</h3>
                 <p class="mt-0.5 truncate text-xs text-gray-500">
                     {{ $cliente?->nombre ?? ('Suministro ' . ($s?->numero_suministro ?? '—')) }} ·

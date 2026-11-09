@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
-        <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
+        <div class="flex items-center justify-between bg-brand-600 px-4 py-2 sm:px-4">
             <h2 class="text-base font-semibold text-white">Resumen — Panel de control de Materiales</h2>
             <a href="{{ route('employee.materiales.index') }}"
                 class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
@@ -77,26 +77,26 @@
             <div>
                 <h3 class="mb-2 text-sm font-semibold text-gray-900">Registro de cuadrillas y valorizado por persona</h3>
                 <div class="overflow-x-auto rounded-lg ring-1 ring-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <table class="min-w-full divide-y divide-gray-200 text-xs">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-3 py-2 text-left font-medium text-gray-500">Nombre</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-500">Tipo</th>
-                                <th class="px-3 py-2 text-right font-medium text-gray-500">N° retiros</th>
-                                <th class="px-3 py-2 text-right font-medium text-gray-500">Total valorizado S/IGV</th>
-                                <th class="px-3 py-2 text-right font-medium text-gray-500">Pendiente de descuento C/IGV</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-500">Corte</th>
+                                <th class="px-2 py-2 text-left font-medium text-gray-500">Nombre</th>
+                                <th class="px-2 py-2 text-left font-medium text-gray-500">Tipo</th>
+                                <th class="px-2 py-2 text-right font-medium text-gray-500">N° retiros</th>
+                                <th class="px-2 py-2 text-right font-medium text-gray-500">Total valorizado S/IGV</th>
+                                <th class="px-2 py-2 text-right font-medium text-gray-500">Pendiente de descuento C/IGV</th>
+                                <th class="px-2 py-2 text-left font-medium text-gray-500">Corte</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($cuadrillas as $fila)
                                 <tr>
-                                    <td class="px-3 py-2 font-medium text-gray-900">{{ $fila['cuadrilla']->nombre }}</td>
-                                    <td class="px-3 py-2 text-gray-600">{{ $fila['cuadrilla']->tipo }}</td>
-                                    <td class="px-3 py-2 text-right text-gray-600">{{ $fila['num_retiros'] }}</td>
-                                    <td class="px-3 py-2 text-right text-gray-600">S/ {{ number_format($fila['total_valorizado'], 2) }}</td>
-                                    <td class="px-3 py-2 text-right {{ $fila['pendiente_descuento'] > 0 ? 'text-amber-600 font-medium' : 'text-gray-600' }}">S/ {{ number_format($fila['pendiente_descuento'], 2) }}</td>
-                                    <td class="px-3 py-2">
+                                    <td class="px-2 py-1.5 font-medium text-gray-900">{{ $fila['cuadrilla']->nombre }}</td>
+                                    <td class="px-2 py-1.5 text-gray-600">{{ $fila['cuadrilla']->tipo }}</td>
+                                    <td class="px-2 py-1.5 text-right text-gray-600">{{ $fila['num_retiros'] }}</td>
+                                    <td class="px-2 py-1.5 text-right text-gray-600">S/ {{ number_format($fila['total_valorizado'], 2) }}</td>
+                                    <td class="px-2 py-1.5 text-right {{ $fila['pendiente_descuento'] > 0 ? 'text-amber-600 font-medium' : 'text-gray-600' }}">S/ {{ number_format($fila['pendiente_descuento'], 2) }}</td>
+                                    <td class="px-2 py-1.5">
                                         <form method="GET" action="{{ route('employee.materiales.resumen.corte', $fila['cuadrilla']) }}" class="flex items-center gap-1">
                                             <x-date-input name="hasta" value="{{ $hastaDefault }}"
                                                 class="w-36 rounded-lg border border-gray-300 px-2 py-1 text-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />

@@ -117,6 +117,22 @@ class CotizacionController extends Controller
         return redirect()->route('employee.materiales.cotizaciones.index');
     }
 
+    /**
+     * Confirma un documento en estado SIN REGISTRO - CONFIRMAR.
+     */
+    public function confirmar(Cotizacion $cotizacion)
+    {
+        if ($cotizacion->estado !== Cotizacion::ESTADO_SIN_REGISTRO) {
+            abort(422, 'Solo se pueden confirmar documentos SIN REGISTRO.');
+        }
+
+        $cotizacion->confirmar();
+
+        session()->flash('message', $cotizacion->numero . ' confirmada (' . $cotizacion->estado . ').');
+
+        return redirect()->route('employee.materiales.cotizaciones.index');
+    }
+
     public function destroy(Cotizacion $cotizacion)
     {
         $cotizacion->delete();

@@ -20,7 +20,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        <ul x-show="abierto" x-cloak @click.outside="abierto = false"
+        <ul x-show="abierto" x-cloak
             class="absolute left-0 right-0 z-10 mt-1 max-h-44 overflow-y-auto rounded-lg bg-white py-1 text-sm shadow-lg ring-1 ring-gray-200">
             <template x-for="op in todas.filter(o => o.toUpperCase().includes(modal.{{ $campo }}.trim().toUpperCase())).slice(0, 30)" :key="op">
                 <li @mousedown.prevent="modal.{{ $campo }} = op; abierto = false"

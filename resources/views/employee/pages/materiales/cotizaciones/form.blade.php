@@ -186,7 +186,7 @@
                                 </select>
                                 <p class="form-error">{{ $errors->first('cuadrilla_id') }}</p>
                                 <p class="mt-1 min-h-8 text-xs text-gray-400">
-                                    <span x-show="tipoSeleccionado && esVale">VALE — a costo, sin IGV, no descuenta stock ahora.</span>
+                                    <span x-show="tipoSeleccionado && esVale">VALE — a costo, sin IGV, descuenta stock al emitirlo.</span>
                                     <span x-show="tipoSeleccionado && !esVale">COTIZACIÓN — con IGV, descuenta stock al generarla.</span>
                                 </p>
                             </div>

@@ -141,6 +141,15 @@ Traducción de la macro `CerrarMes` de `MacrosCYC.bas` (descompilada con oletool
 - Pantallas: `employee/materiales/cierres` (indicadores actuales antes de cerrar + formulario de cierre con casilla de confirmación + historial de cierres pasados) → `.../{id}` (detalle del snapshot de un cierre).
 - **Pendiente para que corra:** `php artisan migrate` (tabla nueva `cierres_materiales` + columna `cierre_materiales_id` en `ingresos`/`ejecutados`/`cotizaciones`).
 
+
+### Ajuste rev 03 del Excel (09/11/2026) — stock por vales
+Fuente: `CONTROL_MATERIALES_CC_10-2026_COMPLETO.xlsm` (rev 03). Cambios aplicados al sistema:
+- `Material::salidas()` = cotizaciones a contratistas + **vales de personal directo** − devoluciones. EJECUTADO ya no mueve el stock (solo informa uso y saldo en su poder; su única fila que toca el stock es la DEVOLUCION). Antes (rev 02) el material retirado con vale no se descontaba y el stock salía inflado.
+- Control nuevo `Material::ejecutadoSinVale()` (CATALOGO!S): `MAX(0, ejecutado no devuelto − MAX(0, vales − devoluciones))`, con badge "SIN VALE" en Catálogo.
+- Estado nuevo `Cotizacion::ESTADO_SIN_REGISTRO` ("SIN REGISTRO - CONFIRMAR"): descuenta stock pero no suma al pendiente; acción "confirmar" (pasa a PENDIENTE o USO INTERNO).
+- Textos corregidos: PDF del vale y formulario ya no dicen que el vale no descuenta stock.
+- Corregido el doble descuento del cierre de mes: `ControlMaterialesCierre` fotografía stock y precio antes de archivar y fija `stock_inicial = stock previo − ingresos() + salidas()` de lo que sigue vigente (PENDIENTE, SIN REGISTRO, posteriores al cierre). Las SIN REGISTRO tampoco se archivan.
+
 ## 4. Orden sugerido para ir "por partes"
 
 1. ~~**CM-1** Parámetros + Catálogo (materiales y herramientas)~~ — hecho el 18/09/2026 (falta `migrate`), la base de todo lo demás.

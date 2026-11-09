@@ -7,12 +7,13 @@
         \App\Models\Cotizacion::ESTADO_PENDIENTE => 'bg-amber-100 text-amber-700',
         \App\Models\Cotizacion::ESTADO_VALE => 'bg-blue-100 text-blue-700',
         \App\Models\Cotizacion::ESTADO_DESCONTADO => 'bg-green-100 text-green-700',
+        \App\Models\Cotizacion::ESTADO_SIN_REGISTRO => 'bg-red-100 text-red-700',
     ];
 @endphp
 
 @section('content')
     <div class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
-        <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
+        <div class="flex items-center justify-between bg-brand-600 px-4 py-2 sm:px-4">
             <h2 class="text-base font-semibold text-white">Cotizaciones / Vales de entrega</h2>
             <a href="{{ route('employee.materiales.index') }}"
                 class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">
@@ -22,7 +23,7 @@
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">
             <x-form-errors class="mb-3" />
-            <form method="GET" action="{{ route('employee.materiales.cotizaciones.index') }}" class="mb-3 flex flex-wrap items-end gap-2">
+            <form method="GET" action="{{ route('employee.materiales.cotizaciones.index') }}" class="mb-2 flex shrink-0 flex-wrap items-end gap-2">
                 <div>
                     <label class="form-label" for="filter_cuadrilla">Cuadrilla</label>
                     <select id="filter_cuadrilla" name="cuadrilla_id" class="form-input" onchange="this.form.submit()">
@@ -39,6 +40,7 @@
                         <option value="{{ \App\Models\Cotizacion::ESTADO_PENDIENTE }}" @selected($estado === \App\Models\Cotizacion::ESTADO_PENDIENTE)>PENDIENTE</option>
                         <option value="{{ \App\Models\Cotizacion::ESTADO_VALE }}" @selected($estado === \App\Models\Cotizacion::ESTADO_VALE)>VALE - USO INTERNO</option>
                         <option value="{{ \App\Models\Cotizacion::ESTADO_DESCONTADO }}" @selected($estado === \App\Models\Cotizacion::ESTADO_DESCONTADO)>DESCONTADO EN VALORIZACION</option>
+                        <option value="{{ \App\Models\Cotizacion::ESTADO_SIN_REGISTRO }}" @selected($estado === \App\Models\Cotizacion::ESTADO_SIN_REGISTRO)>SIN REGISTRO - CONFIRMAR</option>
                     </select>
                 </div>
                 <div>
@@ -49,62 +51,70 @@
                 @if ($search || $estado || $cuadrillaId)
                     <a href="{{ route('employee.materiales.cotizaciones.index') }}" class="btn-secondary px-3 py-1.5 text-sm">Limpiar</a>
                 @endif
+                @can('cotizaciones.crear')
+                <a href="{{ route('employee.materiales.cotizaciones.create') }}" class="btn-brand ml-auto px-3 py-1.5 text-sm">Nueva cotización / vale</a>
+                @endcan
             </form>
 
-            <div class="mb-3 flex shrink-0 items-center justify-between">
-                <p class="text-xs text-gray-500">Total: <strong>{{ $cotizaciones->total() }}</strong></p>
-                @can('cotizaciones.crear')
-                <a href="{{ route('employee.materiales.cotizaciones.create') }}" class="btn-brand px-3 py-1.5 text-sm">Nueva cotización / vale</a>
-                @endcan
-            </div>
-
             <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-xs">
                     <thead>
                         <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">N° documento</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Correlativo</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Fecha</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Cuadrilla</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-right">Monto S/IGV</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-right">Total C/IGV</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Estado</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">N° valorización</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Acciones</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">N° documento</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Correlativo</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Fecha</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Cuadrilla</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-right">Monto S/IGV</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-right">Total C/IGV</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Estado</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">N° valorización</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($cotizaciones as $cotizacion)
                             <tr>
-                                <td class="px-4 py-3 font-medium text-gray-900">{{ $cotizacion->numero }}</td>
-                                <td class="px-4 py-3 text-gray-500">{{ $cotizacion->serie }}-{{ $cotizacion->correlativo }}</td>
-                                <td class="px-4 py-3 text-gray-600">{{ $cotizacion->fecha->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3 text-gray-600">{{ $cotizacion->cuadrilla->nombre ?? '—' }}</td>
-                                <td class="px-4 py-3 text-right text-gray-600">{{ number_format($cotizacion->monto_sin_igv, 2) }}</td>
-                                <td class="px-4 py-3 text-right text-gray-600">{{ number_format($cotizacion->total_con_igv, 2) }}</td>
-                                <td class="px-4 py-3">
+                                <td class="px-2 py-1.5 font-medium text-gray-900">{{ $cotizacion->numero }}</td>
+                                <td class="px-2 py-1.5 text-gray-500">{{ $cotizacion->serie }}-{{ $cotizacion->correlativo }}</td>
+                                <td class="px-2 py-1.5 text-gray-600">{{ $cotizacion->fecha->format('d/m/Y') }}</td>
+                                <td class="px-2 py-1.5 text-gray-600">{{ $cotizacion->cuadrilla->nombre ?? '—' }}</td>
+                                <td class="px-2 py-1.5 text-right text-gray-600">{{ number_format($cotizacion->monto_sin_igv, 2) }}</td>
+                                <td class="px-2 py-1.5 text-right text-gray-600">{{ number_format($cotizacion->total_con_igv, 2) }}</td>
+                                <td class="px-2 py-1.5">
                                     <span class="badge {{ $coloresEstado[$cotizacion->estado] ?? 'bg-gray-100 text-gray-700' }}">
                                         {{ $cotizacion->estado }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-gray-600">{{ $cotizacion->n_valorizacion ?? '—' }}</td>
-                                <td class="px-4 py-3">
+                                <td class="px-2 py-1.5 text-gray-600">{{ $cotizacion->n_valorizacion ?? '—' }}</td>
+                                <td class="px-2 py-1.5">
                                     <div class="flex items-center justify-center gap-1" x-data="{ open: false, n_valorizacion: '' }">
                                         <a href="{{ route('employee.materiales.cotizaciones.pdf', $cotizacion) }}" class="btn-icon" title="Descargar PDF">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H8a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </a>
                                         @can('cotizaciones.editar')
                                         <a href="{{ route('employee.materiales.cotizaciones.edit', $cotizacion) }}" class="btn-icon" title="Corregir (mismo número)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </a>
                                         @endcan
+                                        @if ($cotizacion->estado === \App\Models\Cotizacion::ESTADO_SIN_REGISTRO)
+                                            @can('cotizaciones.editar')
+                                            <form method="POST" action="{{ route('employee.materiales.cotizaciones.confirmar', $cotizacion) }}">
+                                                @csrf
+                                                <button type="submit" class="btn-icon text-red-600 hover:bg-red-50" title="Confirmar documento (pasa a {{ $cotizacion->es_vale ? 'USO INTERNO' : 'PENDIENTE' }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                            @endcan
+                                        @endif
                                         @if (!$cotizacion->es_vale && $cotizacion->estado === \App\Models\Cotizacion::ESTADO_PENDIENTE && auth('employee')->user()->can('cotizaciones.descontar'))
                                             <button type="button" @click="open = true" class="btn-icon text-green-600 hover:bg-green-50" title="Marcar descontado en valorización">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                             </button>
@@ -129,7 +139,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-icon text-red-500 hover:bg-red-50" title="Eliminar">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                             </button>
