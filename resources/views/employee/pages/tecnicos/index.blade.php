@@ -24,7 +24,7 @@
         })"
         class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200"
     >
-        <div class="flex items-center justify-between bg-brand-600 px-4 py-2.5 sm:px-6">
+        <div class="flex items-center justify-between bg-brand-600 px-4 py-2 sm:px-4">
             <h2 class="text-base font-semibold text-white">Personal de Campo</h2>
             @can('personal.crear')
             <button type="button" @click="openCreate()" class="rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-brand-700 shadow-sm hover:bg-brand-50">Registrar</button>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="flex flex-1 flex-col p-3 sm:p-4 lg:min-h-0 lg:p-4">
-            <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-3">
                 <div class="flex flex-wrap gap-2">
                     @foreach ($pestanas as $valor => $etiqueta)
                         <a href="{{ route('employee.technicals.index', ['tipo' => $valor] + ($search ? ['search' => $search] : [])) }}"
@@ -54,38 +54,30 @@
                 </form>
             </div>
 
-            <p class="mb-3 text-xs text-gray-500">
-                @if ($esPersonalDirecto)
-                    Retira materiales con <strong>vale a costo</strong> y reporta lo <strong>ejecutado</strong>. Puede recibir solicitudes y usar la app.
-                @else
-                    Retira materiales con <strong>cotización con IGV</strong> (no reporta ejecutado). Puede recibir solicitudes y usar la app.
-                @endif
-            </p>
-
             <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-xs">
                     <thead>
                         <tr class="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Documento</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Nombre</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Estado</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Empresa(s)</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">Celular</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3">App</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-right">N° retiros</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-right">Valorizado S/IGV</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Documento</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Nombre</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Estado</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Empresa(s)</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Celular</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5">App</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-right">N° retiros</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-right">Valorizado S/IGV</th>
                             @unless ($esPersonalDirecto)
-                                <th class="sticky top-0 z-10 bg-white px-4 py-3 text-right">Pend. descuento</th>
+                                <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-right">Pend. descuento</th>
                             @endunless
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Historial</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Solicitudes</th>
-                            <th class="sticky top-0 z-10 bg-white px-4 py-3 text-center">Acciones</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-center">Historial</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-center">Solicitudes</th>
+                            <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($personas as $persona)
                             <tr>
-                                <td class="px-4 py-3 whitespace-nowrap">
+                                <td class="px-2 py-1.5 whitespace-nowrap">
                                     @if ($persona->numero_documento)
                                         <span class="badge bg-gray-100 text-gray-700">{{ $tiposDocumento[$persona->tipo_documento] ?? 'DOC' }}</span>
                                         <span class="ml-1 font-medium text-gray-700">{{ $persona->numero_documento }}</span>
@@ -93,33 +85,33 @@
                                         <span class="text-gray-400">—</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 font-medium text-gray-900">{{ $persona->nombre }}</td>
-                                <td class="px-4 py-3">
+                                <td class="px-2 py-1.5 font-medium text-gray-900">{{ $persona->nombre }}</td>
+                                <td class="px-2 py-1.5">
                                     <span class="badge {{ $coloresEstado[$persona->estado] ?? 'bg-gray-100 text-gray-700' }}">{{ $persona->estado }}</span>
                                 </td>
-                                <td class="px-4 py-3 text-gray-600">{{ $persona->empresas->pluck('codigo')->filter()->implode(' / ') ?: '—' }}</td>
-                                <td class="px-4 py-3 text-gray-600">{{ $persona->celular ?? '—' }}</td>
-                                <td class="px-4 py-3 text-gray-600">
+                                <td class="px-2 py-1.5 text-gray-600">{{ $persona->empresas->pluck('codigo')->filter()->implode(' / ') ?: '—' }}</td>
+                                <td class="px-2 py-1.5 text-gray-600">{{ $persona->celular ?? '—' }}</td>
+                                <td class="px-2 py-1.5 text-gray-600">
                                     @if ($persona->usaApp())
                                         <span title="Tiene acceso a la app">{{ $persona->email }}</span>
                                     @else
                                         <span class="text-xs text-gray-400">Sin acceso</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-right text-gray-600">{{ $persona->numRetiros() }}</td>
-                                <td class="px-4 py-3 text-right text-gray-600">{{ number_format($persona->totalValorizado(), 2) }}</td>
+                                <td class="px-2 py-1.5 text-right text-gray-600">{{ $persona->numRetiros() }}</td>
+                                <td class="px-2 py-1.5 text-right text-gray-600">{{ number_format($persona->totalValorizado(), 2) }}</td>
                                 @unless ($esPersonalDirecto)
-                                    <td class="px-4 py-3 text-right text-gray-600">{{ number_format($persona->pendienteDescuento(), 2) }}</td>
+                                    <td class="px-2 py-1.5 text-right text-gray-600">{{ number_format($persona->pendienteDescuento(), 2) }}</td>
                                 @endunless
-                                <td class="px-4 py-3 text-center">
+                                <td class="px-2 py-1.5 text-center">
                                     <a href="{{ route('employee.technicals.record.index', $persona->id) }}"
                                         class="btn-icon" title="Ver historial de solicitudes">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </a>
                                 </td>
-                                <td class="px-4 py-3 text-center">
+                                <td class="px-2 py-1.5 text-center">
                                     {{-- Personal no ACTIVO: en vez de entrar a asignar, modal informativo --}}
                                     @can('personal.asignar')
                                     <a href="{{ route('employee.technicals.requests.index', $persona->id) }}"
@@ -134,25 +126,25 @@
                                                 confirmButtonText: 'Entendido',
                                             })"
                                         @endif>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 7h6m-6 4h6" />
                                         </svg>
                                         <span class="badge absolute -right-1 -top-1 bg-brand-600 text-white">{{ $persona->solicitudes_count }}</span>
                                     </a>
                                     @endcan
                                 </td>
-                                <td class="px-4 py-3">
+                                <td class="px-2 py-1.5">
                                     <div class="flex items-center justify-center gap-1">
                                         @can('personal.editar')
                                         <button type="button" @click="openEdit({{ $persona->id }})" class="btn-icon" title="Editar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
                                         @endcan
                                         @can('personal.eliminar')
                                         <button type="button" @click="remove({{ $persona->id }})" class="btn-icon text-red-500 hover:bg-red-50" title="Eliminar">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
@@ -167,7 +159,7 @@
                 </table>
             </div>
 
-            <div class="mt-4 shrink-0">
+            <div class="mt-2 shrink-0">
                 {{ $personas->links('pagination::tailwind') }}
             </div>
         </div>
