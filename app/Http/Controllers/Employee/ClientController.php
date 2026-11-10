@@ -182,7 +182,9 @@ class ClientController extends Controller
             // este Windows local) puede no estar corriendo. Al ser un proceso
             // realmente separado, no bloquea esta respuesta ni se ejecuta dos
             // veces si el usuario reintenta la subida.
-            $this->runQueueWorkerInBackground();
+            if (config('app.queue_autostart')) {
+                $this->runQueueWorkerInBackground();
+            }
 
             return response()->json([
                 'success' => true,
@@ -217,7 +219,10 @@ class ClientController extends Controller
         if (PHP_OS_FAMILY === 'Windows') {
             pclose(popen("start /B \"\" {$command}", 'r'));
         } else {
-            exec("{$command} > /dev/null 2>&1 &");
+            // `setsid nohup` separa el worker del proceso del servidor web: en
+            // hosting compartido (LiteSpeed) los hijos directos de la petición
+            // se matan a los pocos segundos y el job quedaba atascado.
+            exec("setsid nohup {$command} --memory=256 --timeout=300 > /dev/null 2>&1 &");
         }
     }
 }

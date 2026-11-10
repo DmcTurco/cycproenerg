@@ -214,7 +214,8 @@ class Cotizacion extends Model
                     return $cotizacion->fresh(['detalles.material', 'cuadrilla']);
                 });
             } catch (QueryException $e) {
-                $esChoqueDeCorrelativo = $e->getCode() === '23505'
+                // 23505 = PostgreSQL; 23000 (errno 1062) = MySQL/MariaDB.
+                $esChoqueDeCorrelativo = in_array($e->getCode(), ['23505', '23000'], true)
                     && (str_contains($e->getMessage(), 'cotizaciones_numero_unique')
                         || str_contains($e->getMessage(), 'cotizaciones_serie_correlativo_unique'))
                     && ! $cotizacion;

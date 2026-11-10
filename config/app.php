@@ -155,4 +155,13 @@ return [
 
     'php_cli_binary' => env('PHP_CLI_BINARY'),
 
+    /*
+    | Si es true, al subir un Excel la app lanza ella misma un `queue:work`
+    | en segundo plano. Por defecto solo en Windows (desarrollo). En hosting
+    | compartido (cPanel/LiteSpeed) esos procesos hijos de la web los mata el
+    | servidor a los pocos segundos, asi que ahi se pone false y un worker
+    | permanente lanzado por cron toma los jobs (ver docs de despliegue).
+    */
+    'queue_autostart' => (bool) env('QUEUE_AUTOSTART', PHP_OS_FAMILY === 'Windows'),
+
 ];

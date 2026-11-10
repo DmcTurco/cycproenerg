@@ -57,7 +57,14 @@ class RevisarColaPendienteCommand extends Command
         //                       mirando esta terminal, corre solo).
         $output = [];
         $returnCode = 0;
-        exec("php artisan queue:work --stop-when-empty --memory=256 --timeout=300 --tries=3 --quiet > /dev/null 2>&1 &", $output, $returnCode);
+        //
+        // Se usa el PHP de consola configurado (PHP_CLI_BINARY) y la ruta
+        // absoluta de artisan, igual que ClientController: en cPanel el
+        // `php` a secas es 8.1 y el proyecto exige 8.2+, y el cron no
+        // siempre arranca dentro de la carpeta del proyecto.
+        $phpBinary = escapeshellarg(config('app.php_cli_binary') ?: PHP_BINARY);
+        $artisan = escapeshellarg(base_path('artisan'));
+        exec("setsid nohup {$phpBinary} {$artisan} queue:work --stop-when-empty --memory=256 --timeout=300 --tries=3 --quiet > /dev/null 2>&1 &", $output, $returnCode);
 
         // OJO: por el `&` de arriba, `exec()` no espera a que `queue:work`
         // termine — vuelve de inmediato. Por eso $returnCode acá solo dice

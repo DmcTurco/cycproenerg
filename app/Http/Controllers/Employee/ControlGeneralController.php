@@ -388,9 +388,11 @@ class ControlGeneralController extends Controller
 
     private function ordenar(Builder $q, string $etapa): void
     {
+        // Sin `NULLS LAST/FIRST` (solo existe en PostgreSQL): `IS NULL` /
+        // `IS NOT NULL` ordena los vacíos igual en PostgreSQL y MySQL/MariaDB.
         match ($etapa) {
-            ControlGeneral::APROBADA, ControlGeneral::TC_CONSTRUIDA => $q->orderByRaw('fecha_aprobacion asc nulls last'),
-            ControlGeneral::HABILITACION => $q->orderByRaw('fecha_programacion asc nulls first')->orderBy('fecha_ingreso_etapa'),
+            ControlGeneral::APROBADA, ControlGeneral::TC_CONSTRUIDA => $q->orderByRaw('fecha_aprobacion IS NULL')->orderBy('fecha_aprobacion'),
+            ControlGeneral::HABILITACION => $q->orderByRaw('fecha_programacion IS NOT NULL')->orderBy('fecha_programacion')->orderBy('fecha_ingreso_etapa'),
             ControlGeneral::ANULACION => $q->orderByDesc('fecha_marca'),
             default => $q->orderByDesc('fecha_habilitacion'),
         };
