@@ -29,6 +29,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ProcessExcelJob implements ShouldQueue
 {
@@ -91,6 +94,7 @@ class ProcessExcelJob implements ShouldQueue
         try {
             $spreadsheet = IOFactory::load(Storage::path($this->filePath));
             $sheet = $spreadsheet->getActiveSheet();
+            $this->normalizarColumnasFecha($sheet);
             $rows = $sheet->toArray(null, true, true, true);
 
             if (count($rows) <= 1) {
@@ -311,6 +315,47 @@ class ProcessExcelJob implements ShouldQueue
             }
 
             return $modelClass::where($attributes)->firstOrFail();
+        }
+    }
+
+    /**
+     * Las celdas con fecha REAL del portal (p. ej. "Fecha de suscripción de
+     * contrato", formato de Excel "mm-dd-yy") salen de `toArray(.., formatData
+     * = true)` como texto en orden MES/DÍA ("10/12/2026" = 12 de octubre).
+     * `parseDate` asume DÍA/MES para ese patrón, así que el día y el mes
+     * quedaban invertidos (12/10 → 10/12, y con día > 12 el mes "13" desbordaba
+     * al año siguiente: fechas de aprobación en el futuro).
+     *
+     * Se resuelve en el origen: toda columna que traiga fechas reales se
+     * fuerza a formato ISO (yyyy-mm-dd), que no es ambiguo. Las columnas de
+     * texto "dd/mm/yyyy" del portal no se tocan.
+     */
+    private function normalizarColumnasFecha(Worksheet $sheet): void
+    {
+        $ultimaFila = $sheet->getHighestDataRow();
+        $ultimaCol = Coordinate::columnIndexFromString($sheet->getHighestDataColumn());
+
+        for ($col = 1; $col <= $ultimaCol; $col++) {
+            $letra = Coordinate::stringFromColumnIndex($col);
+            $esFecha = false;
+
+            for ($fila = 2; $fila <= $ultimaFila && $fila <= 200; $fila++) {
+                $coord = $letra . $fila;
+                if (! $sheet->cellExists($coord)) {
+                    continue;
+                }
+                $celda = $sheet->getCell($coord);
+                if (is_numeric($celda->getValue()) && ExcelDate::isDateTime($celda)) {
+                    $esFecha = true;
+                    break;
+                }
+            }
+
+            if ($esFecha) {
+                $sheet->getStyle("{$letra}2:{$letra}{$ultimaFila}")
+                    ->getNumberFormat()
+                    ->setFormatCode('yyyy-mm-dd');
+            }
         }
     }
 

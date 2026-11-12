@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call(EmployeeSeeder::class);
         $this->call(RolesPermisosSeeder::class);
         $this->call(RolInternasAlmacenSeeder::class);
+        $this->call(EmpleadoInternasSeeder::class);
         $this->call(PersonaCampoSeeder::class);
         // Control de Materiales: datos reales del Excel rev 03
         // (reemplaza a los antiguos MaterialSeeder y HerramientaSeeder).
