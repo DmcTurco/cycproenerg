@@ -75,12 +75,12 @@ class ControlGeneralCargaPortalTest extends TestCase
     public function test_una_segunda_carga_conserva_lo_manual_y_mueve_lo_que_avanzo(): void
     {
         $this->cargar([$this->fila('1', '02-Solicitud de Suministro aprobada', 'LIMA', 'Sin registro')]);
-        Solicitud::where('numero_solicitud', '1')->first()->controlGeneral->update(['asesor' => 'ANA', 'observacion' => 'ok']);
+        Solicitud::where('numero_solicitud', '1')->first()->controlGeneral->update(['asesor_id' => \App\Models\Asesor::create(['company_id' => 1, 'nombre' => 'ANA'])->id, 'observacion' => 'ok']);
 
         $this->cargar([$this->fila('1', '06-Instalación interna finalizada', 'LIMA', 'Pendiente')]);
 
         $cg = Solicitud::where('numero_solicitud', '1')->first()->controlGeneral;
         $this->assertSame(ControlGeneral::TC_CONSTRUIDA, $cg->etapa);
-        $this->assertSame(['ANA', 'ok'], [$cg->asesor, $cg->observacion]);
+        $this->assertSame(['ANA', 'ok'], [$cg->asesor->nombre, $cg->observacion]);
     }
 }

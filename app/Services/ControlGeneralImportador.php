@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Asesor;
 use App\Models\ControlGeneral;
+use App\Models\PersonaCampo;
 use App\Models\Solicitud;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -20,6 +22,11 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  * que la macro (ColMap), así no depende del orden de las columnas.
  * Las solicitudes se buscan por N° de solicitud: tienen que existir ya en el
  * sistema (cargadas del portal). Las que no se encuentran se informan.
+ *
+ * Asesor, cuadrilla, técnico y contratista se guardan por id: el nombre del
+ * Excel se busca en Asesores / Personal de campo (sin distinguir mayúsculas
+ * ni espacios de más). Si no hay coincidencia queda vacío y se informa en
+ * `sin_coincidencia`, para que se registre a la persona y se vuelva a importar.
  */
 class ControlGeneralImportador
 {
@@ -38,15 +45,28 @@ class ControlGeneralImportador
         'CONTRATISTA' => 'contratista',
     ];
 
+    /** @var array{asesor:array<string,int>, persona:array<string,int>} nombre normalizado => id */
+    private array $catalogo = ['asesor' => [], 'persona' => []];
+
+    /** @var array<string,array<string,bool>> rol => nombres del Excel que no se encontraron */
+    private array $sinCoincidencia = [];
+
     /**
      * @return array{
      *   leidas:int, importadas:int, por_etapa:array<string,int>,
-     *   no_encontradas:array<int,string>, movidas_por_marca:int
+     *   no_encontradas:array<int,string>, movidas_por_marca:int,
+     *   sin_coincidencia:array<string,array<int,string>>
      * }
      */
     public function importar(string $archivo, bool $guardar = true): array
     {
         $libro = IOFactory::load($archivo);
+
+        $this->catalogo = [
+            'asesor' => Asesor::pluck('id', 'nombre')->mapWithKeys(fn ($id, $n) => [$this->clave($n) => $id])->all(),
+            'persona' => PersonaCampo::pluck('id', 'nombre')->mapWithKeys(fn ($id, $n) => [$this->clave($n) => $id])->all(),
+        ];
+        $this->sinCoincidencia = [];
 
         // 1) Filas "fijas" de cada hoja + lo escrito en las filas "vivas"
         //    (fórmulas que jalan de otra hoja, FindPull de la macro).
@@ -125,6 +145,8 @@ class ControlGeneralImportador
 
         $guardar ? DB::transaction($trabajo) : $trabajo();
 
+        $resultado['sin_coincidencia'] = array_map(fn ($nombres) => array_keys($nombres), $this->sinCoincidencia);
+
         return $resultado;
     }
 
@@ -138,9 +160,9 @@ class ControlGeneralImportador
             'fecha_ingreso_etapa' => now()->toDateString(),
             'fecha_aprobacion' => $this->fecha($f['fapr'] ?? null) ?? $this->fecha($base['fapr'] ?? null),
             'construida' => $this->si($f['constr'] ?? null),
-            'asesor' => $this->texto($f['asesor'] ?? null),
-            'cuadrilla' => $this->texto($f['cuadrilla'] ?? null),
-            'contratista' => $this->texto($f['contratista'] ?? null),
+            'asesor_id' => $this->buscarId('asesor', 'asesor', $f['asesor'] ?? null),
+            'cuadrilla_id' => $this->buscarId('persona', 'cuadrilla', $f['cuadrilla'] ?? null),
+            'contratista_id' => $this->buscarId('persona', 'contratista', $f['contratista'] ?? null),
             'observacion' => $this->texto($f['obs'] ?? null),
             'fecha_observacion' => $this->fecha($f['fobs'] ?? null),
             // En la hoja 2 vale lo que dice la hoja (ella lo puede corregir);
@@ -151,10 +173,10 @@ class ControlGeneralImportador
             'fecha_marca' => $this->fecha($f['fmarca'] ?? null),
             'estado_tramite' => $this->texto($f['tramite'] ?? null),
             'fecha_programacion' => $this->fecha($f['fprog'] ?? null),
-            'tecnico' => $this->texto($f['tecnico'] ?? null),
+            'tecnico_id' => $this->buscarId('persona', 'técnico', $f['tecnico'] ?? null),
             'observado' => $this->si($f['obsv'] ?? null),
             'observado_portal' => array_key_exists('obsv', $base) ? $this->si($base['obsv']) : null,
-            'habilitado' => $this->si($f['habil'] ?? null) || $etapa === ControlGeneral::HABILITADA,
+            'habilitado' => (int) ($this->si($f['habil'] ?? null) || $etapa === ControlGeneral::HABILITADA),
             'fecha_habilitacion' => $this->fecha($f['fhab'] ?? null),
         ];
 
@@ -281,9 +303,33 @@ class ControlGeneralImportador
         return $valor === '' ? null : $valor;
     }
 
-    private function si($valor): bool
+    /**
+     * Id de quien se llama así en el Excel, o null si no está registrado
+     * (queda anotado para el informe).
+     */
+    private function buscarId(string $lista, string $rol, $nombre): ?int
     {
-        return in_array(mb_strtoupper(trim((string) $valor), 'UTF-8'), ['SÍ', 'SI'], true);
+        $nombre = $this->texto($nombre);
+        if ($nombre === null) {
+            return null;
+        }
+
+        $id = $this->catalogo[$lista][$this->clave($nombre)] ?? null;
+        if ($id === null) {
+            $this->sinCoincidencia[$rol][$nombre] = true;
+        }
+
+        return $id;
+    }
+
+    private function clave(string $nombre): string
+    {
+        return mb_strtoupper(preg_replace('/\s+/u', ' ', trim($nombre)), 'UTF-8');
+    }
+
+    private function si($valor): int
+    {
+        return (int) in_array(mb_strtoupper(trim((string) $valor), 'UTF-8'), ['SÍ', 'SI'], true);
     }
 
     private function vacio($valor): bool

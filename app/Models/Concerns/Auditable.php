@@ -38,11 +38,14 @@ trait Auditable
         });
 
         static::updated(function ($modelo) {
-            $despues = $modelo->auditFiltrar($modelo->getChanges());
+            $cambios = $modelo->getChanges();
+            $despues = $modelo->auditFiltrar($cambios);
             if (!$despues) {
                 return; // solo cambiaron campos excluidos (p. ej. cachés)
             }
-            $antes = array_intersect_key($modelo->getRawOriginal(), $despues);
+            // Mismo filtro que "después", para que un modelo que traduce
+            // campos (p. ej. un id a su nombre) lo haga en los dos lados.
+            $antes = $modelo->auditFiltrar(array_intersect_key($modelo->getRawOriginal(), $cambios));
 
             Auditoria::registrar(
                 'actualizado',

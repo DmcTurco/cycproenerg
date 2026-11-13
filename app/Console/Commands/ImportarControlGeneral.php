@@ -50,6 +50,11 @@ class ImportarControlGeneral extends Command
             $this->line(implode(', ', array_slice($r['no_encontradas'], 0, 50)) . (count($r['no_encontradas']) > 50 ? ' …' : ''));
         }
 
+        foreach ($r['sin_coincidencia'] as $rol => $nombres) {
+            $this->warn(count($nombres) . " nombres de {$rol} del Excel no están registrados (quedaron vacíos; regístralos y vuelve a importar):");
+            $this->line(implode(', ', array_slice($nombres, 0, 50)) . (count($nombres) > 50 ? ' …' : ''));
+        }
+
         return self::SUCCESS;
     }
 }

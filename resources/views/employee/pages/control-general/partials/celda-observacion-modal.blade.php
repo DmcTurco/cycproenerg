@@ -29,11 +29,11 @@
                 </p>
 
                 <div class="mt-4 space-y-4">
-                    @if (in_array('asesor', $camposModal, true))
-                        @include('employee.pages.control-general.partials.modal-buscador', ['campo' => 'asesor', 'etiqueta' => 'Asesor'])
+                    @if (in_array('asesor_id', $camposModal, true))
+                        @include('employee.pages.control-general.partials.modal-buscador', ['campo' => 'asesor_id', 'etiqueta' => 'Asesor'])
                     @endif
-                    @if (in_array('cuadrilla', $camposModal, true))
-                        @include('employee.pages.control-general.partials.modal-buscador', ['campo' => 'cuadrilla', 'etiqueta' => 'Cuadrilla'])
+                    @if (in_array('cuadrilla_id', $camposModal, true))
+                        @include('employee.pages.control-general.partials.modal-buscador', ['campo' => 'cuadrilla_id', 'etiqueta' => 'Cuadrilla'])
                     @endif
                     <div>
                         <label class="form-label">Observaciones</label>

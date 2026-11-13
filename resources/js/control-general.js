@@ -18,12 +18,15 @@ document.addEventListener('alpine:init', () => {
 
         // Modal de Asesor / Cuadrilla / Observaciones: se editan juntos y se
         // guardan de una sola vez (ver guardarModal). Qué campos trae cada
-        // fila lo decide la vista según la etapa (camposModal).
-        modal: { abierto: false, asesor: '', cuadrilla: '', observacion: '' },
+        // fila lo decide la vista según la etapa (camposModal). Asesor y
+        // cuadrilla se ELIGEN de la lista: se guarda el id (modal.*_id) y se
+        // recuerda el nombre (modal.nombres) para mostrarlo sin recargar.
+        modal: { abierto: false, asesor_id: null, cuadrilla_id: null, observacion: '', nombres: { asesor_id: '', cuadrilla_id: '' } },
 
         abrirModal() {
-            this.modal.asesor = this.f.asesor || '';
-            this.modal.cuadrilla = this.f.cuadrilla || '';
+            this.modal.asesor_id = this.f.asesor_id ?? null;
+            this.modal.cuadrilla_id = this.f.cuadrilla_id ?? null;
+            this.modal.nombres = { asesor_id: this.f.asesor || '', cuadrilla_id: this.f.cuadrilla || '' };
             this.modal.observacion = this.f.observacion || '';
             this.modal.abierto = true;
         },
@@ -33,11 +36,13 @@ document.addEventListener('alpine:init', () => {
         },
 
         async guardarModal(campos) {
+            const limpio = (v) => (v === null || v === undefined ? '' : String(v).trim());
             const cambios = {};
             for (const campo of campos) {
-                const nuevo = (this.modal[campo] ?? '').toString().trim();
-                const anterior = (this.f[campo] ?? '').toString().trim();
-                if (nuevo !== anterior) cambios[campo] = nuevo;
+                const nuevo = limpio(this.modal[campo]);
+                if (nuevo !== limpio(this.f[campo])) {
+                    cambios[campo] = campo.endsWith('_id') ? (this.modal[campo] ?? null) : nuevo;
+                }
             }
             if (!Object.keys(cambios).length) {
                 this.modal.abierto = false;
@@ -57,6 +62,9 @@ document.addEventListener('alpine:init', () => {
                 if (!resp.ok) throw new Error(data.message || 'No se pudo guardar el cambio.');
 
                 Object.assign(this.f, cambios);
+                for (const campo of Object.keys(cambios)) {
+                    if (campo.endsWith('_id')) this.f[campo.slice(0, -3)] = cambios[campo] ? this.modal.nombres[campo] : null;
+                }
                 this.situacion = data.situacion ?? this.situacion;
                 if (data.fecha_observacion !== undefined) this.f.fecha_observacion = data.fecha_observacion;
 
@@ -67,6 +75,23 @@ document.addEventListener('alpine:init', () => {
             } catch (e) {
                 this.estado = 'error';
                 aviso(e.message, 'error');
+            }
+        },
+
+        // Elegir (o quitar, con op = null) a alguien de una lista desde la
+        // propia celda (técnico, contratista): se guarda el id al instante.
+        async elegirPersona(campo, nombre, op) {
+            const idAntes = this.f[campo] ?? null;
+            const nombreAntes = this.f[nombre] ?? null;
+            const id = op ? op.id : null;
+            if (id === idAntes) return;
+
+            this.f[campo] = id;
+            this.f[nombre] = op ? op.nombre : null;
+            const ok = await this.guardar(campo, id);
+            if (!ok) {
+                this.f[campo] = idAntes;
+                this.f[nombre] = nombreAntes;
             }
         },
 

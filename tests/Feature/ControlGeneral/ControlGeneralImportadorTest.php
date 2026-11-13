@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\ControlGeneral;
 
+use App\Models\Asesor;
 use App\Models\ControlGeneral;
+use App\Models\PersonaCampo;
 use App\Models\Solicitud;
 use App\Services\ControlGeneralImportador;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,6 +27,16 @@ class ControlGeneralImportadorTest extends TestCase
     {
         parent::setUp();
 
+        // Se importan por id: tienen que estar registrados (el nombre del Excel se
+        // busca sin distinguir mayúsculas ni espacios de más).
+        foreach (['ANA', 'LUIS'] as $nombre) {
+            Asesor::create(['company_id' => 1, 'nombre' => $nombre]);
+        }
+        foreach (['JUAN', 'PEDRO', 'Jian Castro'] as $nombre) {
+            PersonaCampo::create(['nombre' => $nombre, 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO, 'estado' => PersonaCampo::ESTADO_ACTIVO]);
+        }
+        PersonaCampo::create(['nombre' => 'CONTRATISTA X', 'tipo' => PersonaCampo::TIPO_CONTRATISTA, 'estado' => PersonaCampo::ESTADO_ACTIVO]);
+
         foreach (['100', '200', '300', '400', '500', '600'] as $sol) {
             Solicitud::create(['numero_solicitud' => $sol, 'numero_suministro' => 'S' . $sol]);
         }
@@ -36,7 +48,7 @@ class ControlGeneralImportadorTest extends TestCase
             ['n', 'emp', 'sum', 'sol', 'fapr', 'constr', 'asesor', 'cuadrilla', 'reing', 'obs'],
             [
                 [1, 'CLB', 'S100', '100', '2026-10-01', 'No', 'ANA', 'JUAN', null, 'llamar lunes'],
-                [2, 'CLB', 'S500', '500', '2026-10-02', 'No', 'ANA', null, 'Anular', 'cliente desiste'],
+                [2, 'CLB', 'S500', '500', '2026-10-02', 'No', 'ANA', 'NADIE', 'Anular', 'cliente desiste'],
                 [3, 'CLB', 'S999', '999', '2026-10-02', 'No', null, null, null, null],
             ]);
         $hoja2 = $this->hoja($libro, '2-TC Construidas',
@@ -102,21 +114,24 @@ class ControlGeneralImportadorTest extends TestCase
         $r = (new ControlGeneralImportador())->importar($this->archivo);
 
         $this->assertSame(['999'], $r['no_encontradas']);
+        // 'NADIE' no está registrado: queda vacío y se informa.
+        $this->assertSame(['cuadrilla' => ['NADIE']], $r['sin_coincidencia']);
+        $this->assertNull($this->cg('500')->cuadrilla_id);
 
         $a = $this->cg('100');
         $this->assertSame(ControlGeneral::APROBADA, $a->etapa);
-        $this->assertSame(['ANA', 'JUAN', 'llamar lunes', '2026-10-01'], [$a->asesor, $a->cuadrilla, $a->observacion, $a->fecha_aprobacion->toDateString()]);
+        $this->assertSame(['ANA', 'JUAN', 'llamar lunes', '2026-10-01'], [$a->asesor->nombre, $a->cuadrilla->nombre, $a->observacion, $a->fecha_aprobacion->toDateString()]);
 
         $tc = $this->cg('200');
         $this->assertSame(ControlGeneral::TC_CONSTRUIDA, $tc->etapa);
         $this->assertSame('Rechazada', $tc->resultado_tc);
         $this->assertSame('Pendiente', $tc->resultado_tc_portal);
-        $this->assertSame('CONTRATISTA X', $tc->contratista);
+        $this->assertSame('CONTRATISTA X', $tc->contratista->nombre);
         $this->assertSame('2026-10-20', $tc->fecha_observacion->toDateString());
 
         $h = $this->cg('300');
         $this->assertSame(ControlGeneral::HABILITACION, $h->etapa);
-        $this->assertSame(['JIAN CASTRO', '2026-11-10', 'Programado'], [$h->tecnico, $h->fecha_programacion->toDateString(), $h->situacion()]);
+        $this->assertSame(['Jian Castro', '2026-11-10', 'Programado'], [$h->tecnico->nombre, $h->fecha_programacion->toDateString(), $h->situacion()]);
 
         $an = $this->cg('400');
         $this->assertSame(ControlGeneral::ANULACION, $an->etapa);

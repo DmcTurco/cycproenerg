@@ -23,9 +23,9 @@ class ControlGeneralController extends Controller
 {
     /** Lo que se puede editar en cada etapa (columnas amarillas del Excel). */
     private const EDITABLES = [
-        ControlGeneral::APROBADA => ['construida', 'asesor', 'cuadrilla', 'accion', 'observacion'],
-        ControlGeneral::TC_CONSTRUIDA => ['resultado_tc', 'observacion', 'fecha_observacion', 'contratista', 'asesor', 'cuadrilla'],
-        ControlGeneral::HABILITACION => ['fecha_programacion', 'tecnico', 'observado', 'habilitado', 'observacion'],
+        ControlGeneral::APROBADA => ['construida', 'asesor_id', 'cuadrilla_id', 'accion', 'observacion'],
+        ControlGeneral::TC_CONSTRUIDA => ['resultado_tc', 'observacion', 'fecha_observacion', 'contratista_id', 'asesor_id', 'cuadrilla_id'],
+        ControlGeneral::HABILITACION => ['fecha_programacion', 'tecnico_id', 'observado', 'habilitado', 'asesor_id', 'cuadrilla_id', 'fecha_ultima_visita', 'observacion'],
         ControlGeneral::ANULACION => ['accion', 'estado_tramite', 'observacion'],
         ControlGeneral::HABILITADA => ['habilitado', 'fecha_habilitacion', 'observacion'],
     ];
@@ -64,7 +64,7 @@ class ControlGeneralController extends Controller
 
         $registros = (clone $enEtapa)
             ->when($filtro, fn ($q) => $this->aplicarFiltro($q, $etapa, $filtro, $diasLimite))
-            ->with(['solicitud.empresa', 'solicitud.solicitante', 'solicitud.ubicacion', 'solicitud.proyecto', 'solicitud.instalacion', 'solicitud.estadoPortal'])
+            ->with(['solicitud.empresa', 'solicitud.solicitante', 'solicitud.ubicacion', 'solicitud.proyecto', 'solicitud.instalacion', 'solicitud.estadoPortal', 'asesor', 'cuadrilla', 'tecnico', 'contratista'])
             ->tap(fn ($q) => $this->ordenar($q, $etapa))
             ->paginate(20)
             ->appends($request->query());
@@ -78,7 +78,7 @@ class ControlGeneralController extends Controller
             'subconteos' => $subconteos,
             'diasLimite' => $diasLimite,
             'duplicados' => $etapa === ControlGeneral::HABILITACION ? $this->suministrosDuplicados() : [],
-            'sugerencias' => $this->sugerencias(),
+            'opciones' => $this->opciones(),
             'editables' => self::EDITABLES[$etapa],
             'ultimaCarga' => Logs::where('estado', 'completado')->latest()->first(),
             'terminos' => $terminos->all(),
@@ -313,12 +313,15 @@ class ControlGeneralController extends Controller
     private function reglas(string $campo): array
     {
         return match ($campo) {
-            'construida', 'observado', 'habilitado' => ['nullable', 'boolean'],
-            'fecha_observacion', 'fecha_programacion', 'fecha_habilitacion' => ['nullable', 'date'],
+            'construida', 'observado', 'habilitado' => ['nullable', 'integer', 'in:0,1'],
+            'fecha_observacion', 'fecha_programacion', 'fecha_ultima_visita', 'fecha_habilitacion' => ['nullable', 'date'],
             'accion' => ['nullable', Rule::in(ControlGeneral::ACCIONES)],
             'estado_tramite' => ['nullable', Rule::in(ControlGeneral::ESTADOS_TRAMITE)],
             'resultado_tc' => ['nullable', Rule::in(ControlGeneral::RESULTADOS_TC)],
             'observacion' => ['nullable', 'string', 'max:2000'],
+            'asesor_id' => ['nullable', 'integer', Rule::exists('asesores', 'id')->whereNull('deleted_at')],
+            'cuadrilla_id', 'tecnico_id' => ['nullable', 'integer', Rule::exists('personas_campo', 'id')->whereNull('deleted_at')],
+            'contratista_id' => ['nullable', 'integer', Rule::exists('personas_campo', 'id')->whereNull('deleted_at')->where('tipo', PersonaCampo::TIPO_CONTRATISTA)],
             default => ['nullable', 'string', 'max:255'],
         };
     }
@@ -328,7 +331,11 @@ class ControlGeneralController extends Controller
         $valor = validator(['valor' => $valor], ['valor' => $this->reglas($campo)])->validate()['valor'] ?? null;
 
         if (in_array($campo, ['construida', 'observado', 'habilitado'], true)) {
-            return (bool) $valor;
+            return (int) $valor;
+        }
+
+        if (str_ends_with($campo, '_id')) {
+            return $valor === null || $valor === '' ? null : (int) $valor;
         }
 
         $valor = is_string($valor) ? trim($valor) : $valor;
@@ -353,9 +360,9 @@ class ControlGeneralController extends Controller
                 ? $q->where(fn ($w) => $w->whereNull('resultado_tc')->orWhere('resultado_tc', 'Sin registro'))
                 : $q->where('resultado_tc', $filtro),
             ControlGeneral::HABILITACION => match ($filtro) {
-                'Observado' => $q->where('observado', true),
-                'Programado' => $q->where('observado', false)->whereNotNull('fecha_programacion'),
-                'Por programar' => $q->where('observado', false)->whereNull('fecha_programacion'),
+                'Observado' => $q->where('observado', 1),
+                'Programado' => $q->where('observado', 0)->whereNotNull('fecha_programacion'),
+                'Por programar' => $q->where('observado', 0)->whereNull('fecha_programacion'),
                 default => null,
             },
             ControlGeneral::ANULACION => in_array($filtro, ControlGeneral::ACCIONES, true)
@@ -413,20 +420,30 @@ class ControlGeneralController extends Controller
     }
 
     /**
-     * Listas para los desplegables (hoja "Listas" del Excel): personas ya
-     * registradas en el sistema + nombres que ya se escribieron a mano.
+     * Listas para elegir (no se escribe): asesores y personal de campo
+     * activos, como [{id, nombre, tipo}]. `tipo` solo lo tiene el personal de
+     * campo (Personal directo / Contratista). Contratista solo ofrece a los
+     * de tipo CONTRATISTA; cuadrilla y técnico, a todo el personal de campo.
      */
-    private function sugerencias(): array
+    private function opciones(): array
     {
-        $usados = fn (string $campo) => ControlGeneral::query()->whereNotNull($campo)->distinct()->pluck($campo);
-        $personas = PersonaCampo::query()->where('estado', PersonaCampo::ESTADO_ACTIVO)->pluck('nombre');
-        $ordenar = fn ($c) => $c->map(fn ($n) => trim($n))->filter()->unique()->sort()->values()->all();
+        $personas = PersonaCampo::query()
+            ->where('estado', PersonaCampo::ESTADO_ACTIVO)
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'tipo'])
+            ->map(fn ($p) => ['id' => $p->id, 'nombre' => trim($p->nombre), 'tipo' => $p->tipo]);
+
+        $asesores = Asesor::query()
+            ->where(fn ($q) => $q->whereNull('estado')->orWhere('estado', 'activo'))
+            ->orderBy('nombre')
+            ->get(['id', 'nombre'])
+            ->map(fn ($a) => ['id' => $a->id, 'nombre' => trim($a->nombre), 'tipo' => null]);
 
         return [
-            'asesor' => $ordenar(Asesor::pluck('nombre')->merge($usados('asesor'))),
-            'cuadrilla' => $ordenar($personas->merge($usados('cuadrilla'))),
-            'tecnico' => $ordenar($personas->merge($usados('tecnico'))),
-            'contratista' => $ordenar($personas->merge($usados('contratista'))),
+            'asesor_id' => $asesores->values()->all(),
+            'cuadrilla_id' => $personas->values()->all(),
+            'tecnico_id' => $personas->values()->all(),
+            'contratista_id' => $personas->where('tipo', PersonaCampo::TIPO_CONTRATISTA)->values()->all(),
         ];
     }
 }

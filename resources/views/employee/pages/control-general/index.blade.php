@@ -31,8 +31,9 @@
     // Qué campos trae el modal de Asesor/Cuadrilla/Observaciones en cada
     // etapa (coincide con lo que antes se podía editar en la fila).
     $camposModal = match ($etapa) {
-        ControlGeneral::APROBADA => ['asesor', 'cuadrilla', 'observacion'],
-        ControlGeneral::TC_CONSTRUIDA => ['cuadrilla', 'observacion'],
+        ControlGeneral::APROBADA => ['asesor_id', 'cuadrilla_id', 'observacion'],
+        ControlGeneral::TC_CONSTRUIDA => ['cuadrilla_id', 'observacion'],
+        ControlGeneral::HABILITACION => ['asesor_id', 'cuadrilla_id', 'observacion'],
         default => ['observacion'],
     };
 
@@ -244,15 +245,6 @@
                 <span>Total: <strong>{{ $registros->total() }}</strong></span>
             </div>
 
-            {{-- Listas de sugerencias (hoja "Listas" del Excel): se elige o se escribe un nombre nuevo --}}
-            @foreach ($sugerencias as $lista => $nombres)
-                <datalist id="cg-lista-{{ $lista }}">
-                    @foreach ($nombres as $nombre)
-                        <option value="{{ $nombre }}"></option>
-                    @endforeach
-                </datalist>
-            @endforeach
-
             <div class="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-100">
                 <table class="min-w-full divide-y divide-gray-200 text-xs">
                     <thead>
@@ -292,6 +284,7 @@
                                     <th class="sticky top-0 z-10 bg-white px-2 py-2.5">F. programación</th>
                                     <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Técnico (habilita)</th>
                                     <th class="sticky top-0 z-10 bg-white px-2 py-2.5">¿Observado?</th>
+                                    <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Asesor / Cuadrilla</th>
                                     <th class="sticky top-0 z-10 bg-white px-2 py-2.5">¿Habilitado?</th>
                                     <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Situación</th>
                                     @break
@@ -310,6 +303,9 @@
                             @endswitch
 
                             <th class="sticky top-0 z-10 bg-white px-2 py-2.5">Observaciones</th>
+                            @if ($etapa === ControlGeneral::HABILITACION)
+                                <th class="sticky top-0 z-10 bg-white px-2 py-2.5">F. última visita</th>
+                            @endif
                             <th class="sticky top-0 z-10 bg-white px-2 py-2.5 text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -329,16 +325,21 @@
                                     'situacion' => $cg->situacion(),
                                     'valores' => [
                                         'construida' => $cg->construida ? '1' : '0',
-                                        'asesor' => $cg->asesor,
-                                        'cuadrilla' => $cg->cuadrilla,
-                                        'contratista' => $cg->contratista,
+                                        'asesor_id' => $cg->asesor_id,
+                                        'asesor' => $cg->asesor?->nombre,
+                                        'cuadrilla_id' => $cg->cuadrilla_id,
+                                        'cuadrilla' => $cg->cuadrilla?->nombre,
+                                        'contratista_id' => $cg->contratista_id,
+                                        'contratista' => $cg->contratista?->nombre,
                                         'accion' => $cg->accion,
                                         'observacion' => $cg->observacion,
                                         'fecha_observacion' => $cg->fecha_observacion?->toDateString(),
                                         'resultado_tc' => $cg->resultado_tc,
                                         'estado_tramite' => $cg->estado_tramite,
                                         'fecha_programacion' => $cg->fecha_programacion?->toDateString(),
-                                        'tecnico' => $cg->tecnico,
+                                        'tecnico_id' => $cg->tecnico_id,
+                                        'tecnico' => $cg->tecnico?->nombre,
+                                        'fecha_ultima_visita' => $cg->fecha_ultima_visita?->toDateString(),
                                         'observado' => $cg->observado ? '1' : '0',
                                         'habilitado' => $cg->habilitado ? '1' : '0',
                                         'fecha_habilitacion' => $cg->fecha_habilitacion?->toDateString(),
@@ -381,15 +382,27 @@
                                         <td class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->fecha_aprobacion?->format('d/m/Y') ?? '—' }}</td>
                                         @include('employee.pages.control-general.partials.celda-select', ['campo' => 'resultado_tc', 'opciones' => ControlGeneral::RESULTADOS_TC, 'vacio' => '—', 'confirmarEn' => ['Concluida'], 'confirmar' => 'Con TC Concluida la solicitud pasa a 3. Habilitación.'])
                                         <td class="whitespace-nowrap px-2 py-1.5 text-gray-600" x-text="formatoFecha(f.fecha_observacion)">{{ $cg->fecha_observacion?->format('d/m/Y') ?? '—' }}</td>
-                                        @include('employee.pages.control-general.partials.celda-texto', ['campo' => 'contratista', 'lista' => 'contratista'])
-                                        <td x-show="masDatos" class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->asesor ?? '—' }}</td>
+                                        @include('employee.pages.control-general.partials.celda-elegir', ['campo' => 'contratista_id'])
+                                        <td x-show="masDatos" class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->asesor?->nombre ?? '—' }}</td>
                                         @include('employee.pages.control-general.partials.celda-dato-modal', ['campo' => 'cuadrilla'])
                                         @break
 
                                     @case(ControlGeneral::HABILITACION)
                                         @include('employee.pages.control-general.partials.celda-fecha', ['campo' => 'fecha_programacion'])
-                                        @include('employee.pages.control-general.partials.celda-texto', ['campo' => 'tecnico', 'lista' => 'tecnico'])
+                                        @include('employee.pages.control-general.partials.celda-elegir', ['campo' => 'tecnico_id'])
                                         @include('employee.pages.control-general.partials.celda-si-no', ['campo' => 'observado'])
+                                        <td class="px-2 py-1.5 {{ $celdaManual }}">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="max-w-[12rem] flex-1 truncate text-gray-700"
+                                                    :title="(f.asesor || '—') + ' / ' + (f.cuadrilla || '—')"
+                                                    x-text="(f.asesor || '—') + ' / ' + (f.cuadrilla || '—')"></span>
+                                                @if ($editable('asesor_id'))
+                                                    <button type="button" @click="abrirModal()" class="btn-icon shrink-0" title="Seleccionar asesor y cuadrilla">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" /></svg>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </td>
                                         @include('employee.pages.control-general.partials.celda-si-no', ['campo' => 'habilitado', 'confirmarEn' => ['1'], 'confirmar' => 'La cuenta pasará a 5. Habilitadas con fecha de hoy.'])
                                         <td class="whitespace-nowrap px-2 py-1.5">
                                             <span class="badge" :class="colorSituacion(situacion)" x-text="situacion">{{ $cg->situacion() }}</span>
@@ -400,18 +413,22 @@
                                         @include('employee.pages.control-general.partials.celda-select', ['campo' => 'accion', 'opciones' => ControlGeneral::ACCIONES, 'vacio' => 'Quitar (vuelve a Aprobadas)', 'confirmarEn' => [''], 'confirmar' => 'Sin acción, la solicitud vuelve a 1. Aprobadas.'])
                                         <td class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->fecha_marca?->format('d/m/Y') ?? '—' }}</td>
                                         @include('employee.pages.control-general.partials.celda-select', ['campo' => 'estado_tramite', 'opciones' => ControlGeneral::ESTADOS_TRAMITE, 'vacio' => '—'])
-                                        <td class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->asesor ?? '—' }}</td>
+                                        <td class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->asesor?->nombre ?? '—' }}</td>
                                         @break
 
                                     @case(ControlGeneral::HABILITADA)
                                         <td class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->fecha_programacion?->format('d/m/Y') ?? '—' }}</td>
-                                        <td class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->tecnico ?? '—' }}</td>
+                                        <td class="whitespace-nowrap px-2 py-1.5 text-gray-600">{{ $cg->tecnico?->nombre ?? '—' }}</td>
                                         @include('employee.pages.control-general.partials.celda-fecha', ['campo' => 'fecha_habilitacion'])
                                         @include('employee.pages.control-general.partials.celda-si-no', ['campo' => 'habilitado', 'confirmarEn' => ['0'], 'confirmar' => 'La cuenta volverá a 3. Habilitación.'])
                                         @break
                                 @endswitch
 
                                 @include('employee.pages.control-general.partials.celda-observacion-modal')
+
+                                @if ($etapa === ControlGeneral::HABILITACION)
+                                    @include('employee.pages.control-general.partials.celda-fecha', ['campo' => 'fecha_ultima_visita'])
+                                @endif
 
                                 <td class="whitespace-nowrap px-2 py-1.5">
                                     <div class="flex items-center justify-center gap-0.5">

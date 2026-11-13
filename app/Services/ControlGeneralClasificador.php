@@ -136,7 +136,7 @@ class ControlGeneralClasificador
         $estado = trim((string) ($p['estado'] ?? ''));
         $pref = substr($estado, 0, 2);
         $tcPortal = self::texto($p['resultado_tc'] ?? null);
-        $observadoPortal = self::esObservado($estado);
+        $observadoPortal = (int) self::esObservado($estado);
         $fechaAprobacion = ($p['fecha_suscripcion'] ?? null) ?: (($p['fecha_entrega_documentos'] ?? null) ?: null);
 
         $cg = ControlGeneral::where('solicitud_id', $solicitud->id)->first();
@@ -191,9 +191,9 @@ class ControlGeneralClasificador
             if ($pref === '02') {
                 // Volvió al estado 02: no corresponde a habilitación.
                 self::mover($cg, ControlGeneral::APROBADA);
-                $cg->construida = false;
+                $cg->construida = 0;
             } else {
-                $cg->observado = (bool) self::merge($cg->observado, $observadoPortal, $cg->observado_portal);
+                $cg->observado = (int) self::merge($cg->observado, $observadoPortal, $cg->observado_portal);
             }
         } elseif ($tcActual === 'Concluida' && $pref !== '02') {
             $cg->resultado_tc = $tcActual;
@@ -229,11 +229,11 @@ class ControlGeneralClasificador
         return str_starts_with($codigoEstado, '08.1') || str_starts_with($codigoEstado, '10.1');
     }
 
-    private static function entrarAHabilitacion(ControlGeneral $cg, ?bool $observadoPortal = null): void
+    private static function entrarAHabilitacion(ControlGeneral $cg, ?int $observadoPortal = null): void
     {
         self::mover($cg, ControlGeneral::HABILITACION);
-        $cg->habilitado = false;
-        $cg->observado = (bool) ($observadoPortal ?? $cg->observado_portal ?? false);
+        $cg->habilitado = 0;
+        $cg->observado = (int) ($observadoPortal ?? $cg->observado_portal ?? 0);
     }
 
     private static function mover(ControlGeneral $cg, string $etapa): void
@@ -242,7 +242,7 @@ class ControlGeneralClasificador
         $cg->fecha_ingreso_etapa = now()->toDateString();
     }
 
-    private static function guardarSnapshots(ControlGeneral $cg, ?string $tcPortal, bool $observadoPortal): void
+    private static function guardarSnapshots(ControlGeneral $cg, ?string $tcPortal, int $observadoPortal): void
     {
         $cg->resultado_tc_portal = $tcPortal;
         $cg->observado_portal = $observadoPortal;
@@ -265,10 +265,6 @@ class ControlGeneralClasificador
 
     private static function igual($a, $b): bool
     {
-        if (is_bool($a) || is_bool($b)) {
-            return (bool) $a === (bool) $b;
-        }
-
         return trim((string) $a) === trim((string) $b);
     }
 

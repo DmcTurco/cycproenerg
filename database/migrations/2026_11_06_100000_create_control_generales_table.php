@@ -16,9 +16,8 @@ return new class extends Migration
      * 4-Anulaciones-Reingresos, 5-Habilitadas). Reemplaza al antiguo
      * módulo Control Interno (fases GENERAL/CONSTRUIDO/TC), que se eliminó.
      *
-     * Asesor, cuadrilla, técnico y contratista se guardan como TEXTO (con
-     * sugerencias de las tablas del sistema en pantalla), igual que en el
-     * Excel, donde se elige de una lista o se escribe un nombre nuevo.
+     * Asesor, cuadrilla, técnico y contratista se guardan por ID (asesores y
+     * personas_campo): solo se eligen de la lista registrada, no se escribe.
      */
     public function up(): void
     {
@@ -35,10 +34,13 @@ return new class extends Migration
             $table->date('fecha_aprobacion')->nullable();
 
             // Lo que llena la usuaria (columnas amarillas del Excel).
-            $table->boolean('construida')->default(false);
-            $table->string('asesor')->nullable();
-            $table->string('cuadrilla')->nullable();
-            $table->string('contratista')->nullable();
+            $table->tinyInteger('construida')->default(0)->comment('0 = No, 1 = Sí');
+            // Quién: se elige de las listas registradas (Asesores y Personal de
+            // campo), no se escribe. Cuadrilla, técnico y contratista son la
+            // misma tabla `personas_campo` según el rol.
+            $table->foreignId('asesor_id')->nullable()->constrained('asesores')->nullOnDelete();
+            $table->foreignId('cuadrilla_id')->nullable()->constrained('personas_campo')->nullOnDelete();
+            $table->foreignId('contratista_id')->nullable()->constrained('personas_campo')->nullOnDelete();
             $table->text('observacion')->nullable();
             $table->date('fecha_observacion')->nullable();
 
@@ -57,11 +59,13 @@ return new class extends Migration
 
             // Habilitación.
             $table->date('fecha_programacion')->nullable();
-            $table->string('tecnico')->nullable();
-            $table->boolean('observado')->default(false);
-            $table->boolean('observado_portal')->nullable()
-                ->comment('Último valor del portal (estado 08.1/10.1), misma regla que resultado_tc_portal');
-            $table->boolean('habilitado')->default(false);
+            $table->foreignId('tecnico_id')->nullable()->constrained('personas_campo')->nullOnDelete();
+            // Dato externo: la última vez que el técnico/cuadrilla visitó la cuenta.
+            $table->date('fecha_ultima_visita')->nullable();
+            $table->tinyInteger('observado')->default(0)->comment('0 = No, 1 = Sí');
+            $table->tinyInteger('observado_portal')->nullable()
+                ->comment('Último valor del portal (estado 08.1/10.1), 0 = No, 1 = Sí; misma regla que resultado_tc_portal');
+            $table->tinyInteger('habilitado')->default(0)->comment('0 = No, 1 = Sí');
             $table->date('fecha_habilitacion')->nullable();
 
             $table->timestamps();

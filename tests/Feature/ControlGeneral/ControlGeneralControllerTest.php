@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\ControlGeneral;
 
+use App\Models\Asesor;
 use App\Models\ControlGeneral;
+use App\Models\PersonaCampo;
 use App\Models\Employee;
 use App\Models\Empresa;
 use App\Models\EstadoPortal;
@@ -105,13 +107,14 @@ class ControlGeneralControllerTest extends TestCase
     public function test_guardar_una_celda_y_mover_de_etapa(): void
     {
         $cg = $this->registro(ControlGeneral::APROBADA, $this->clb);
+        $ana = Asesor::create(['company_id' => 1, 'nombre' => 'ANA PÉREZ']);
         $usuaria = $this->empleado(['control_general.ver', 'control_general.editar']);
 
         $this->actingAs($usuaria, 'employee')
-            ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'asesor', 'valor' => ' ANA PÉREZ '])
+            ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'asesor_id', 'valor' => $ana->id])
             ->assertOk()
             ->assertJson(['movida' => false]);
-        $this->assertSame('ANA PÉREZ', $cg->fresh()->asesor);
+        $this->assertSame('ANA PÉREZ', $cg->fresh()->asesor->nombre);
 
         $this->actingAs($usuaria, 'employee')
             ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'construida', 'valor' => '1'])
@@ -142,7 +145,7 @@ class ControlGeneralControllerTest extends TestCase
 
         $this->actingAs($consulta, 'employee')->get(route('employee.control-general.index'))->assertOk();
         $this->actingAs($consulta, 'employee')
-            ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'asesor', 'valor' => 'X'])
+            ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'asesor_id', 'valor' => 1])
             ->assertForbidden();
     }
 
@@ -202,31 +205,67 @@ class ControlGeneralControllerTest extends TestCase
     public function test_guardar_asesor_cuadrilla_y_observacion_juntos_desde_el_modal(): void
     {
         $cg = $this->registro(ControlGeneral::APROBADA, $this->clb);
+        $ana = Asesor::create(['company_id' => 1, 'nombre' => 'ANA PÉREZ']);
+        $cuadrilla = PersonaCampo::create(['nombre' => 'CUADRILLA 1', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO, 'estado' => PersonaCampo::ESTADO_ACTIVO]);
         $usuaria = $this->empleado(['control_general.ver', 'control_general.editar']);
 
         $this->actingAs($usuaria, 'employee')
             ->patchJson(route('employee.control-general.update', $cg), [
-                'campos' => ['asesor' => ' ANA PÉREZ ', 'cuadrilla' => 'CUADRILLA 1', 'observacion' => 'Pendiente de visita'],
+                'campos' => ['asesor_id' => $ana->id, 'cuadrilla_id' => $cuadrilla->id, 'observacion' => 'Pendiente de visita'],
             ])
             ->assertOk()
             ->assertJson(['movida' => false]);
 
         $cg->refresh();
-        $this->assertSame('ANA PÉREZ', $cg->asesor);
-        $this->assertSame('CUADRILLA 1', $cg->cuadrilla);
+        $this->assertSame('ANA PÉREZ', $cg->asesor->nombre);
+        $this->assertSame('CUADRILLA 1', $cg->cuadrilla->nombre);
         $this->assertSame('Pendiente de visita', $cg->observacion);
     }
 
     public function test_el_modal_no_deja_guardar_un_campo_que_no_es_editable_en_la_etapa(): void
     {
-        $cg = $this->registro(ControlGeneral::HABILITACION, $this->clb);
+        $cg = $this->registro(ControlGeneral::ANULACION, $this->clb);
         $usuaria = $this->empleado(['control_general.ver', 'control_general.editar']);
 
         $this->actingAs($usuaria, 'employee')
             ->patchJson(route('employee.control-general.update', $cg), [
-                'campos' => ['asesor' => 'ALGUIEN'],
+                'campos' => ['asesor_id' => 1],
             ])
             ->assertStatus(422);
+    }
+
+    public function test_no_se_puede_guardar_un_id_que_no_existe_ni_un_contratista_que_no_lo_es(): void
+    {
+        $cg = $this->registro(ControlGeneral::HABILITACION, $this->clb);
+        $usuaria = $this->empleado(['control_general.ver', 'control_general.editar']);
+        $directo = PersonaCampo::create(['nombre' => 'DIRECTO', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO, 'estado' => PersonaCampo::ESTADO_ACTIVO]);
+
+        $this->actingAs($usuaria, 'employee')
+            ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'tecnico_id', 'valor' => 99999])
+            ->assertStatus(422);
+
+        // Un técnico sí puede ser personal directo...
+        $this->actingAs($usuaria, 'employee')
+            ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'tecnico_id', 'valor' => $directo->id])
+            ->assertOk();
+        $this->assertSame($directo->id, $cg->fresh()->tecnico_id);
+
+        $this->assertNull($cg->fresh()->contratista_id);
+    }
+
+    public function test_el_log_guarda_el_nombre_de_quien_se_eligio(): void
+    {
+        $cg = $this->registro(ControlGeneral::APROBADA, $this->clb);
+        $usuaria = $this->empleado(['control_general.ver', 'control_general.editar']);
+        $ana = Asesor::create(['company_id' => 1, 'nombre' => 'ANA PÉREZ']);
+
+        $this->actingAs($usuaria, 'employee')
+            ->patchJson(route('employee.control-general.update', $cg), ['campo' => 'asesor_id', 'valor' => $ana->id])
+            ->assertOk();
+
+        $log = \App\Models\Auditoria::where('auditable_type', $cg->getMorphClass())->where('auditable_id', $cg->id)->where('accion', 'actualizado')->latest('id')->first();
+        $this->assertSame('ANA PÉREZ', $log->despues['asesor']);
+        $this->assertArrayNotHasKey('asesor_id', $log->despues);
     }
 
     public function test_parametros_se_guardan_y_requieren_permiso(): void

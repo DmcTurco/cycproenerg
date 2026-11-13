@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\ControlGeneral;
 
+use App\Models\Asesor;
 use App\Models\ControlGeneral;
+use App\Models\PersonaCampo;
 use App\Models\Solicitud;
 use App\Services\ControlGeneralClasificador;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -104,7 +106,7 @@ class ControlGeneralClasificadorTest extends TestCase
 
         $cg = $this->cg($s);
         $this->assertSame(ControlGeneral::HABILITACION, $cg->etapa);
-        $this->assertTrue($cg->observado);
+        $this->assertSame(1, $cg->observado);
         $this->assertSame('Observado', $cg->situacion());
     }
 
@@ -122,13 +124,15 @@ class ControlGeneralClasificadorTest extends TestCase
     {
         $s = $this->solicitud();
         ControlGeneralClasificador::aplicarPortal($s, $this->portal());
-        $this->cg($s)->update(['asesor' => 'ANA', 'cuadrilla' => 'JUAN', 'observacion' => 'llamar']);
+        $ana = Asesor::create(['company_id' => 1, 'nombre' => 'ANA']);
+        $juan = PersonaCampo::create(['nombre' => 'JUAN', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO, 'estado' => PersonaCampo::ESTADO_ACTIVO]);
+        $this->cg($s)->update(['asesor_id' => $ana->id, 'cuadrilla_id' => $juan->id, 'observacion' => 'llamar']);
 
         $r = ControlGeneralClasificador::aplicarPortal($s, $this->portal(['estado' => '06']));
 
         $cg = $this->cg($s);
         $this->assertSame(ControlGeneral::TC_CONSTRUIDA, $r['despues']);
-        $this->assertSame(['ANA', 'JUAN', 'llamar'], [$cg->asesor, $cg->cuadrilla, $cg->observacion]);
+        $this->assertSame(['ANA', 'JUAN', 'llamar'], [$cg->asesor->nombre, $cg->cuadrilla->nombre, $cg->observacion]);
     }
 
     public function test_aprobada_que_avanza_a_04_se_queda_en_aprobadas_como_avanzo_en_portal(): void
@@ -168,7 +172,7 @@ class ControlGeneralClasificadorTest extends TestCase
         $a = $this->solicitud();
         ControlGeneral::create(['solicitud_id' => $a->id, 'etapa' => ControlGeneral::ANULACION, 'accion' => 'Anular']);
         $h = $this->solicitud();
-        ControlGeneral::create(['solicitud_id' => $h->id, 'etapa' => ControlGeneral::HABILITADA, 'habilitado' => true]);
+        ControlGeneral::create(['solicitud_id' => $h->id, 'etapa' => ControlGeneral::HABILITADA, 'habilitado' => 1]);
 
         ControlGeneralClasificador::aplicarPortal($a, $this->portal(['estado' => '08', 'resultado_tc' => 'Concluida']));
         ControlGeneralClasificador::aplicarPortal($h, $this->portal(['estado' => '02']));
@@ -205,21 +209,21 @@ class ControlGeneralClasificadorTest extends TestCase
     {
         $s = $this->solicitud();
         ControlGeneralClasificador::aplicarPortal($s, $this->portal(['estado' => '08', 'resultado_tc' => 'Concluida']));
-        $this->cg($s)->update(['observado' => true]);
+        $this->cg($s)->update(['observado' => 1]);
 
         ControlGeneralClasificador::aplicarPortal($s, $this->portal(['estado' => '08', 'resultado_tc' => 'Concluida']));
-        $this->assertTrue($this->cg($s)->observado);
+        $this->assertSame(1, $this->cg($s)->observado);
 
         ControlGeneralClasificador::aplicarPortal($s, $this->portal(['estado' => '08.1', 'resultado_tc' => 'Concluida']));
         ControlGeneralClasificador::aplicarPortal($s, $this->portal(['estado' => '09', 'resultado_tc' => 'Concluida']));
-        $this->assertFalse($this->cg($s)->observado);
+        $this->assertSame(0, $this->cg($s)->observado);
     }
 
     // ---------- Movimientos por marca manual ----------
 
     public function test_construida_si_pasa_a_tc_construidas(): void
     {
-        $cg = ControlGeneral::create(['solicitud_id' => $this->solicitud()->id, 'etapa' => ControlGeneral::APROBADA, 'construida' => true]);
+        $cg = ControlGeneral::create(['solicitud_id' => $this->solicitud()->id, 'etapa' => ControlGeneral::APROBADA, 'construida' => 1]);
 
         $this->assertSame(ControlGeneral::TC_CONSTRUIDA, ControlGeneralClasificador::aplicarMovimientos($cg));
     }
@@ -238,7 +242,7 @@ class ControlGeneralClasificadorTest extends TestCase
 
     public function test_construida_tiene_prioridad_sobre_anular(): void
     {
-        $cg = ControlGeneral::create(['solicitud_id' => $this->solicitud()->id, 'etapa' => ControlGeneral::APROBADA, 'accion' => 'Anular', 'construida' => true]);
+        $cg = ControlGeneral::create(['solicitud_id' => $this->solicitud()->id, 'etapa' => ControlGeneral::APROBADA, 'accion' => 'Anular', 'construida' => 1]);
 
         $this->assertSame(ControlGeneral::TC_CONSTRUIDA, ControlGeneralClasificador::aplicarMovimientos($cg));
     }
@@ -260,15 +264,16 @@ class ControlGeneralClasificadorTest extends TestCase
 
     public function test_habilitado_pasa_a_habilitadas_con_fecha_de_hoy_y_se_puede_deshacer(): void
     {
-        $cg = ControlGeneral::create(['solicitud_id' => $this->solicitud()->id, 'etapa' => ControlGeneral::HABILITACION, 'habilitado' => true, 'tecnico' => 'JIAN']);
+        $jian = PersonaCampo::create(['nombre' => 'JIAN', 'tipo' => PersonaCampo::TIPO_PERSONAL_DIRECTO, 'estado' => PersonaCampo::ESTADO_ACTIVO]);
+        $cg = ControlGeneral::create(['solicitud_id' => $this->solicitud()->id, 'etapa' => ControlGeneral::HABILITACION, 'habilitado' => 1, 'tecnico_id' => $jian->id]);
 
         $this->assertSame(ControlGeneral::HABILITADA, ControlGeneralClasificador::aplicarMovimientos($cg));
         $this->assertSame(now()->toDateString(), $cg->fresh()->fecha_habilitacion->toDateString());
 
-        $cg->habilitado = false;
+        $cg->habilitado = 0;
         $this->assertSame(ControlGeneral::HABILITACION, ControlGeneralClasificador::aplicarMovimientos($cg));
         $this->assertNull($cg->fresh()->fecha_habilitacion);
-        $this->assertSame('JIAN', $cg->fresh()->tecnico);
+        $this->assertSame('JIAN', $cg->fresh()->tecnico->nombre);
     }
 
     // ---------- Indicadores ----------
@@ -291,7 +296,7 @@ class ControlGeneralClasificadorTest extends TestCase
         $this->assertSame('Por programar', $cg->situacion());
         $cg->fecha_programacion = '2026-11-10';
         $this->assertSame('Programado', $cg->situacion());
-        $cg->observado = true;
+        $cg->observado = 1;
         $this->assertSame('Observado', $cg->situacion());
     }
 }

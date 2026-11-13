@@ -41,7 +41,7 @@ En resultado de TC y observado se guarda el último valor del portal (`resultado
 - JS: `resources/js/control-general.js` (componente Alpine `cgFila`).
 
 ## 5. Datos
-- Tabla `control_generales` (migración `2026_11_06_100000_create_control_generales_table`). Asesor, cuadrilla, técnico y contratista son **texto** (como el Excel: se elige de la lista o se escribe uno nuevo).
+- Tabla `control_generales` (migración `2026_11_06_100000_create_control_generales_table`). Asesor, cuadrilla, técnico y contratista se guardan por **id** (`asesor_id` → `asesores`; `cuadrilla_id`, `tecnico_id` y `contratista_id` → `personas_campo`) y solo se **eligen** de la lista registrada, no se escribe. Contratista solo ofrece a los de tipo CONTRATISTA; cada nombre muestra su etiqueta (Personal directo / Contratista). En el log (auditoría) se guarda el **nombre**, no el id. Al importar el Excel, el nombre se busca en esas tablas; si no existe queda vacío y el comando lo informa.
 - Modelo `App\Models\ControlGeneral`, relación `Solicitud::controlGeneral()`.
 - La bitácora de cada carga (`logs.resumen_carga`) guarda nuevas por etapa, movidas, actualizadas y filas omitidas.
 - `config/const.php`: `empresas.codigos_por_ruc` (CYC/CLB) y `categorias_proyecto` (antes bajo `control_interno`).

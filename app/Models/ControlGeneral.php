@@ -16,7 +16,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ControlGeneral extends Model
 {
-    use Auditable;
+    use Auditable {
+        auditFiltrar as auditFiltrarBase;
+    }
     use SoftDeletes;
 
     protected string $auditModuloNombre = 'Control General';
@@ -61,9 +63,9 @@ class ControlGeneral extends Model
         'fecha_ingreso_etapa',
         'fecha_aprobacion',
         'construida',
-        'asesor',
-        'cuadrilla',
-        'contratista',
+        'asesor_id',
+        'cuadrilla_id',
+        'contratista_id',
         'observacion',
         'fecha_observacion',
         'resultado_tc',
@@ -72,7 +74,8 @@ class ControlGeneral extends Model
         'fecha_marca',
         'estado_tramite',
         'fecha_programacion',
-        'tecnico',
+        'tecnico_id',
+        'fecha_ultima_visita',
         'observado',
         'observado_portal',
         'habilitado',
@@ -85,16 +88,60 @@ class ControlGeneral extends Model
         'fecha_observacion' => 'date',
         'fecha_marca' => 'date',
         'fecha_programacion' => 'date',
+        'fecha_ultima_visita' => 'date',
         'fecha_habilitacion' => 'date',
-        'construida' => 'boolean',
-        'observado' => 'boolean',
-        'observado_portal' => 'boolean',
-        'habilitado' => 'boolean',
+        'construida' => 'integer',
+        'observado' => 'integer',
+        'observado_portal' => 'integer',
+        'habilitado' => 'integer',
     ];
 
     public function solicitud()
     {
         return $this->belongsTo(Solicitud::class);
+    }
+
+    // Se elige de las listas registradas. Cuadrilla, técnico y contratista
+    // son la misma tabla (personas_campo) según el rol.
+    public function asesor()
+    {
+        return $this->belongsTo(Asesor::class, 'asesor_id')->withTrashed();
+    }
+
+    public function cuadrilla()
+    {
+        return $this->belongsTo(PersonaCampo::class, 'cuadrilla_id')->withTrashed();
+    }
+
+    public function tecnico()
+    {
+        return $this->belongsTo(PersonaCampo::class, 'tecnico_id')->withTrashed();
+    }
+
+    public function contratista()
+    {
+        return $this->belongsTo(PersonaCampo::class, 'contratista_id')->withTrashed();
+    }
+
+    /**
+     * En el log se guarda el NOMBRE (no el id) de quién se eligió, para que
+     * la auditoría se lea sola aunque después cambie o se borre la persona.
+     */
+    public function auditFiltrar(array $atributos): array
+    {
+        $atributos = $this->auditFiltrarBase($atributos);
+
+        $roles = ['asesor_id' => Asesor::class, 'cuadrilla_id' => PersonaCampo::class, 'tecnico_id' => PersonaCampo::class, 'contratista_id' => PersonaCampo::class];
+        foreach ($roles as $columna => $clase) {
+            if (!array_key_exists($columna, $atributos)) {
+                continue;
+            }
+            $id = $atributos[$columna];
+            unset($atributos[$columna]);
+            $atributos[substr($columna, 0, -3)] = $id ? ($clase::withTrashed()->find($id)?->nombre ?? "#{$id}") : null;
+        }
+
+        return $atributos;
     }
 
     /**
