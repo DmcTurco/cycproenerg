@@ -73,6 +73,18 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware(['auth:employee', 'permiso'])-
         Route::get('/parametros', [Employee\ParametroControlGeneralController::class, 'edit'])->name('parametros.edit');
         Route::put('/parametros', [Employee\ParametroControlGeneralController::class, 'update'])->name('parametros.update');
         Route::patch('/{controlGeneral}', [Employee\ControlGeneralController::class, 'update'])->name('update');
+        Route::get('/{controlGeneral}/documentos', [Employee\DocumentosHabilitacionController::class, 'index'])->name('documentos');
+        Route::put('/{controlGeneral}/documentos', [Employee\DocumentosHabilitacionController::class, 'guardar'])->name('documentos.guardar');
+        Route::get('/{controlGeneral}/documentos/zip', [Employee\DocumentosHabilitacionController::class, 'zip'])->name('documentos.zip');
+        Route::get('/{controlGeneral}/documentos/{documento}', [Employee\DocumentosHabilitacionController::class, 'pdf'])->name('documentos.pdf');
+    });
+
+    // Empresas instaladoras: datos, logo y sello para los documentos de habilitación.
+    Route::prefix('empresas')->name('empresas.')->group(function () {
+        Route::get('/', [Employee\EmpresaController::class, 'index'])->name('index');
+        Route::get('/{empresa}/editar', [Employee\EmpresaController::class, 'edit'])->name('edit');
+        Route::put('/{empresa}', [Employee\EmpresaController::class, 'update'])->name('update');
+        Route::get('/{empresa}/imagen/{tipo}', [Employee\EmpresaController::class, 'imagen'])->name('imagen');
     });
 
     // Control de Materiales (migración de CONTROL_MATERIALES_CC_08-2026 rev 02.xlsm).

@@ -63,6 +63,10 @@ class PersonaCampoController extends Controller
             'numero_documento' => 'nullable|string|max:20|unique:personas_campo,numero_documento' . $ignorar,
             'fecha_nacimiento' => 'nullable|date',
             'celular' => 'nullable|string|max:20',
+            'numero_registro' => 'nullable|string|max:20',
+            'categoria' => 'nullable|in:' . implode(',', PersonaCampo::CATEGORIAS),
+            'direccion' => 'nullable|string|max:255',
+            'distrito' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255|unique:personas_campo,email' . $ignorar,
             'password' => ($pidePassword ? 'required' : 'nullable') . '|string|min:8',
         ];
@@ -75,7 +79,7 @@ class PersonaCampoController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['nombre', 'tipo', 'estado', 'tipo_documento', 'numero_documento', 'fecha_nacimiento', 'celular', 'email']);
+        $data = $request->only(['nombre', 'tipo', 'estado', 'tipo_documento', 'numero_documento', 'fecha_nacimiento', 'celular', 'numero_registro', 'categoria', 'direccion', 'distrito', 'email']);
         $data = array_map(fn ($valor) => $valor === '' ? null : $valor, $data);
 
         if ($request->filled('password')) {
@@ -146,6 +150,10 @@ class PersonaCampoController extends Controller
                 'numero_documento' => $persona->numero_documento,
                 'fecha_nacimiento' => optional($persona->fecha_nacimiento)->format('Y-m-d'),
                 'celular' => $persona->celular,
+                'numero_registro' => $persona->numero_registro,
+                'categoria' => $persona->categoria,
+                'direccion' => $persona->direccion,
+                'distrito' => $persona->distrito,
                 'email' => $persona->email,
                 'tiene_password' => filled($persona->password),
                 'password' => '',

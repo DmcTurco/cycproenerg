@@ -53,9 +53,16 @@ class PersonaCampo extends Authenticatable
         'numero_documento',
         'fecha_nacimiento',
         'celular',
+        'numero_registro',
+        'categoria',
+        'direccion',
+        'distrito',
         'email',
         'password',
     ];
+
+    /** Categorías de instalador (acta de habilitación). */
+    public const CATEGORIAS = ['IG 1', 'IG 2', 'IG 3'];
 
     protected $hidden = [
         'password',

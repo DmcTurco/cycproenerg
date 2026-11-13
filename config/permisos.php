@@ -30,6 +30,7 @@ return [
         'personal' => ['label' => 'Personal de campo', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar', 'asignar' => 'Asignar solicitudes']],
         'asesores' => ['label' => 'Asesores', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar']],
         'control_general' => ['label' => 'Control General (Internas, TC, Habilitación)', 'acciones' => ['ver' => 'Ver', 'editar' => 'Editar', 'parametros' => 'Parámetros']],
+        'empresas' => ['label' => 'Empresas (datos para documentos)', 'acciones' => ['ver' => 'Ver', 'editar' => 'Editar']],
         'catalogo' => ['label' => 'Materiales: catálogo', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar', 'parametros' => 'Parámetros']],
         'ingresos' => ['label' => 'Materiales: ingresos', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar']],
         'cotizaciones' => ['label' => 'Materiales: cotizaciones y vales', 'acciones' => ['ver' => 'Ver', 'crear' => 'Crear', 'editar' => 'Editar', 'eliminar' => 'Eliminar', 'descontar' => 'Marcar descontado']],
@@ -69,8 +70,14 @@ return [
 
         // Control General (Internas, TC, Habilitación)
         'employee.control-general.update' => 'control_general.editar',
+        'employee.control-general.documentos.guardar' => 'control_general.editar',
         'employee.control-general.parametros.*' => 'control_general.parametros',
         'employee.control-general.*' => 'control_general.ver',
+
+        // Empresas instaladoras
+        'employee.empresas.update' => 'empresas.editar',
+        'employee.empresas.edit' => 'empresas.editar',
+        'employee.empresas.*' => 'empresas.ver',
 
         // Materiales: catálogo
         'employee.materiales.parametros.*' => 'catalogo.parametros',

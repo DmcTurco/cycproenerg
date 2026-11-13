@@ -68,6 +68,11 @@ return new class extends Migration
             $table->tinyInteger('habilitado')->default(0)->comment('0 = No, 1 = Sí');
             $table->date('fecha_habilitacion')->nullable();
 
+            // Datos de los documentos de habilitación que todavía no vienen de ningún
+            // módulo (N° de instalación, material, puntos de consumo, diseño típico…).
+            // Provisional: cuando haya de dónde sacarlos se dejan de usar.
+            $table->json('datos_documentos')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

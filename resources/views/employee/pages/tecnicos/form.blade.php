@@ -57,6 +57,35 @@
     </div>
 </div>
 
+{{-- Datos del instalador: salen en el acta de habilitación (F-GEA-007). --}}
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+        <label class="form-label" for="numero_registro">N° de registro de instalador</label>
+        <input id="numero_registro" type="text" x-model="form.numero_registro" class="form-input" />
+        <p class="form-error" x-show="errors.numero_registro" x-text="errors.numero_registro"></p>
+    </div>
+    <div>
+        <label class="form-label" for="categoria">Categoría</label>
+        <select id="categoria" x-model="form.categoria" class="form-input">
+            <option value="">—</option>
+            @foreach (\App\Models\PersonaCampo::CATEGORIAS as $categoria)
+                <option value="{{ $categoria }}">{{ $categoria }}</option>
+            @endforeach
+        </select>
+        <p class="form-error" x-show="errors.categoria" x-text="errors.categoria"></p>
+    </div>
+    <div>
+        <label class="form-label" for="direccion">Dirección</label>
+        <input id="direccion" type="text" x-model="form.direccion" class="form-input" />
+        <p class="form-error" x-show="errors.direccion" x-text="errors.direccion"></p>
+    </div>
+    <div>
+        <label class="form-label" for="distrito">Distrito</label>
+        <input id="distrito" type="text" x-model="form.distrito" class="form-input" />
+        <p class="form-error" x-show="errors.distrito" x-text="errors.distrito"></p>
+    </div>
+</div>
+
 <div>
     <label class="form-label">Empresa(s)</label>
     <div class="flex flex-wrap gap-4 rounded-lg border border-gray-200 px-3 py-2">

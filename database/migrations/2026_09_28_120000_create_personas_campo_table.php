@@ -42,6 +42,11 @@ return new class extends Migration
             $table->string('numero_documento', 20)->nullable()->unique();
             $table->date('fecha_nacimiento')->nullable();
             $table->string('celular', 20)->nullable();
+            // Datos del instalador para el acta de habilitación (F-GEA-007).
+            $table->string('numero_registro', 20)->nullable()->comment('N° de registro de instalador');
+            $table->string('categoria', 10)->nullable()->comment('IG 1, IG 2 o IG 3');
+            $table->string('direccion')->nullable();
+            $table->string('distrito')->nullable();
             // Acceso a la app móvil: opcional, solo quien la usa.
             $table->string('email')->nullable()->unique();
             $table->string('password')->nullable();

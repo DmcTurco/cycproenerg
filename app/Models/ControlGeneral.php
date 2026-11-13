@@ -80,6 +80,7 @@ class ControlGeneral extends Model
         'observado_portal',
         'habilitado',
         'fecha_habilitacion',
+        'datos_documentos',
     ];
 
     protected $casts = [
@@ -94,6 +95,7 @@ class ControlGeneral extends Model
         'observado' => 'integer',
         'observado_portal' => 'integer',
         'habilitado' => 'integer',
+        'datos_documentos' => 'array',
     ];
 
     public function solicitud()

@@ -21,6 +21,19 @@ return new class extends Migration
             $table->string('codigo', 10)->nullable()->unique();
             $table->string('nombre')->nullable();
             $table->string('registro_gas_natural')->nullable();
+            // Datos para los documentos de habilitación (se editan en Empresas).
+            $table->string('direccion')->nullable();
+            $table->string('distrito')->nullable();
+            $table->string('provincia')->nullable();
+            $table->string('departamento')->nullable();
+            $table->string('categoria', 10)->nullable()->comment('Categoría de la empresa instaladora, ej. IG 3');
+            $table->string('telefono', 30)->nullable();
+            $table->string('correo')->nullable();
+            $table->string('numero_poliza', 30)->nullable();
+            $table->string('representante_legal')->nullable();
+            // Rutas en el disco public (storage/app/public).
+            $table->string('logo')->nullable();
+            $table->string('sello')->nullable()->comment('Firma y sello del representante legal');
             $table->timestamps();
             $table->softDeletes();
         });

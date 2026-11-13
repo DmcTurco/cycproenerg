@@ -69,3 +69,25 @@ Permisos `control_general.ver` / `.editar` / `.parametros` (`config/permisos.php
 ## 10. Posibles mejoras (no hechas)
 - Pasar sola a Habilitadas una solicitud que el portal ya reporta en estado 12 (Instalación habilitada). Hoy, igual que la macro, queda en Habilitación hasta que ella marca Habilitado.
 - Exportar cada pestaña a Excel.
+
+## Documentos de habilitación
+
+En 3-Habilitación y 5-Habilitadas, el ícono de documento de cada fila abre la pantalla de documentos de esa solicitud (`employee.control-general.documentos`, `DocumentosHabilitacionController`). A la izquierda la lista de documentos, al centro la vista previa en PDF y a la derecha un formulario corto con lo que el sistema todavía no tiene. Reemplaza a los libros `ACTAS DE HABILITACION *.xlsm` y a las plantillas Word `DECLARACION JURADA *`.
+
+Documentos (definidos en `config/documentos_habilitacion.php`, vistas en `resources/views/employee/pages/control-general/documentos/pdf/`):
+
+1. **Acta de habilitación (F-GEA-007)**.
+2. **DJ de capacitación y tenencia del gasodoméstico**.
+3. **DJ de cumplimiento de normas técnicas y de seguridad**.
+4. **Certificado de garantías de la instalación interna** (lleva la firma y el sello del representante legal de la empresa).
+5. **Anexo: diseño típico**: una o más páginas elegidas en una lista (Residencial A.1 y B.1; Comercio CU-LI-1P, CU-LI-2P y RM-LI-3A). Las imágenes están en `resources/documentos/anexos/`.
+
+Se descarga un documento solo o todos en un ZIP (el anexo solo si se eligió algún diseño).
+
+**De dónde sale cada dato**
+- Cliente, ubicación, puntos, tipo de instalación y fecha de ingreso: de la solicitud. "Uso de la instalación" marca Comercial si la categoría del proyecto es Comercio.
+- Instalador: el técnico elegido en la fila. Su DNI, N° de registro, categoría, dirección y distrito se cargan en Personal de campo.
+- Empresa instaladora (razón social, RUC, registro, categoría, dirección, teléfono, correo, póliza, logo, firma y sello): de la tabla `empresas`, que se edita en el menú **Administración → Empresas** (permiso `empresas`). Los datos iniciales de C&C y CLB los pone `EmpresaSeeder`.
+- Lo que falta en el sistema se avisa arriba del formulario.
+
+**Datos manuales (JSON provisional)**: N° de instalación, N° de certificado, fecha, lugar, material, tipo, potencia nominal, gasodomésticos, puntos de consumo y diseños típicos se guardan en `control_generales.datos_documentos` (JSON). Es provisional: cuando otro módulo dé estos datos se deja de usar el JSON.

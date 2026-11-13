@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\MyApp;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,12 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(self::HOME);
+                return redirect(match ($guard) {
+                    'employee' => '/' . MyApp::EMPLOYEE_SUBDIR . '/home',
+                    'company' => '/' . MyApp::COMPANIES_SUBDIR . '/home',
+                    'admin' => '/' . MyApp::ADMINS_SUBDIR . '/home',
+                    default => self::HOME,
+                });
             }
         }
 

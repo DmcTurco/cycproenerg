@@ -20,7 +20,7 @@
         x-data="crudModal({
             baseUrl: '{{ route('employee.technicals.index') }}',
             unwrap: 'persona',
-            defaults: { id: null, nombre: '', tipo: '{{ $tipo }}', estado: 'ACTIVO', tipo_documento: '1', numero_documento: '', fecha_nacimiento: '', celular: '', email: '', password: '', tiene_password: false, empresas: [] },
+            defaults: { id: null, nombre: '', tipo: '{{ $tipo }}', estado: 'ACTIVO', tipo_documento: '1', numero_documento: '', fecha_nacimiento: '', celular: '', numero_registro: '', categoria: '', direccion: '', distrito: '', email: '', password: '', tiene_password: false, empresas: [] },
         })"
         class="flex flex-1 flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200"
     >
