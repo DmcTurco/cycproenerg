@@ -75,6 +75,9 @@ Route::prefix(MyApp::EMPLOYEE_SUBDIR)->middleware(['auth:employee', 'permiso'])-
         Route::patch('/{controlGeneral}', [Employee\ControlGeneralController::class, 'update'])->name('update');
         Route::get('/{controlGeneral}/documentos', [Employee\DocumentosHabilitacionController::class, 'index'])->name('documentos');
         Route::put('/{controlGeneral}/documentos', [Employee\DocumentosHabilitacionController::class, 'guardar'])->name('documentos.guardar');
+        Route::post('/{controlGeneral}/documentos/archivos', [Employee\DocumentosHabilitacionController::class, 'subir'])->name('documentos.archivos.subir');
+        Route::get('/{controlGeneral}/documentos/archivos/{archivo}', [Employee\DocumentosHabilitacionController::class, 'archivo'])->name('documentos.archivos.ver');
+        Route::delete('/{controlGeneral}/documentos/archivos/{archivo}', [Employee\DocumentosHabilitacionController::class, 'eliminarArchivo'])->name('documentos.archivos.eliminar');
         Route::get('/{controlGeneral}/documentos/zip', [Employee\DocumentosHabilitacionController::class, 'zip'])->name('documentos.zip');
         Route::get('/{controlGeneral}/documentos/{documento}', [Employee\DocumentosHabilitacionController::class, 'pdf'])->name('documentos.pdf');
     });

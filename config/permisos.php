@@ -71,6 +71,8 @@ return [
         // Control General (Internas, TC, Habilitación)
         'employee.control-general.update' => 'control_general.editar',
         'employee.control-general.documentos.guardar' => 'control_general.editar',
+        'employee.control-general.documentos.archivos.subir' => 'control_general.editar',
+        'employee.control-general.documentos.archivos.eliminar' => 'control_general.editar',
         'employee.control-general.parametros.*' => 'control_general.parametros',
         'employee.control-general.*' => 'control_general.ver',
 

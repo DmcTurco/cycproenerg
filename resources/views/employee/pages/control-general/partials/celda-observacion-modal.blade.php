@@ -29,6 +29,12 @@
                 </p>
 
                 <div class="mt-4 space-y-4">
+                    @if (in_array('tecnico_id', $camposModal, true))
+                        @include('employee.pages.control-general.partials.modal-buscador', ['campo' => 'tecnico_id', 'etiqueta' => 'Técnico (habilita)'])
+                    @endif
+                    @if (in_array('contratista_id', $camposModal, true))
+                        @include('employee.pages.control-general.partials.modal-buscador', ['campo' => 'contratista_id', 'etiqueta' => 'Contratista'])
+                    @endif
                     @if (in_array('asesor_id', $camposModal, true))
                         @include('employee.pages.control-general.partials.modal-buscador', ['campo' => 'asesor_id', 'etiqueta' => 'Asesor'])
                     @endif

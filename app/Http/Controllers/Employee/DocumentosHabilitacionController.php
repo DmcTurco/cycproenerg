@@ -7,6 +7,8 @@ use App\Models\ControlGeneral;
 use App\Services\DocumentosHabilitacion;
 use App\Support\Permisos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /**
@@ -35,6 +37,9 @@ class DocumentosHabilitacionController extends Controller
             'js' => [
                 'documentos' => collect($cfg['documentos'])->map(fn ($d, $clave) => ['clave' => $clave, 'titulo' => $d['titulo'], 'campos' => $d['campos']])->values()->all(),
                 'datos' => $ctx['datos'],
+                'archivos' => $this->archivosJs($controlGeneral),
+                'urlSubir' => route('employee.control-general.documentos.archivos.subir', $controlGeneral),
+                'urlArchivo' => route('employee.control-general.documentos.archivos.eliminar', [$controlGeneral, '__ID__']),
                 'anexos' => collect($cfg['anexos'])->map(fn ($a, $clave) => ['clave' => $clave, 'titulo' => $a['titulo']])->values()->all(),
                 'materiales' => $cfg['materiales'],
                 'tiposInstalacion' => $cfg['tipos_instalacion'],
@@ -72,6 +77,76 @@ class DocumentosHabilitacionController extends Controller
         return response()
             ->download($this->documentos->zip($controlGeneral), "Documentos de habilitacion {$codigo}.zip")
             ->deleteFileAfterSend(true);
+    }
+
+    /** Sube un documento a mano para esta solicitud (queda en el disco privado). */
+    public function subir(Request $request, ControlGeneral $controlGeneral)
+    {
+        $request->validate([
+            'archivo' => 'required|file|max:20480|mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx',
+            'nombre' => 'nullable|string|max:150',
+        ], [
+            'archivo.required' => 'Elige un archivo.',
+            'archivo.max' => 'El archivo pesa más de 20 MB.',
+            'archivo.mimes' => 'Solo PDF, imágenes, Word o Excel.',
+            'archivo.uploaded' => 'No se pudo subir el archivo.',
+        ]);
+
+        $file = $request->file('archivo');
+        $original = $file->getClientOriginalName();
+
+        // Nombre legible: solicitud-nombre-fecha.ext (ej. 3800001-acta-firmada-20261122-153045.pdf).
+        $solicitud = $controlGeneral->solicitud?->numero_solicitud ?? $controlGeneral->id;
+        $base = Str::slug(pathinfo($original, PATHINFO_FILENAME)) ?: 'documento';
+        $ext = strtolower($file->getClientOriginalExtension() ?: $file->guessExtension());
+        $nombreDisco = Str::limit("{$solicitud}-{$base}", 80, '') . '-' . now()->format('Ymd-His') . '.' . $ext;
+        if (Storage::disk('local')->exists("control-general/{$controlGeneral->id}/{$nombreDisco}")) {
+            $nombreDisco = Str::beforeLast($nombreDisco, '.') . '-' . Str::lower(Str::random(4)) . '.' . $ext;
+        }
+
+        $archivo = $controlGeneral->archivos()->create([
+            'nombre' => $request->filled('nombre') ? trim($request->input('nombre')) : pathinfo($original, PATHINFO_FILENAME),
+            'nombre_original' => $original,
+            'ruta' => $file->storeAs("control-general/{$controlGeneral->id}", $nombreDisco, 'local'),
+            'mime' => $file->getMimeType(),
+            'tamano' => $file->getSize(),
+            'subido_por' => $request->user('employee')?->id,
+        ]);
+
+        return response()->json(['ok' => true, 'archivos' => $this->archivosJs($controlGeneral), 'id' => $archivo->id]);
+    }
+
+    /** Muestra (inline) o descarga (?descargar=1) un documento subido. */
+    public function archivo(Request $request, ControlGeneral $controlGeneral, int $archivo)
+    {
+        $a = $controlGeneral->archivos()->findOrFail($archivo);
+        abort_unless(Storage::disk('local')->exists($a->ruta), 404);
+
+        $disposicion = $request->boolean('descargar') || !$a->esVisible() ? 'attachment' : 'inline';
+
+        return Storage::disk('local')->response($a->ruta, $a->nombre_original, [
+            'Content-Type' => $a->mime ?: 'application/octet-stream',
+        ], $disposicion);
+    }
+
+    public function eliminarArchivo(ControlGeneral $controlGeneral, int $archivo)
+    {
+        $controlGeneral->archivos()->findOrFail($archivo)->delete();
+
+        return response()->json(['ok' => true, 'archivos' => $this->archivosJs($controlGeneral)]);
+    }
+
+    private function archivosJs(ControlGeneral $cg): array
+    {
+        return $cg->archivos()->get()->map(fn ($a) => [
+            'id' => $a->id,
+            'nombre' => $a->nombre,
+            'original' => $a->nombre_original,
+            'tamano' => $a->tamano,
+            'visible' => $a->esVisible(),
+            'fecha' => $a->created_at?->format('d/m/Y H:i'),
+            'ver' => route('employee.control-general.documentos.archivos.ver', [$cg, $a->id]),
+        ])->all();
     }
 
     /**

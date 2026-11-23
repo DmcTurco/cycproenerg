@@ -21,12 +21,14 @@ document.addEventListener('alpine:init', () => {
         // fila lo decide la vista según la etapa (camposModal). Asesor y
         // cuadrilla se ELIGEN de la lista: se guarda el id (modal.*_id) y se
         // recuerda el nombre (modal.nombres) para mostrarlo sin recargar.
-        modal: { abierto: false, asesor_id: null, cuadrilla_id: null, observacion: '', nombres: { asesor_id: '', cuadrilla_id: '' } },
+        modal: { abierto: false, asesor_id: null, cuadrilla_id: null, tecnico_id: null, contratista_id: null, observacion: '', nombres: { asesor_id: '', cuadrilla_id: '', tecnico_id: '', contratista_id: '' } },
 
         abrirModal() {
             this.modal.asesor_id = this.f.asesor_id ?? null;
             this.modal.cuadrilla_id = this.f.cuadrilla_id ?? null;
-            this.modal.nombres = { asesor_id: this.f.asesor || '', cuadrilla_id: this.f.cuadrilla || '' };
+            this.modal.tecnico_id = this.f.tecnico_id ?? null;
+            this.modal.contratista_id = this.f.contratista_id ?? null;
+            this.modal.nombres = { asesor_id: this.f.asesor || '', cuadrilla_id: this.f.cuadrilla || '', tecnico_id: this.f.tecnico || '', contratista_id: this.f.contratista || '' };
             this.modal.observacion = this.f.observacion || '';
             this.modal.abierto = true;
         },

@@ -1,7 +1,14 @@
 @extends('employee.layouts.user_type.auth')
 
 @php($fullBleed = true)
-@php($backUrl = route('employee.client.index'))
+{{-- Si se llegó desde otra pantalla (ej. Control General) ese enlace trae ?volver=
+     con la dirección de origen; solo se acepta si es de este mismo sitio. --}}
+@php
+    $volver = (string) request('volver');
+    $backUrl = $volver !== '' && str_starts_with($volver, url('/') . '/')
+        ? $volver
+        : route('employee.client.index');
+@endphp
 
 @section('content')
     <div

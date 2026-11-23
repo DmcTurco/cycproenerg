@@ -103,6 +103,11 @@ class ControlGeneral extends Model
         return $this->belongsTo(Solicitud::class);
     }
 
+    public function archivos()
+    {
+        return $this->hasMany(ControlGeneralArchivo::class)->latest('id');
+    }
+
     // Se elige de las listas registradas. Cuadrilla, técnico y contratista
     // son la misma tabla (personas_campo) según el rol.
     public function asesor()

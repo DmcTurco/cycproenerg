@@ -157,6 +157,43 @@ class ControlGeneralDocumentosTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_se_suben_ven_y_eliminan_documentos(): void
+    {
+        Storage::fake('local');
+        $cg = $this->habilitacion();
+        $editora = $this->empleado(['control_general.ver', 'control_general.editar']);
+
+        $respuesta = $this->actingAs($editora, 'employee')
+            ->postJson(route('employee.control-general.documentos.archivos.subir', $cg), [
+                'archivo' => UploadedFile::fake()->create('acta firmada.pdf', 100, 'application/pdf'),
+                'nombre' => 'Acta firmada',
+            ])
+            ->assertOk()
+            ->assertJsonPath('archivos.0.nombre', 'Acta firmada');
+
+        $archivo = $cg->archivos()->first();
+        Storage::disk('local')->assertExists($archivo->ruta);
+        $this->assertMatchesRegularExpression('#/3800001-acta-firmada-\d{8}-\d{6}\.pdf$#', $archivo->ruta);
+
+        $this->actingAs($editora, 'employee')
+            ->get(route('employee.control-general.documentos.archivos.ver', [$cg, $archivo->id]))
+            ->assertOk();
+
+        // Tipos no permitidos y sin permiso de editar.
+        $this->actingAs($editora, 'employee')
+            ->postJson(route('employee.control-general.documentos.archivos.subir', $cg), ['archivo' => UploadedFile::fake()->create('virus.exe', 10)])
+            ->assertStatus(422);
+        $this->actingAs($this->empleado(['control_general.ver']), 'employee')
+            ->postJson(route('employee.control-general.documentos.archivos.subir', $cg), ['archivo' => UploadedFile::fake()->create('a.pdf', 10, 'application/pdf')])
+            ->assertForbidden();
+
+        $this->actingAs($editora, 'employee')
+            ->deleteJson(route('employee.control-general.documentos.archivos.eliminar', [$cg, $archivo->id]))
+            ->assertOk();
+        $this->assertSame(0, $cg->archivos()->count());
+        Storage::disk('local')->assertMissing($archivo->ruta);
+    }
+
     public function test_el_zip_trae_todos_los_documentos_y_el_anexo_solo_si_se_eligio(): void
     {
         $cg = $this->habilitacion('Comercio');
